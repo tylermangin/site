@@ -1,0 +1,9 @@
+name: "tylers-website"
+output_dir: "."
+navbar:
+  title: "Tyler Mangin"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Work"
+      href: work.html
