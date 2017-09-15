@@ -7,7 +7,7 @@ navbar:
       href: index.html
     - text: "Work"
       href: work.html
-    right:
+  right:
     - icon: fa-envelope-o fa-2x
       href: mailto:tyler.mangin@gmail.com
     - icon: fa-github fa-2x
