@@ -7,3 +7,16 @@ navbar:
       href: index.html
     - text: "Work"
       href: work.html
+    right:
+    - icon: fa-envelope-o fa-2x
+      href: mailto:tyler.mangin@gmail.com
+    - icon: fa-github fa-2x
+      href: https://github.com/tylermangin
+    - icon: fa-twitter fa-2x
+      href: https://twitter.com/RealTylerMangin
+    - icon: fa-linkedin fa-2x
+      href: https://www.linkedin.com/in/tyler-mangin-72779197/
+
+output:
+    html_document:
+        css: style.css
