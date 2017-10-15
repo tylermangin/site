@@ -1,0 +1,99 @@
+---
+title: "Resume"
+output: html_document
+---
+
+[.pdf version](Resume.pdf)
+
+##Summary
+
+PhD Candidiate Economist from a top-50 Economics program looking to follow a passion for drawing actionable consumer insights out of large and complex data sets.
+
+
+## Work Experience
+
+### Economist
+Comlinkdata
+July 2016 to Present
+
+* Did some important stuff, Did some important stuffDid some important stuffDid some important stuffDid some important stuff
+* Did some important stuffDid some important stuffDid some important stuffDid some important stuff
+* Did some important stuffDid some important stuffDid some important stuff
+
+### Instructor
+University of Colorado
+August 2014 to May 2016
+
+* Taught four semester-length introductory lecture sections of between 150-250 students each
+* Above average scores on student Faculty Course Questionnaires
+* Four semesters of Teaching Assistantships for Economics and Statistics Courses
+
+
+### Accounting Intern
+Whole Foods
+February 2012 to July 2013
+
+* Created ARMIA sales forecasting models  for regional store and department level weekly sales
+* Organized and streamlined process of cost-discrepancy resolution
+
+### Produce Buyer
+Whole Foods
+March 2009 to February 2012
+
+* Purchased \$1 million of produce each month
+* Created a partially automated statistical-based ordering system with underlying sales modeling, leading to a  10\% reduction in spoilage and waste
+
+### Researcher
+PsiPhen Laboratories
+February 2006 to July 2006
+
+* Designed, organized and executed an experimental protocol and statistical analysis on 100 subjects
+* Presented study to the Annual Conference of the Society for Scientific Investigation (SSE), the publishing body for the Journal of Scientific Exploration
+
+## Education
+
+### PhD Candidate (ABD)
+Economics (Current)
+The University of Colorado
+
+
+### Master of Arts 
+Economics (May 2014)
+The University of Colorado
+
+### Bachelor of Arts
+History (May 2008)
+The University of Colorado
+
+
+
+## Research
+
+"Tests for Seasonal Unit Roots in Grocery Purchases"
+Working paper
+
+"The USDA Organic Price Premium and Nutritional Quality"
+Working paper
+
+## Computer Skills 
+
+Basic 
+
+* Amazon Web Services 
+* (S3, EC2, EMR, Athena) 
+* Hive
+* Bash
+* Spark 
+* (SparkR) 
+* ArcGIS
+* Git 
+* Python 
+
+Advanced 
+
+* Excel 
+* (VBA)
+* STATA 
+* SQL 
+* R 
+* (RMarkdown, Shiny)

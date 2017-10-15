@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Resume</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Tyler Mangin</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    About Me
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="aboutme.html">About Me</a>
+    </li>
+    <li>
+      <a href="Resume.html">Resume</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Projects
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="https://sites.google.com/a/colorado.edu/tylermangin/home">Teaching</a>
+    </li>
+    <li>
+      <a href="BLP_estimation_cereal.html">BLP Estimation on Cereal Data</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:tyler.mangin@gmail.com">
+    <span class="fa fa-envelope-o fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/tylermangin">
+    <span class="fa fa-github fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/RealTylerMangin">
+    <span class="fa fa-twitter fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
+    <span class="fa fa-linkedin fa-2x"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Resume</h1>
+
+</div>
+
+
+<p><a href="Resume.pdf">.pdf version</a></p>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>PhD Candidiate Economist from a top-50 Economics program looking to follow a passion for drawing actionable consumer insights out of large and complex data sets.</p>
+</div>
+<div id="work-experience" class="section level2">
+<h2>Work Experience</h2>
+<div id="economist" class="section level3">
+<h3>Economist</h3>
+<p>Comlinkdata July 2016 to Present</p>
+<ul>
+<li>Did some important stuff, Did some important stuffDid some important stuffDid some important stuffDid some important stuff</li>
+<li>Did some important stuffDid some important stuffDid some important stuffDid some important stuff</li>
+<li>Did some important stuffDid some important stuffDid some important stuff</li>
+</ul>
+</div>
+<div id="instructor" class="section level3">
+<h3>Instructor</h3>
+<p>University of Colorado August 2014 to May 2016</p>
+<ul>
+<li>Taught four semester-length introductory lecture sections of between 150-250 students each</li>
+<li>Above average scores on student Faculty Course Questionnaires</li>
+<li>Four semesters of Teaching Assistantships for Economics and Statistics Courses</li>
+</ul>
+</div>
+<div id="accounting-intern" class="section level3">
+<h3>Accounting Intern</h3>
+<p>Whole Foods February 2012 to July 2013</p>
+<ul>
+<li>Created ARMIA sales forecasting models for regional store and department level weekly sales</li>
+<li>Organized and streamlined process of cost-discrepancy resolution</li>
+</ul>
+</div>
+<div id="produce-buyer" class="section level3">
+<h3>Produce Buyer</h3>
+<p>Whole Foods March 2009 to February 2012</p>
+<ul>
+<li>Purchased $1 million of produce each month</li>
+<li>Created a partially automated statistical-based ordering system with underlying sales modeling, leading to a 10% reduction in spoilage and waste</li>
+</ul>
+</div>
+<div id="researcher" class="section level3">
+<h3>Researcher</h3>
+<p>PsiPhen Laboratories February 2006 to July 2006</p>
+<ul>
+<li>Designed, organized and executed an experimental protocol and statistical analysis on 100 subjects</li>
+<li>Presented study to the Annual Conference of the Society for Scientific Investigation (SSE), the publishing body for the Journal of Scientific Exploration</li>
+</ul>
+</div>
+</div>
+<div id="education" class="section level2">
+<h2>Education</h2>
+<div id="phd-candidate-abd" class="section level3">
+<h3>PhD Candidate (ABD)</h3>
+<p>Economics (Current) The University of Colorado</p>
+</div>
+<div id="master-of-arts" class="section level3">
+<h3>Master of Arts</h3>
+<p>Economics (May 2014) The University of Colorado</p>
+</div>
+<div id="bachelor-of-arts" class="section level3">
+<h3>Bachelor of Arts</h3>
+<p>History (May 2008) The University of Colorado</p>
+</div>
+</div>
+<div id="research" class="section level2">
+<h2>Research</h2>
+<p>“Tests for Seasonal Unit Roots in Grocery Purchases” Working paper</p>
+<p>“The USDA Organic Price Premium and Nutritional Quality” Working paper</p>
+</div>
+<div id="computer-skills" class="section level2">
+<h2>Computer Skills</h2>
+<p>Basic</p>
+<ul>
+<li>Amazon Web Services</li>
+<li>(S3, EC2, EMR, Athena)</li>
+<li>Hive</li>
+<li>Bash</li>
+<li>Spark</li>
+<li>(SparkR)</li>
+<li>ArcGIS</li>
+<li>Git</li>
+<li>Python</li>
+</ul>
+<p>Advanced</p>
+<ul>
+<li>Excel</li>
+<li>(VBA)</li>
+<li>STATA</li>
+<li>SQL</li>
+<li>R</li>
+<li>(RMarkdown, Shiny)</li>
+</ul>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
