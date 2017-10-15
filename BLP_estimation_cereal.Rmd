@@ -1,0 +1,565 @@
+---
+title: "BLP Estimation on Cereal Data"
+author: "Tyler Mangin"
+output: html_document
+---
+
+
+Based on code written by [Aviv Nevo](http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm), May 1998
+
+Adapted by [Michael Carniol](https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R), January 2015
+
+Adapted again by Tyler Mangin, May 2017
+
+
+I ran this routine on a canonical data set from Aviv Nevo. I found the data here: http://www.rasmusen.org/zg604/lectures/blp/.
+
+
+```{r setup, include=FALSE}
+
+while(!require(AER)){install.packages("AER")}
+while(!require(SQUAREM)){install.packages("SQUAREM")}
+while(!require(BB)){install.packages("BB")}
+while(!require(plyr)){install.packages("plyr")}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+data  = read.csv('/Users/Mangin/Documents/Consumer Model/cereal_ps3.csv')
+
+#Use only one year
+dat = data[(data$quarter == 1 & data$year == 88),]
+
+```
+
+
+The elements we need are: 
+
+1.The share of unit sales of several products
+
+2.Several markets
+
+3.A set of product characterisitcs (including price)
+
+
+In these data, the share has been constructed, the products are indicated by the "brand" field, the markets are cities, and the product characterisitics are price, the "mushiness" of the cereal, and the amount of sugar in the cereal.
+
+
+```{r}
+
+  share.fld =     "share"
+  prod.id.fld =   "brand"
+  mkt.id.fld =    "city"
+  prc.fld =       "price"
+  x.var.flds =    c("sugar",
+                    "mushy")
+  
+   
+  #Set up data
+  dat <- dat[dat[, share.fld] > 0, ]
+  dat <- dat[order(dat[, mkt.id.fld], dat[, prod.id.fld]), ]
+  JM <- nrow(dat)
+
+
+
+```
+
+
+Let the indirect utility (maximized utility) of consumer $i$, with income $y_i$, of product $j$ in market $m$ be
+
+$$u_{ijm} = \alpha_i(y_i - p_{jm}) + x_{jm}\beta_i + \xi_{jm} + \epsilon_{ijm} $$ ,
+
+where $x_{jm}$ is a set of observed product/market characterisitics, $\xi_{jm}$ is a set of unobserved product/market characterisitics, and $\epsilon_{ijm}$ is a mean-zero stochastic term.
+
+
+This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, $p_{jm}$ is seperated out in the above equation, but in practice it can be included in $x_{jm}$, which can cause more confusion than you would think. I will include $p_{jm}$ in the $nxk$ matrix $x$ from here on out, partly by defining $\theta_{i} = [\alpha_{i}, \beta_{i}]$, which becomes useful later.
+
+
+```{r}
+
+  #Number of characteristics (including constant and price)
+  X <- as.matrix(cbind(ones = rep(1, JM), dat[, c(x.var.flds, prc.fld)]));
+  K <- ncol(X)
+
+  
+```
+
+
+Additionally, although income $y_i$ is important for theory, it drops out of the estimation (exactly at which step is indicated below), so I will exclude that from here on out as well. 
+
+That makes my simplified, less pedagogic version of the above (Equation 1):
+
+$$u_{ijm} = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} $$
+
+
+###Defining Markets and Market Shares
+
+
+In  this data set, most of the process has been done, so that we are given the set of $s_{jm}$, and need only construct $s_{m0}$.
+
+Observed market shares are defined as $s_{jm} = q_{jm}/M$. Technically, $\sum_J q_{jm} = M$ but, the practice usually used is to define a market $M$ based on some population measure. Almost surely, the sum of observed $q$ across all the choices is smaller than $M$, which creates take a set of $s_{jm}$ that do not sum to 1 across $j$.
+
+```{r}
+
+  #market object
+  mkt.id <- dat[, mkt.id.fld];
+
+  #shares object
+  s.jm <- as.vector(dat[, share.fld]);
+
+  #sum of produt shares by market
+  temp <- aggregate(s.jm, by = list(mkt.id = mkt.id), sum);
+
+  summary(temp)
+
+
+```
+
+
+So, in this case, the observed unit sales consitituted about 40-55% of the "market", however it was defined. This makes it possible to define an "outside good" $s_{m0}$ as the difference. Having an 'outside good' is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify $j-1$ parameters, so the 'outside good' acts as the reference point for the rest of the goods in the choice set.
+
+
+
+```{r }
+
+  #Compute the outside good market share by market
+
+  sum1 <- temp$x[match(mkt.id, temp$mkt.id)];
+  s.j0 <- as.vector(1 - sum1);
+  rm(temp, sum1);
+
+
+```
+
+
+##Models 
+
+How the model is estimated depends crucially on what assumptions are made on how $\alpha$ and $\beta$ vary across individuals.  
+
+###The Logit Model
+
+If it is assumed that all consumer heterogeneity is captured in $\epsilon_{ijm}$, then equation 1 becomes:
+
+$$u_{ijm} = x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} $$ 
+
+Importantly, that means that $\alpha$ and $\beta$ are the same across all consumers, so  $\theta_{i}$ is now just $\theta = [\alpha, \beta]$, which does not vary across $i$. 
+
+If it is additionally assumed that $\epsilon_{ijm}$ are i.i.d Type I extreme value distributions, then the shares have a simple closed form:
+
+$$ s_{jm} = \frac{ exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } $$
+
+In this and all following formulations, if the the term $\alpha_i y_i$ is included from the beginning, it drops out here since it does not vary across options.
+
+These assumptions make $s_{jm}$ log-linear:
+
+
+$$ \delta_{jm} = ln(s_{jm}) - log(s_{m0}) = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} $$
+
+In no way have we solved the simultineaity of $p_{jm}$, or dealt with the unobserved variable bias of $\xi_{jm}$, both of which need to be addressed with based on the data available and the situation. 
+
+But, the nice thing about this form is that by tranforming a non-linear problem into a linear problem, we can use straightforward linear estimation. 
+
+
+
+```{r }
+
+  # delta object
+  dat[, "delta"] <- Y <- log(s.jm) - log(s.j0);
+
+  #OLS
+  fm.olsreg = paste0("delta ~ ", 
+                          paste(x.var.flds, collapse = " + "), " + ", 
+                          paste(prc.fld, collapse = " + "))
+
+
+  ols = lm(data = dat,
+           formula = fm.olsreg)
+  
+  summary(ols)
+  
+```
+
+
+One point that seems trival now but becomes important later is that the coefficents here are interpretable as an estimate of mean utility across individuals, and the standard errors as an estimate of the deviations from mean utility.
+
+Since we linearized the problem, 2SLS is also possible. In this dataset, instruments are included ($z_1, z_2, z_3$). I'm not sure what they are.
+
+We are also going to carefully save many of the objects from the 2SLS regression for use later.
+
+
+
+```{r}
+#2SLS
+  
+  prc.iv.flds = c("z1",
+                  "z2",
+                  "z3")
+
+  beta.est = NULL;
+
+  str.ivreg.y <- "delta ~ "
+  str.ivreg.x <- paste(x.var.flds, collapse = " + ")
+  str.ivreg.prc <- paste(prc.fld, collapse = " + ")
+  str.ivreg.iv <- paste(prc.iv.flds, collapse = " + ")
+  print("2SLS specification:")
+  print(fm.ivreg <- paste0(str.ivreg.y, str.ivreg.x, " + ", str.ivreg.prc, " | ", str.ivreg.x, " + ", str.ivreg.iv))
+  rm(str.ivreg.y, str.ivreg.x, str.ivreg.prc, str.ivreg.iv)
+  
+  print("2SLS beta estimate:")
+  print(summary(mo.ivreg <- ivreg(fm.ivreg, data = dat, x = TRUE)))
+  beta.est <- summary(mo.ivreg)$coef[, 1:2]
+  #Z = instrumental variable matrix include exogenous X's
+  Z <- as.matrix(mo.ivreg$x$instruments)
+  PZ <- Z %*% solve(t(Z) %*% Z) %*% t(Z);
+  theta1 <- coef(mo.ivreg);
+  xi.hat <- as.vector(mo.ivreg$resid);
+  Z.hat <- Z * matrix(rep(xi.hat, ncol(Z)), ncol = ncol(Z))
+  W.inv <- try(solve(t(Z.hat) %*% Z.hat), silent = FALSE)
+  if("matrix" == class(W.inv)){
+    PZ <- Z %*% W.inv %*% t(Z);
+    PX.inv <- solve(t(X) %*% PZ %*% X)
+    theta1 <- PX.inv %*% t(X) %*% PZ %*% Y
+    xi.hat <- Y - X %*% theta1
+    X.hat <- (PZ %*% X) * matrix(rep(xi.hat, K), ncol = K)
+    tsls.se <- sqrt(diag(PX.inv %*% t(X.hat) %*% X.hat %*% PX.inv))
+    # print("GMM step 2 updated theta1 estimate:")
+    # print(beta.est <- data.frame(beta.est = theta1, se.est = tsls.se))
+  }
+  dat[, "xi.hat"] <- xi.hat
+  
+
+
+```
+
+
+
+  
+###Random Coefficents
+
+If $\alpha_i$ and $\beta_i$ are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume $\alpha_i$ and $\beta_i$ follow a multivariate normal. If $v_i$ is an indivdual's deviation from the average, then this assumption amounts to
+
+
+$$ \begin{bmatrix} \alpha_i \\ \beta_i \end{bmatrix}  \sim N(\begin{bmatrix} \alpha \\ \beta \end{bmatrix},\Sigma v_i)$$
+
+In aggregate market data, consumers are not observed, and so $\alpha_i$ and $\beta_i$ are simulated.
+
+```{r}
+
+## Matrix of individuals' characteristics ##
+  #number of simulated consumers
+  n.sim = 100
+  
+  #Standard normal distribution draws, one for each characteristic in X
+    #columns are simulated consumers, rows are variables in X (including constant and price)
+  v = matrix(rnorm(K * n.sim), nrow = K, ncol = n.sim)
+
+
+```
+
+This assumption introduces some nonlinearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to seperate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form
+
+$$u_{ijm} = \delta_{jm} +  \mu_{ijm}$$
+
+
+1.) Linear Terms $\delta_{jm}$
+
+Represents the mean average value to all consumers.
+
+The linear parameters are $\theta^1 = [\alpha, \beta]$, corresponding to the average marginal utility of money and of product characteristics.
+
+$$\delta_{jm} = x_{jm}\theta^1 + \xi_{jm} + \epsilon_{ijm}$$
+
+
+2.) Nonlinear Terms $\mu_{ijm}$ 
+
+Represents the mean-zero deviation from $\delta_{jm}$.
+
+The the nonlinear parameters be $\theta^2 = [\Sigma]$, corresponding to individual deviations from marginal utility of money and of product characteristics. 
+
+$$\mu_{ijm} =  x_{jm}\Sigma v_i $$
+
+
+The market share of the $j$th product is the integral over the population distribution $P^*(v,\epsilon)$ of consumers in market $M$ which bought product $j$:
+
+
+$$ s_{jm}(x_m,p_m,\delta_m; \theta_2) = \int_{m_{j}} dP^*(v,\epsilon) $$
+
+
+Let $S$ be the acutal observed shares in the data, as opposed to the model's shares $s$. The estimation algorithm becomes
+
+
+$$ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || $$
+
+
+
+# Optimization routine
+
+
+To run the optimization, we will use the multiStart function from the BB package. One feature of this function is that starts the optimization from multiple starting points, to test the sensitivity of the results to starting values.
+
+
+```{r, eval=FALSE, echo=TRUE}
+
+
+  multiStart(par,
+             fn,
+             gr,
+             action = c("solve", "optimize"),
+             method=c(2,3,1),
+             lower=-Inf,
+             upper=Inf,
+             project=NULL,
+             projectArgs=NULL,
+             control=list(),
+             quiet=FALSE,
+             details=FALSE)
+
+
+```
+
+The first input is the parameter vector we are optimizing, which in our case is values of $\theta^2$. The second input is a non-linear objective function to be optimized. In our case this will be a function that takes the $\theta^2$ vector as an input and returns the value of the objective function $f$ ( gmm_obj, defined below). Next, multiStart takes a gradient input, which is another function taking the $\theta^2$ parameter vector as an input and returning the gradient vector of the objective function at that point.
+
+Now, we will set up the functions that run the optimization. We will start at the innermost point in the function and work out. The optimization runs in steps, in which iteratively different estimates of the parameters are used to calculate the objective function, which we are hoping to minimize.
+
+The main reason the BLP algorithim works is the contraction mapping on the "inner loop" of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analgous to the closed form expression from above, in which the market shares are the average over the $n$ observations for the simulated consumers.
+
+
+$$ s_{jm}(x_m,p_m,\delta_m; \theta_2)  =  \frac{1}{r*n} \Sigma_{r*n} s_{jm} =  \frac{1}{r*n} \Sigma_{r*n}  \frac{ exp( x_{jm}\theta_1 + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } $$
+
+
+
+
+
+```{r}
+
+  ind_sh <- function(delta.in, mu.in){
+    # This function computes the "individual" probabilities of choosing each brand
+    # Requires global variables: mkt.id, X, v
+    numer <- exp(mu.in) * matrix(rep(exp(delta.in), n.sim), ncol = n.sim);
+    denom <- as.matrix(do.call("rbind", lapply(mkt.id, function(tt){
+      1 + colSums(numer[mkt.id %in% tt, ])
+    })))
+    return(numer / denom);	
+  }
+
+```
+
+
+With that as an input, the contraction mapping consists of updating a step $h$ estimate of of mean utility $\delta^h$ with the difference between the log observed shares $S$ and the log predicted shares $s$
+
+
+$$ \delta^{h+1} = \delta^h + ln(S) - ln(s(x_m,p_m,\delta_m; \theta_2)) $$
+
+
+
+```{r}
+
+  blp_inner <- function(delta.in, mu.in) {
+    # Computes a single update of the BLP (1995) contraction mapping.
+    # of market level predicted shares.
+    # This single-update function is required by SQUAREM, see Varadhan and
+    # Roland (SJS, 2008), and Roland and Varadhan (ANM, 2005)
+    # INPUT
+    # 	delta.in : current value of delta vector
+    # 	mu.in: current mu matrix
+    # Requires global variables: s.jm
+    # OUTPUT
+    # 	delta.out : delta vector that equates observed with predicted market shares
+    pred.s <- rowMeans(ind_sh(delta.in, mu.in));
+    delta.out <- delta.in + log(s.jm) - log(pred.s)
+    return(delta.out)
+  }
+
+```
+
+
+Additionally, we will be accelerating the convergence of this contraction mapping using the squarem function from the SQUAREM package. The function takes a fixed-point function (in our case blp_inner), which accepts $\delta^h$ and returns $\delta^{h+1}$. 
+
+
+To move from the inner loop to the objective function, we use the updated estimate $\hat{\delta}$ to form an estimate of the individual utility of the unobserved product characteristics $\hat{\xi} = \hat{\delta} - x_{jm}\theta^1$. From that, we get the method of moments condition 
+
+$$E[\xi_i'Z(Z'\xi_i'\xi_i'Z)^{-1}Z'\xi_i] = 0$$
+
+And, with an estimate $\hat{\xi_i}$, and using $Z'Z$ as a consistent estimate $E[Z'\xi_i'\xi_i'Z]$, the above is our objective function to minimize.
+
+
+```{r}
+
+  gmm_obj <- function(theta2){
+    # This function computes the GMM objective function
+    # Requires global variable inputs: X, v, delta, a, W
+    # Outputs: theta1, xi.hat
+    print(paste0("GMM Loop number: ", Sys.time()))
+    print(a <<- a + 1)
+    print("Updated theta2 estimate:")
+    print(theta2)
+    print("Change in theta2 estimate:")
+    print(theta.chg <- as.numeric(theta2 - theta2.prev));
+    if(sum(theta.chg != 0) <= 2){
+      delta <- dat[, "delta"];
+    } else {
+      delta <- Y;
+    }
+    theta2.prev <<- theta2;
+    
+    mu <- X %*% diag(theta2) %*% v;
+    
+    print("Running SQUAREM contraction mapping")
+    print(system.time(
+      squarem.output <- squarem(par = delta, fixptfn = blp_inner, mu.in = mu, control = list(trace = TRUE))
+    ));
+    delta <- squarem.output$par
+    print(summary(dat[, "delta"] - delta));
+    dat[, "delta"] <<- delta;
+    
+    mo.ivreg <- ivreg(fm.ivreg, data = dat, x = TRUE)
+    theta1 <<- coef(mo.ivreg);
+    xi.hat <<- as.vector(mo.ivreg$resid);
+    Z.hat <- Z * matrix(rep(xi.hat, ncol(Z)), ncol = ncol(Z))
+    W.inv <- try(solve(t(Z.hat) %*% Z.hat), silent = FALSE)
+
+      if("matrix" == class(W.inv)){
+
+      PX.inv <- solve(t(X) %*% PZ %*% X)
+      theta1 <<- PX.inv %*% t(X) %*% PZ %*% delta
+      xi.hat <<- delta - X %*% theta1
+      X.hat <- (PZ %*% X) * matrix(rep(xi.hat, K), ncol = K)
+      tsls.se <- sqrt(diag(PX.inv %*% t(X.hat) %*% X.hat %*% PX.inv))
+      print("GMM step 2 updated theta1 estimate:")
+      print(beta.est <<- data.frame(beta.est = theta1, beta.se = tsls.se, sigma.est = theta2))
+      print("made it here")
+    }
+
+        dat[, "xi.hat"] <<- xi.hat
+    f <- t(xi.hat) %*% Z %*% W.inv %*% t(Z) %*% xi.hat;
+    
+    
+    print("Updated GMM objective:")
+    print(f <- as.numeric(f));
+    return(f)
+  }
+
+```
+
+
+In general, we could just use the objective function, systematically varying the estimated parameters to look for the minimized value. However, since our model is smooth, and has derivatives, we should be able to use that information to make better choices about how to vary our parameter estimates. This is called the Quasi-Newton's Method, and consists of constructing a linear approximation of the objective function around the current estimate (using the current step's estimated parameters). 
+
+This method takes two inputs: first, it requires the jacobian of the objective function. 
+
+```{r}
+
+  jacobian <- function(delta.in, theta.in){
+    print(paste0("Calculating Jacobian matrix, ", Sys.time()))
+    #Requires global variables X, v, mkt.id
+    mu1 <- X %*% diag(theta.in) %*% v;
+    ind.shares <- ind_sh(delta.in, mu1);
+    K <- ncol(X);
+    print(paste0("Calculating dsigma matrix, ", Sys.time()))
+    dsigma <- lapply(l.Xv, function(x){
+      temp2 <- x * ind.shares;
+      temp3 <- as.matrix(do.call("rbind", lapply(mkt.id, function(m){
+        colSums(temp2[mkt.id %in% m, ])
+      })));
+      dsigma.res <- rowMeans(temp2 - ind.shares * temp3);
+      return(dsigma.res)
+    })
+    dsigma <- as.matrix(do.call("cbind", dsigma))
+    print(paste0("Calculating ddelta matrices, ", Sys.time()))
+    ddelta <- list()
+    for(m in mkt.id){
+      if(m %in% names(ddelta)){next}
+      temp1 <- as.matrix(ind.shares[mkt.id %in% m, ]);
+      H1 <- temp1 %*% t(temp1);
+      H2 <- diag(rowSums(temp1));
+      H <- (H2 - H1) / n.sim;
+      H.inv <- solve(H);
+      ddelta[[as.character(m)]] <- H.inv %*% dsigma[mkt.id %in% m, ];
+      rm(temp1, H1, H2, H, H.inv)
+    }
+    ddelta <- as.matrix(do.call("rbind", ddelta));
+    return(ddelta)
+  }
+
+```
+  
+Second, it requires the gradient, evaluated at the mean utility level predicted by the parameters inside of step $h$.
+
+```{r}  
+  
+  gradient_obj <- function(theta2){
+    #Requires global variables PZ, delta, xi.hat
+    print(system.time(jacobian_res <<- jacobian(as.vector(dat[, "delta"]), theta2)))
+    print(paste0("Updated gradient:", Sys.time()))
+    print(f <- -2 * as.numeric(t(jacobian_res) %*% PZ %*% xi.hat));
+    #######
+    L <- ncol(Z)
+    covg <- matrix(0, nrow = L, ncol = L)
+    for(i in 1:JM){
+      covg <- covg + (Z[i, ] %*% t(Z[i, ])) * xi.hat[i]^2
+    }
+    d.delta <- jacobian_res;
+    Dg <- t(d.delta) %*% Z
+    p.Dg <- try(solve(Dg %*% W.inv %*% t(Dg)))
+    cov.mat <- p.Dg %*% (Dg %*% W.inv %*% covg %*% W.inv %*% t(Dg)) %*% p.Dg
+    beta.est$sigma.se <<- sqrt(diag(cov.mat));
+    print(paste0("Updated coefficients table:", Sys.time()))
+    print(beta.est)
+    write.csv(beta.est, file = paste0("BLP_beta_est_", Sys.Date(), ".csv"))
+    #######
+    return(as.numeric(f))
+  }
+
+```
+
+
+
+So, with the functions all set up, all we will need to finalize the procedure are initial values for the parameters. One option, of course, is to guess. But we can potentially do better. Since, as discussed above, in the logit case, mean average value to all consumers, $\delta_{jm}$, is just the fitted values, with parameters $\theta^1$ and $\mu_{ijm}$, the deviations from that mean, with the standard errors as the parameters $\theta^2$. Since we already estimated it, we can use that as our guess.
+
+
+```{r objects}
+
+
+  #Starting point
+  print("Sigma guess:")
+    # tsls.se = beta.est[, 2]
+    print(theta2 <- 0.5 * tsls.se);
+    theta2 = t(theta2)
+    
+  theta2.prev <- theta2;
+
+
+```
+
+
+With an initial value guess, we can put it all together by passing multistart the parameter vector we are optimizing, the objective function to be optimized. and the gradient. 
+
+At that point, we need only sit back and hope for convergence.
+
+```{r}
+
+
+    # Break X and v matrices into list variables 
+  # in attempt to expedite calculation of the Jacobian matrix
+  l.X <- lapply(1:K, function(k){
+    return(X[, k])
+  })
+  l.v <- lapply(1:K, function(k){
+    return(v[k, ])
+  })
+  l.Xv <- lapply(1:K, function(k){
+    l.X[[k]] %*% t(l.v[[k]]);
+  })
+  
+  print("Estimating random coefficients multinomial logit")
+  a <- 0;
+  beta.est <- NULL;
+  print(system.time(
+    theta.est <- multiStart(par = theta2, fn = gmm_obj, gr = gradient_obj, lower = 0, control = list(trace = TRUE), action = "optimize")
+  ));
+  save(theta.est, file = paste0("theta_est_.RData"))
+  
+
+  
+```  
+  
+
+

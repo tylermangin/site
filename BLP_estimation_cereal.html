@@ -1,0 +1,3145 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Tyler Mangin" />
+
+
+<title>BLP Estimation on Cereal Data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Tyler Mangin</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    About Me
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="aboutme.html">About Me</a>
+    </li>
+    <li>
+      <a href="resume.pdf">Resume</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Projects
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="https://sites.google.com/a/colorado.edu/tylermangin/home">Teaching</a>
+    </li>
+    <li>
+      <a href="BLP_estimation_cereal.html">BLP Estimation on Cereal Data</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:tyler.mangin@gmail.com">
+    <span class="fa fa-envelope-o fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/tylermangin">
+    <span class="fa fa-github fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/RealTylerMangin">
+    <span class="fa fa-twitter fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
+    <span class="fa fa-linkedin fa-2x"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">BLP Estimation on Cereal Data</h1>
+<h4 class="author"><em>Tyler Mangin</em></h4>
+
+</div>
+
+
+<p>Based on code written by <a href="http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm">Aviv Nevo</a>, May 1998</p>
+<p>Adapted by <a href="https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R">Michael Carniol</a>, January 2015</p>
+<p>Adapted again by Tyler Mangin, May 2017</p>
+<p>I ran this routine on a canonical data set from Aviv Nevo. I found the data here: <a href="http://www.rasmusen.org/zg604/lectures/blp/" class="uri">http://www.rasmusen.org/zg604/lectures/blp/</a>.</p>
+<p>The elements we need are:</p>
+<p>1.The share of unit sales of several products</p>
+<p>2.Several markets</p>
+<p>3.A set of product characterisitcs (including price)</p>
+<p>In these data, the share has been constructed, the products are indicated by the “brand” field, the markets are cities, and the product characterisitics are price, the “mushiness” of the cereal, and the amount of sugar in the cereal.</p>
+<pre class="r"><code>  share.fld =     &quot;share&quot;
+  prod.id.fld =   &quot;brand&quot;
+  mkt.id.fld =    &quot;city&quot;
+  prc.fld =       &quot;price&quot;
+  x.var.flds =    c(&quot;sugar&quot;,
+                    &quot;mushy&quot;)
+  
+   
+  #Set up data
+  dat &lt;- dat[dat[, share.fld] &gt; 0, ]
+  dat &lt;- dat[order(dat[, mkt.id.fld], dat[, prod.id.fld]), ]
+  JM &lt;- nrow(dat)</code></pre>
+<p>Let the indirect utility (maximized utility) of consumer <span class="math inline">\(i\)</span>, with income <span class="math inline">\(y_i\)</span>, of product <span class="math inline">\(j\)</span> in market <span class="math inline">\(m\)</span> be</p>
+<p><span class="math display">\[u_{ijm} = \alpha_i(y_i - p_{jm}) + x_{jm}\beta_i + \xi_{jm} + \epsilon_{ijm} \]</span> ,</p>
+<p>where <span class="math inline">\(x_{jm}\)</span> is a set of observed product/market characterisitics, <span class="math inline">\(\xi_{jm}\)</span> is a set of unobserved product/market characterisitics, and <span class="math inline">\(\epsilon_{ijm}\)</span> is a mean-zero stochastic term.</p>
+<p>This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, <span class="math inline">\(p_{jm}\)</span> is seperated out in the above equation, but in practice it can be included in <span class="math inline">\(x_{jm}\)</span>, which can cause more confusion than you would think. I will include <span class="math inline">\(p_{jm}\)</span> in the <span class="math inline">\(nxk\)</span> matrix <span class="math inline">\(x\)</span> from here on out, partly by defining <span class="math inline">\(\theta_{i} = [\alpha_{i}, \beta_{i}]\)</span>, which becomes useful later.</p>
+<pre class="r"><code>  #Number of characteristics (including constant and price)
+  X &lt;- as.matrix(cbind(ones = rep(1, JM), dat[, c(x.var.flds, prc.fld)]));
+  K &lt;- ncol(X)</code></pre>
+<p>Additionally, although income <span class="math inline">\(y_i\)</span> is important for theory, it drops out of the estimation (exactly at which step is indicated below), so I will exclude that from here on out as well.</p>
+<p>That makes my simplified, less pedagogic version of the above (Equation 1):</p>
+<p><span class="math display">\[u_{ijm} = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} \]</span></p>
+<div id="defining-markets-and-market-shares" class="section level3">
+<h3>Defining Markets and Market Shares</h3>
+<p>In this data set, most of the process has been done, so that we are given the set of <span class="math inline">\(s_{jm}\)</span>, and need only construct <span class="math inline">\(s_{m0}\)</span>.</p>
+<p>Observed market shares are defined as <span class="math inline">\(s_{jm} = q_{jm}/M\)</span>. Technically, <span class="math inline">\(\sum_J q_{jm} = M\)</span> but, the practice usually used is to define a market <span class="math inline">\(M\)</span> based on some population measure. Almost surely, the sum of observed <span class="math inline">\(q\)</span> across all the choices is smaller than <span class="math inline">\(M\)</span>, which creates take a set of <span class="math inline">\(s_{jm}\)</span> that do not sum to 1 across <span class="math inline">\(j\)</span>.</p>
+<pre class="r"><code>  #market object
+  mkt.id &lt;- dat[, mkt.id.fld];
+
+  #shares object
+  s.jm &lt;- as.vector(dat[, share.fld]);
+
+  #sum of produt shares by market
+  temp &lt;- aggregate(s.jm, by = list(mkt.id = mkt.id), sum);
+
+  summary(temp)</code></pre>
+<pre><code>##      mkt.id            x         
+##  Min.   : 1.00   Min.   :0.1847  
+##  1st Qu.:17.00   1st Qu.:0.4096  
+##  Median :33.00   Median :0.4601  
+##  Mean   :32.34   Mean   :0.4700  
+##  3rd Qu.:46.00   3rd Qu.:0.5501  
+##  Max.   :65.00   Max.   :0.6728</code></pre>
+<p>So, in this case, the observed unit sales consitituted about 40-55% of the “market”, however it was defined. This makes it possible to define an “outside good” <span class="math inline">\(s_{m0}\)</span> as the difference. Having an ‘outside good’ is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify <span class="math inline">\(j-1\)</span> parameters, so the ‘outside good’ acts as the reference point for the rest of the goods in the choice set.</p>
+<pre class="r"><code>  #Compute the outside good market share by market
+
+  sum1 &lt;- temp$x[match(mkt.id, temp$mkt.id)];
+  s.j0 &lt;- as.vector(1 - sum1);
+  rm(temp, sum1);</code></pre>
+</div>
+<div id="models" class="section level2">
+<h2>Models</h2>
+<p>How the model is estimated depends crucially on what assumptions are made on how <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> vary across individuals.</p>
+<div id="the-logit-model" class="section level3">
+<h3>The Logit Model</h3>
+<p>If it is assumed that all consumer heterogeneity is captured in <span class="math inline">\(\epsilon_{ijm}\)</span>, then equation 1 becomes:</p>
+<p><span class="math display">\[u_{ijm} = x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} \]</span></p>
+<p>Importantly, that means that <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are the same across all consumers, so <span class="math inline">\(\theta_{i}\)</span> is now just <span class="math inline">\(\theta = [\alpha, \beta]\)</span>, which does not vary across <span class="math inline">\(i\)</span>.</p>
+<p>If it is additionally assumed that <span class="math inline">\(\epsilon_{ijm}\)</span> are i.i.d Type I extreme value distributions, then the shares have a simple closed form:</p>
+<p><span class="math display">\[ s_{jm} = \frac{ exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } \]</span></p>
+<p>In this and all following formulations, if the the term <span class="math inline">\(\alpha_i y_i\)</span> is included from the beginning, it drops out here since it does not vary across options.</p>
+<p>These assumptions make <span class="math inline">\(s_{jm}\)</span> log-linear:</p>
+<p><span class="math display">\[ \delta_{jm} = ln(s_{jm}) - log(s_{m0}) = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} \]</span></p>
+<p>In no way have we solved the simultineaity of <span class="math inline">\(p_{jm}\)</span>, or dealt with the unobserved variable bias of <span class="math inline">\(\xi_{jm}\)</span>, both of which need to be addressed with based on the data available and the situation.</p>
+<p>But, the nice thing about this form is that by tranforming a non-linear problem into a linear problem, we can use straightforward linear estimation.</p>
+<pre class="r"><code>  # delta object
+  dat[, &quot;delta&quot;] &lt;- Y &lt;- log(s.jm) - log(s.j0);
+
+  #OLS
+  fm.olsreg = paste0(&quot;delta ~ &quot;, 
+                          paste(x.var.flds, collapse = &quot; + &quot;), &quot; + &quot;, 
+                          paste(prc.fld, collapse = &quot; + &quot;))
+
+
+  ols = lm(data = dat,
+           formula = fm.olsreg)
+  
+  summary(ols)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = fm.olsreg, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7943 -0.7224  0.0055  0.7570  3.3952 
+## 
+## Coefficients:
+##               Estimate Std. Error t value             Pr(&gt;|t|)    
+## (Intercept)  -2.988385   0.153176 -19.509 &lt; 0.0000000000000002 ***
+## sugar         0.049561   0.006014   8.241 0.000000000000000473 ***
+## mushy         0.059955   0.071458   0.839                0.402    
+## price       -10.428699   1.201357  -8.681 &lt; 0.0000000000000002 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.128 on 1124 degrees of freedom
+## Multiple R-squared:  0.09366,    Adjusted R-squared:  0.09125 
+## F-statistic: 38.72 on 3 and 1124 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+<p>One point that seems trival now but becomes important later is that the coefficents here are interpretable as an estimate of mean utility across individuals, and the standard errors as an estimate of the deviations from mean utility.</p>
+<p>Since we linearized the problem, 2SLS is also possible. In this dataset, instruments are included (<span class="math inline">\(z_1, z_2, z_3\)</span>). I’m not sure what they are.</p>
+<p>We are also going to carefully save many of the objects from the 2SLS regression for use later.</p>
+<pre class="r"><code>#2SLS
+  
+  prc.iv.flds = c(&quot;z1&quot;,
+                  &quot;z2&quot;,
+                  &quot;z3&quot;)
+
+  beta.est = NULL;
+
+  str.ivreg.y &lt;- &quot;delta ~ &quot;
+  str.ivreg.x &lt;- paste(x.var.flds, collapse = &quot; + &quot;)
+  str.ivreg.prc &lt;- paste(prc.fld, collapse = &quot; + &quot;)
+  str.ivreg.iv &lt;- paste(prc.iv.flds, collapse = &quot; + &quot;)
+  print(&quot;2SLS specification:&quot;)</code></pre>
+<pre><code>## [1] &quot;2SLS specification:&quot;</code></pre>
+<pre class="r"><code>  print(fm.ivreg &lt;- paste0(str.ivreg.y, str.ivreg.x, &quot; + &quot;, str.ivreg.prc, &quot; | &quot;, str.ivreg.x, &quot; + &quot;, str.ivreg.iv))</code></pre>
+<pre><code>## [1] &quot;delta ~ sugar + mushy + price | sugar + mushy + z1 + z2 + z3&quot;</code></pre>
+<pre class="r"><code>  rm(str.ivreg.y, str.ivreg.x, str.ivreg.prc, str.ivreg.iv)
+  
+  print(&quot;2SLS beta estimate:&quot;)</code></pre>
+<pre><code>## [1] &quot;2SLS beta estimate:&quot;</code></pre>
+<pre class="r"><code>  print(summary(mo.ivreg &lt;- ivreg(fm.ivreg, data = dat, x = TRUE)))</code></pre>
+<pre><code>## 
+## Call:
+## ivreg(formula = fm.ivreg, data = dat, x = TRUE)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -4.06082 -0.74808 -0.02715  0.76105  3.51798 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -1.697126   1.406373  -1.207 0.227786    
+## sugar         0.064219   0.017046   3.767 0.000174 ***
+## mushy         0.008283   0.092873   0.089 0.928951    
+## price       -21.594304  12.147217  -1.778 0.075721 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.17 on 1124 degrees of freedom
+## Multiple R-Squared: 0.02401, Adjusted R-squared: 0.02141 
+## Wald test: 13.68 on 3 and 1124 DF,  p-value: 0.000000009036</code></pre>
+<pre class="r"><code>  beta.est &lt;- summary(mo.ivreg)$coef[, 1:2]
+  #Z = instrumental variable matrix include exogenous X&#39;s
+  Z &lt;- as.matrix(mo.ivreg$x$instruments)
+  PZ &lt;- Z %*% solve(t(Z) %*% Z) %*% t(Z);
+  theta1 &lt;- coef(mo.ivreg);
+  xi.hat &lt;- as.vector(mo.ivreg$resid);
+  Z.hat &lt;- Z * matrix(rep(xi.hat, ncol(Z)), ncol = ncol(Z))
+  W.inv &lt;- try(solve(t(Z.hat) %*% Z.hat), silent = FALSE)
+  if(&quot;matrix&quot; == class(W.inv)){
+    PZ &lt;- Z %*% W.inv %*% t(Z);
+    PX.inv &lt;- solve(t(X) %*% PZ %*% X)
+    theta1 &lt;- PX.inv %*% t(X) %*% PZ %*% Y
+    xi.hat &lt;- Y - X %*% theta1
+    X.hat &lt;- (PZ %*% X) * matrix(rep(xi.hat, K), ncol = K)
+    tsls.se &lt;- sqrt(diag(PX.inv %*% t(X.hat) %*% X.hat %*% PX.inv))
+    # print(&quot;GMM step 2 updated theta1 estimate:&quot;)
+    # print(beta.est &lt;- data.frame(beta.est = theta1, se.est = tsls.se))
+  }
+  dat[, &quot;xi.hat&quot;] &lt;- xi.hat</code></pre>
+</div>
+<div id="random-coefficents" class="section level3">
+<h3>Random Coefficents</h3>
+<p>If <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> follow a multivariate normal. If <span class="math inline">\(v_i\)</span> is an indivdual’s deviation from the average, then this assumption amounts to</p>
+<p><span class="math display">\[ \begin{bmatrix} \alpha_i \\ \beta_i \end{bmatrix}  \sim N(\begin{bmatrix} \alpha \\ \beta \end{bmatrix},\Sigma v_i)\]</span></p>
+<p>In aggregate market data, consumers are not observed, and so <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> are simulated.</p>
+<pre class="r"><code>## Matrix of individuals&#39; characteristics ##
+  #number of simulated consumers
+  n.sim = 100
+  
+  #Standard normal distribution draws, one for each characteristic in X
+    #columns are simulated consumers, rows are variables in X (including constant and price)
+  v = matrix(rnorm(K * n.sim), nrow = K, ncol = n.sim)</code></pre>
+<p>This assumption introduces some nonlinearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to seperate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form</p>
+<p><span class="math display">\[u_{ijm} = \delta_{jm} +  \mu_{ijm}\]</span></p>
+<p>1.) Linear Terms <span class="math inline">\(\delta_{jm}\)</span></p>
+<p>Represents the mean average value to all consumers.</p>
+<p>The linear parameters are <span class="math inline">\(\theta^1 = [\alpha, \beta]\)</span>, corresponding to the average marginal utility of money and of product characteristics.</p>
+<p><span class="math display">\[\delta_{jm} = x_{jm}\theta^1 + \xi_{jm} + \epsilon_{ijm}\]</span></p>
+<p>2.) Nonlinear Terms <span class="math inline">\(\mu_{ijm}\)</span></p>
+<p>Represents the mean-zero deviation from <span class="math inline">\(\delta_{jm}\)</span>.</p>
+<p>The the nonlinear parameters be <span class="math inline">\(\theta^2 = [\Sigma]\)</span>, corresponding to individual deviations from marginal utility of money and of product characteristics.</p>
+<p><span class="math display">\[\mu_{ijm} =  x_{jm}\Sigma v_i \]</span></p>
+<p>The market share of the <span class="math inline">\(j\)</span>th product is the integral over the population distribution <span class="math inline">\(P^*(v,\epsilon)\)</span> of consumers in market <span class="math inline">\(M\)</span> which bought product <span class="math inline">\(j\)</span>:</p>
+<p><span class="math display">\[ s_{jm}(x_m,p_m,\delta_m; \theta_2) = \int_{m_{j}} dP^*(v,\epsilon) \]</span></p>
+<p>Let <span class="math inline">\(S\)</span> be the acutal observed shares in the data, as opposed to the model’s shares <span class="math inline">\(s\)</span>. The estimation algorithm becomes</p>
+<p><span class="math display">\[ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || \]</span></p>
+</div>
+</div>
+<div id="optimization-routine" class="section level1">
+<h1>Optimization routine</h1>
+<p>To run the optimization, we will use the multiStart function from the BB package. One feature of this function is that starts the optimization from multiple starting points, to test the sensitivity of the results to starting values.</p>
+<pre class="r"><code>  multiStart(par,
+             fn,
+             gr,
+             action = c(&quot;solve&quot;, &quot;optimize&quot;),
+             method=c(2,3,1),
+             lower=-Inf,
+             upper=Inf,
+             project=NULL,
+             projectArgs=NULL,
+             control=list(),
+             quiet=FALSE,
+             details=FALSE)</code></pre>
+<p>The first input is the parameter vector we are optimizing, which in our case is values of <span class="math inline">\(\theta^2\)</span>. The second input is a non-linear objective function to be optimized. In our case this will be a function that takes the <span class="math inline">\(\theta^2\)</span> vector as an input and returns the value of the objective function <span class="math inline">\(f\)</span> ( gmm_obj, defined below). Next, multiStart takes a gradient input, which is another function taking the <span class="math inline">\(\theta^2\)</span> parameter vector as an input and returning the gradient vector of the objective function at that point.</p>
+<p>Now, we will set up the functions that run the optimization. We will start at the innermost point in the function and work out. The optimization runs in steps, in which iteratively different estimates of the parameters are used to calculate the objective function, which we are hoping to minimize.</p>
+<p>The main reason the BLP algorithim works is the contraction mapping on the “inner loop” of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analgous to the closed form expression from above, in which the market shares are the average over the <span class="math inline">\(n\)</span> observations for the simulated consumers.</p>
+<p><span class="math display">\[ s_{jm}(x_m,p_m,\delta_m; \theta_2)  =  \frac{1}{r*n} \Sigma_{r*n} s_{jm} =  \frac{1}{r*n} \Sigma_{r*n}  \frac{ exp( x_{jm}\theta_1 + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } \]</span></p>
+<pre class="r"><code>  ind_sh &lt;- function(delta.in, mu.in){
+    # This function computes the &quot;individual&quot; probabilities of choosing each brand
+    # Requires global variables: mkt.id, X, v
+    numer &lt;- exp(mu.in) * matrix(rep(exp(delta.in), n.sim), ncol = n.sim);
+    denom &lt;- as.matrix(do.call(&quot;rbind&quot;, lapply(mkt.id, function(tt){
+      1 + colSums(numer[mkt.id %in% tt, ])
+    })))
+    return(numer / denom);  
+  }</code></pre>
+<p>With that as an input, the contraction mapping consists of updating a step <span class="math inline">\(h\)</span> estimate of of mean utility <span class="math inline">\(\delta^h\)</span> with the difference between the log observed shares <span class="math inline">\(S\)</span> and the log predicted shares <span class="math inline">\(s\)</span></p>
+<p><span class="math display">\[ \delta^{h+1} = \delta^h + ln(S) - ln(s(x_m,p_m,\delta_m; \theta_2)) \]</span></p>
+<pre class="r"><code>  blp_inner &lt;- function(delta.in, mu.in) {
+    # Computes a single update of the BLP (1995) contraction mapping.
+    # of market level predicted shares.
+    # This single-update function is required by SQUAREM, see Varadhan and
+    # Roland (SJS, 2008), and Roland and Varadhan (ANM, 2005)
+    # INPUT
+    #   delta.in : current value of delta vector
+    #   mu.in: current mu matrix
+    # Requires global variables: s.jm
+    # OUTPUT
+    #   delta.out : delta vector that equates observed with predicted market shares
+    pred.s &lt;- rowMeans(ind_sh(delta.in, mu.in));
+    delta.out &lt;- delta.in + log(s.jm) - log(pred.s)
+    return(delta.out)
+  }</code></pre>
+<p>Additionally, we will be accelerating the convergence of this contraction mapping using the squarem function from the SQUAREM package. The function takes a fixed-point function (in our case blp_inner), which accepts <span class="math inline">\(\delta^h\)</span> and returns <span class="math inline">\(\delta^{h+1}\)</span>.</p>
+<p>To move from the inner loop to the objective function, we use the updated estimate <span class="math inline">\(\hat{\delta}\)</span> to form an estimate of the individual utility of the unobserved product characteristics <span class="math inline">\(\hat{\xi} = \hat{\delta} - x_{jm}\theta^1\)</span>. From that, we get the method of moments condition</p>
+<p><span class="math display">\[E[\xi_i&#39;Z(Z&#39;\xi_i&#39;\xi_i&#39;Z)^{-1}Z&#39;\xi_i] = 0\]</span></p>
+<p>And, with an estimate <span class="math inline">\(\hat{\xi_i}\)</span>, and using <span class="math inline">\(Z&#39;Z\)</span> as a consistent estimate <span class="math inline">\(E[Z&#39;\xi_i&#39;\xi_i&#39;Z]\)</span>, the above is our objective function to minimize.</p>
+<pre class="r"><code>  gmm_obj &lt;- function(theta2){
+    # This function computes the GMM objective function
+    # Requires global variable inputs: X, v, delta, a, W
+    # Outputs: theta1, xi.hat
+    print(paste0(&quot;GMM Loop number: &quot;, Sys.time()))
+    print(a &lt;&lt;- a + 1)
+    print(&quot;Updated theta2 estimate:&quot;)
+    print(theta2)
+    print(&quot;Change in theta2 estimate:&quot;)
+    print(theta.chg &lt;- as.numeric(theta2 - theta2.prev));
+    if(sum(theta.chg != 0) &lt;= 2){
+      delta &lt;- dat[, &quot;delta&quot;];
+    } else {
+      delta &lt;- Y;
+    }
+    theta2.prev &lt;&lt;- theta2;
+    
+    mu &lt;- X %*% diag(theta2) %*% v;
+    
+    print(&quot;Running SQUAREM contraction mapping&quot;)
+    print(system.time(
+      squarem.output &lt;- squarem(par = delta, fixptfn = blp_inner, mu.in = mu, control = list(trace = TRUE))
+    ));
+    delta &lt;- squarem.output$par
+    print(summary(dat[, &quot;delta&quot;] - delta));
+    dat[, &quot;delta&quot;] &lt;&lt;- delta;
+    
+    mo.ivreg &lt;- ivreg(fm.ivreg, data = dat, x = TRUE)
+    theta1 &lt;&lt;- coef(mo.ivreg);
+    xi.hat &lt;&lt;- as.vector(mo.ivreg$resid);
+    Z.hat &lt;- Z * matrix(rep(xi.hat, ncol(Z)), ncol = ncol(Z))
+    W.inv &lt;- try(solve(t(Z.hat) %*% Z.hat), silent = FALSE)
+
+      if(&quot;matrix&quot; == class(W.inv)){
+
+      PX.inv &lt;- solve(t(X) %*% PZ %*% X)
+      theta1 &lt;&lt;- PX.inv %*% t(X) %*% PZ %*% delta
+      xi.hat &lt;&lt;- delta - X %*% theta1
+      X.hat &lt;- (PZ %*% X) * matrix(rep(xi.hat, K), ncol = K)
+      tsls.se &lt;- sqrt(diag(PX.inv %*% t(X.hat) %*% X.hat %*% PX.inv))
+      print(&quot;GMM step 2 updated theta1 estimate:&quot;)
+      print(beta.est &lt;&lt;- data.frame(beta.est = theta1, beta.se = tsls.se, sigma.est = theta2))
+      print(&quot;made it here&quot;)
+    }
+
+        dat[, &quot;xi.hat&quot;] &lt;&lt;- xi.hat
+    f &lt;- t(xi.hat) %*% Z %*% W.inv %*% t(Z) %*% xi.hat;
+    
+    
+    print(&quot;Updated GMM objective:&quot;)
+    print(f &lt;- as.numeric(f));
+    return(f)
+  }</code></pre>
+<p>In general, we could just use the objective function, systematically varying the estimated parameters to look for the minimized value. However, since our model is smooth, and has derivatives, we should be able to use that information to make better choices about how to vary our parameter estimates. This is called the Quasi-Newton’s Method, and consists of constructing a linear approximation of the objective function around the current estimate (using the current step’s estimated parameters).</p>
+<p>This method takes two inputs: first, it requires the jacobian of the objective function.</p>
+<pre class="r"><code>  jacobian &lt;- function(delta.in, theta.in){
+    print(paste0(&quot;Calculating Jacobian matrix, &quot;, Sys.time()))
+    #Requires global variables X, v, mkt.id
+    mu1 &lt;- X %*% diag(theta.in) %*% v;
+    ind.shares &lt;- ind_sh(delta.in, mu1);
+    K &lt;- ncol(X);
+    print(paste0(&quot;Calculating dsigma matrix, &quot;, Sys.time()))
+    dsigma &lt;- lapply(l.Xv, function(x){
+      temp2 &lt;- x * ind.shares;
+      temp3 &lt;- as.matrix(do.call(&quot;rbind&quot;, lapply(mkt.id, function(m){
+        colSums(temp2[mkt.id %in% m, ])
+      })));
+      dsigma.res &lt;- rowMeans(temp2 - ind.shares * temp3);
+      return(dsigma.res)
+    })
+    dsigma &lt;- as.matrix(do.call(&quot;cbind&quot;, dsigma))
+    print(paste0(&quot;Calculating ddelta matrices, &quot;, Sys.time()))
+    ddelta &lt;- list()
+    for(m in mkt.id){
+      if(m %in% names(ddelta)){next}
+      temp1 &lt;- as.matrix(ind.shares[mkt.id %in% m, ]);
+      H1 &lt;- temp1 %*% t(temp1);
+      H2 &lt;- diag(rowSums(temp1));
+      H &lt;- (H2 - H1) / n.sim;
+      H.inv &lt;- solve(H);
+      ddelta[[as.character(m)]] &lt;- H.inv %*% dsigma[mkt.id %in% m, ];
+      rm(temp1, H1, H2, H, H.inv)
+    }
+    ddelta &lt;- as.matrix(do.call(&quot;rbind&quot;, ddelta));
+    return(ddelta)
+  }</code></pre>
+<p>Second, it requires the gradient, evaluated at the mean utility level predicted by the parameters inside of step <span class="math inline">\(h\)</span>.</p>
+<pre class="r"><code>  gradient_obj &lt;- function(theta2){
+    #Requires global variables PZ, delta, xi.hat
+    print(system.time(jacobian_res &lt;&lt;- jacobian(as.vector(dat[, &quot;delta&quot;]), theta2)))
+    print(paste0(&quot;Updated gradient:&quot;, Sys.time()))
+    print(f &lt;- -2 * as.numeric(t(jacobian_res) %*% PZ %*% xi.hat));
+    #######
+    L &lt;- ncol(Z)
+    covg &lt;- matrix(0, nrow = L, ncol = L)
+    for(i in 1:JM){
+      covg &lt;- covg + (Z[i, ] %*% t(Z[i, ])) * xi.hat[i]^2
+    }
+    d.delta &lt;- jacobian_res;
+    Dg &lt;- t(d.delta) %*% Z
+    p.Dg &lt;- try(solve(Dg %*% W.inv %*% t(Dg)))
+    cov.mat &lt;- p.Dg %*% (Dg %*% W.inv %*% covg %*% W.inv %*% t(Dg)) %*% p.Dg
+    beta.est$sigma.se &lt;&lt;- sqrt(diag(cov.mat));
+    print(paste0(&quot;Updated coefficients table:&quot;, Sys.time()))
+    print(beta.est)
+    write.csv(beta.est, file = paste0(&quot;BLP_beta_est_&quot;, Sys.Date(), &quot;.csv&quot;))
+    #######
+    return(as.numeric(f))
+  }</code></pre>
+<p>So, with the functions all set up, all we will need to finalize the procedure are initial values for the parameters. One option, of course, is to guess. But we can potentially do better. Since, as discussed above, in the logit case, mean average value to all consumers, <span class="math inline">\(\delta_{jm}\)</span>, is just the fitted values, with parameters <span class="math inline">\(\theta^1\)</span> and <span class="math inline">\(\mu_{ijm}\)</span>, the deviations from that mean, with the standard errors as the parameters <span class="math inline">\(\theta^2\)</span>. Since we already estimated it, we can use that as our guess.</p>
+<pre class="r"><code>  #Starting point
+  print(&quot;Sigma guess:&quot;)</code></pre>
+<pre><code>## [1] &quot;Sigma guess:&quot;</code></pre>
+<pre class="r"><code>    # tsls.se = beta.est[, 2]
+    print(theta2 &lt;- 0.5 * tsls.se);</code></pre>
+<pre><code>##        ones       sugar       mushy       price 
+## 0.727581577 0.008837817 0.049185287 6.303916821</code></pre>
+<pre class="r"><code>    theta2 = t(theta2)
+    
+  theta2.prev &lt;- theta2;</code></pre>
+<p>With an initial value guess, we can put it all together by passing multistart the parameter vector we are optimizing, the objective function to be optimized. and the gradient.</p>
+<p>At that point, we need only sit back and hope for convergence.</p>
+<pre class="r"><code>    # Break X and v matrices into list variables 
+  # in attempt to expedite calculation of the Jacobian matrix
+  l.X &lt;- lapply(1:K, function(k){
+    return(X[, k])
+  })
+  l.v &lt;- lapply(1:K, function(k){
+    return(v[k, ])
+  })
+  l.Xv &lt;- lapply(1:K, function(k){
+    l.X[[k]] %*% t(l.v[[k]]);
+  })
+  
+  print(&quot;Estimating random coefficients multinomial logit&quot;)</code></pre>
+<pre><code>## [1] &quot;Estimating random coefficients multinomial logit&quot;</code></pre>
+<pre class="r"><code>  a &lt;- 0;
+  beta.est &lt;- NULL;
+  print(system.time(
+    theta.est &lt;- multiStart(par = theta2, fn = gmm_obj, gr = gradient_obj, lower = 0, control = list(trace = TRUE), action = &quot;optimize&quot;)
+  ));</code></pre>
+<pre><code>## Parameter set :  1 ... 
+## [1] &quot;GMM Loop number: 2017-10-14 22:18:57&quot;
+## [1] 1
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.727581577 0.008837817 0.049185287 6.303916821 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] 0 0 0 0
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.7843411   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.04581575   Extrapolation:  TRUE   Steplength:  2.107043 
+## Residual:  0.007231566   Extrapolation:  TRUE   Steplength:  2.686801 
+## Residual:  0.0003299405   Extrapolation:  TRUE   Steplength:  1.56818 
+## Residual:  0.00001447826   Extrapolation:  TRUE   Steplength:  3.628277 
+## Residual:  0.0000001366314   Extrapolation:  TRUE   Steplength:  1.428793 
+##    user  system elapsed 
+##    0.92    0.00    0.92 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.20315 -0.05352  0.02097  0.02974  0.08852  0.60810 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se   sigma.est
+## ones   -1.581994375  1.52432972 0.727581577
+## sugar   0.060088662  0.01854447 0.008837817
+## mushy  -0.002137705  0.10189362 0.049185287
+## price -22.437958153 13.21334008 6.303916821
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.004113
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:18:59&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:18:59&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:18:59&quot;
+##    user  system elapsed 
+##    0.25    0.00    0.27 
+## [1] &quot;Updated gradient:2017-10-14 22:18:59&quot;
+## [1]  0.32258790  3.68800600 -0.04938155  0.07799129
+## [1] &quot;Updated coefficients table:2017-10-14 22:18:59&quot;
+##            beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.581994375  1.52432972 0.727581577  3.89675289
+## sugar   0.060088662  0.01854447 0.008837817  0.05894211
+## mushy  -0.002137705  0.10189362 0.049185287  0.58083822
+## price -22.437958153 13.21334008 6.303916821 10.46443798
+## iter:  0  f-value:  1.004113  pgrad:  0.3225879 
+## [1] &quot;GMM Loop number: 2017-10-14 22:18:59&quot;
+## [1] 2
+## [1] &quot;Updated theta2 estimate:&quot;
+##      ones     sugar     mushy     price 
+## 0.0000000 0.0000000 0.2022646 6.0621493 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.727581577 -0.008837817  0.153079349 -0.241767568
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.5616425   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02161306   Extrapolation:  TRUE   Steplength:  1.868103 
+## Residual:  0.003886696   Extrapolation:  TRUE   Steplength:  2.903895 
+## Residual:  0.00005952838   Extrapolation:  TRUE   Steplength:  1.390966 
+## Residual:  0.000001493419   Extrapolation:  TRUE   Steplength:  3.402297 
+## Residual:  0.00000002403029   Extrapolation:  TRUE   Steplength:  1.803588 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.109459 -0.012870  0.009774  0.012100  0.038967  0.111555 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est    beta.se sigma.est
+## ones   -1.54012718  1.5006795 0.0000000
+## sugar   0.06196932  0.0182411 0.0000000
+## mushy  -0.02884339  0.1008665 0.2022646
+## price -22.92704546 13.0043380 6.0621493
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9390024
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:01&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:01&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:01&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:01&quot;
+## [1] -0.14478265 -1.29428403  0.03444585  0.09449662
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:01&quot;
+##           beta.est    beta.se sigma.est  sigma.se
+## ones   -1.54012718  1.5006795 0.0000000 3.1796796
+## sugar   0.06196932  0.0182411 0.0000000 0.0868205
+## mushy  -0.02884339  0.1008665 0.2022646 0.3680237
+## price -22.92704546 13.0043380 6.0621493 9.9554837
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:01&quot;
+## [1] 3
+## [1] &quot;Updated theta2 estimate:&quot;
+##       ones      sugar      mushy      price 
+## 0.00227110 0.02030249 0.20172431 6.06066695 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0022710998  0.0203024886 -0.0005403269 -0.0014822994
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.8000517   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01717409   Extrapolation:  TRUE   Steplength:  1.851651 
+## Residual:  0.001964577   Extrapolation:  TRUE   Steplength:  2.365155 
+## Residual:  0.0001152667   Extrapolation:  TRUE   Steplength:  1.732611 
+## Residual:  0.00001967623   Extrapolation:  TRUE   Steplength:  3.299588 
+## Residual:  0.00000004867629   Extrapolation:  TRUE   Steplength:  1.357768 
+##    user  system elapsed 
+##    0.89    0.00    0.89 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 0.003739 0.012795 0.026742 0.033815 0.051300 0.107627 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se  sigma.est
+## ones   -1.60458709  1.49707805 0.00227110
+## sugar   0.05716756  0.01820866 0.02030249
+## mushy  -0.02913332  0.10051913 0.20172431
+## price -22.35159851 12.97462640 6.06066695
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.006976
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:02&quot;
+## [1] 4
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0003208061 0.0028678449 0.2021883123 6.0619398697 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0019502937 -0.0174346437  0.0004640025  0.0012729160
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.5831483   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02066306   Extrapolation:  TRUE   Steplength:  1.85225 
+## Residual:  0.003743907   Extrapolation:  TRUE   Steplength:  2.907998 
+## Residual:  0.0000570231   Extrapolation:  TRUE   Steplength:  1.38961 
+## Residual:  0.000001588544   Extrapolation:  TRUE   Steplength:  3.397599 
+## Residual:  0.00000002888981   Extrapolation:  TRUE   Steplength:  1.888203 
+##    user  system elapsed 
+##    0.87    0.00    0.87 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.098580 -0.045457 -0.022834 -0.029834 -0.010866 -0.003348 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.54397528  1.50037903 0.0003208061
+## sugar   0.06155003  0.01823782 0.0028678449
+## mushy  -0.02858150  0.10084648 0.2021883123
+## price -22.89996373 13.00176814 6.0619398697
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9376152
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:04&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:04&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:04&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:19:04&quot;
+## [1] -0.14521775  0.02091499  0.02687221  0.09383054
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:04&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.54397528  1.50037903 0.0003208061  3.12908575
+## sugar   0.06155003  0.01823782 0.0028678449  0.07571433
+## mushy  -0.02858150  0.10084648 0.2021883123  0.37636678
+## price -22.89996373 13.00176814 6.0619398697 10.45993881
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:04&quot;
+## [1] 5
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0006374972 0.0028222335 0.2021297093 6.0617352439 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00031669111 -0.00004561144 -0.00005860296 -0.00020462579
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.582629   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02067779   Extrapolation:  TRUE   Steplength:  1.852492 
+## Residual:  0.003746237   Extrapolation:  TRUE   Steplength:  2.908079 
+## Residual:  0.00005702743   Extrapolation:  TRUE   Steplength:  1.389584 
+## Residual:  0.000001586517   Extrapolation:  TRUE   Steplength:  3.39766 
+## Residual:  0.00000002877793   Extrapolation:  TRUE   Steplength:  1.886788 
+##    user  system elapsed 
+##    0.87    0.02    0.90 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000181217 -0.000111320 -0.000077544 -0.000081080 -0.000045422 
+##         Max. 
+## -0.000006384 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.54394895  1.50037507 0.0006374972
+## sugar   0.06155705  0.01823776 0.0028222335
+## mushy  -0.02857098  0.10084638 0.2021297093
+## price -22.90003795 13.00173249 6.0617352439
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9375581
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:06&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:06&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:06&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:06&quot;
+## [1] -0.14496796346  0.00008937783  0.02698181579  0.09382537595
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:06&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.54394895  1.50037507 0.0006374972  3.12876524
+## sugar   0.06155705  0.01823776 0.0028222335  0.07587903
+## mushy  -0.02857098  0.10084638 0.2021297093  0.37628089
+## price -22.90003795 13.00173249 6.0617352439 10.45302812
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:06&quot;
+## [1] 6
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0009795891 0.0028220226 0.2020660383 6.0615138371 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0003420918643 -0.0000002109116 -0.0000636710308 -0.0002214068337
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.5824716   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0206774   Extrapolation:  TRUE   Steplength:  1.852525 
+## Residual:  0.003746215   Extrapolation:  TRUE   Steplength:  2.908069 
+## Residual:  0.00005702226   Extrapolation:  TRUE   Steplength:  1.389555 
+## Residual:  0.000001586083   Extrapolation:  TRUE   Steplength:  3.397653 
+## Residual:  0.00000002875578   Extrapolation:  TRUE   Steplength:  1.886493 
+##    user  system elapsed 
+##    0.87    0.00    0.89 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000096981 -0.000023557 -0.000014750 -0.000016968 -0.000007756 
+##         Max. 
+##  0.000005706 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.54400026  1.50036518 0.0009795891
+## sugar   0.06155674  0.01823764 0.0028220226
+## mushy  -0.02855619  0.10084584 0.2020660383
+## price -22.89951170 13.00164653 6.0615138371
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9375033
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:08&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:08&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:08&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:08&quot;
+## [1] -0.1447107605  0.0001207814  0.0269693888  0.0938095316
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:08&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.54400026  1.50036518 0.0009795891  3.12866194
+## sugar   0.06155674  0.01823764 0.0028220226  0.07588672
+## mushy  -0.02855619  0.10084584 0.2020660383  0.37632777
+## price -22.89951170 13.00164653 6.0615138371 10.45354898
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:08&quot;
+## [1] 7
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.198682823 0.002657012 0.165220572 5.933351649 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.197703234 -0.000165011 -0.036845466 -0.128162188
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.5164845   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02205426   Extrapolation:  TRUE   Steplength:  1.900264 
+## Residual:  0.003971954   Extrapolation:  TRUE   Steplength:  2.861079 
+## Residual:  0.00006926086   Extrapolation:  TRUE   Steplength:  1.388224 
+## Residual:  0.000001526581   Extrapolation:  TRUE   Steplength:  3.408118 
+## Residual:  0.00000002097772   Extrapolation:  TRUE   Steplength:  1.658019 
+##    user  system elapsed 
+##    0.89    0.00    0.89 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.046316 -0.012882 -0.009130 -0.009979 -0.005469  0.001010 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.57187680  1.49754115 0.198682823
+## sugar   0.06141225  0.01820461 0.002657012
+## mushy  -0.02039248  0.10067771 0.165220572
+## price -22.60938868 12.97729251 5.933351649
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9164898
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:10&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:10&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:10&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:10&quot;
+## [1] -0.000684564  0.011647459  0.018401877  0.085203875
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:10&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.57187680  1.49754115 0.198682823  3.11529079
+## sugar   0.06141225  0.01820461 0.002657012  0.07949723
+## mushy  -0.02039248  0.10067771 0.165220572  0.40670348
+## price -22.60938868 12.97729251 5.933351649 10.75200781
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:10&quot;
+## [1] 8
+## [1] &quot;Updated theta2 estimate:&quot;
+##      ones     sugar     mushy     price 
+## 0.1996561 0.0000000 0.1390573 5.8122112 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0009732936 -0.0026570115 -0.0261632631 -0.1211404353
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.470785   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02238663   Extrapolation:  TRUE   Steplength:  1.946937 
+## Residual:  0.003834065   Extrapolation:  TRUE   Steplength:  2.757127 
+## Residual:  0.00008821997   Extrapolation:  TRUE   Steplength:  1.402521 
+## Residual:  0.00000165325   Extrapolation:  TRUE   Steplength:  3.389257 
+## Residual:  0.00000001907873   Extrapolation:  TRUE   Steplength:  1.581331 
+##    user  system elapsed 
+##    0.89    0.00    0.89 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.027505 -0.009329 -0.006038 -0.006770 -0.003636  0.002717 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se sigma.est
+## ones   -1.58260687  1.49606485 0.1996561
+## sugar   0.06174844  0.01818583 0.0000000
+## mushy  -0.01535005  0.10059661 0.1390573
+## price -22.50637737 12.96439494 5.8122112
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9096421
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:12&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:12&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:12&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:19:12&quot;
+## [1]  0.004180378 -1.106071567  0.020140323  0.083737341
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:12&quot;
+##           beta.est     beta.se sigma.est    sigma.se
+## ones   -1.58260687  1.49606485 0.1996561  3.11706357
+## sugar   0.06174844  0.01818583 0.0000000  0.09253993
+## mushy  -0.01535005  0.10059661 0.1390573  0.42894620
+## price -22.50637737 12.96439494 5.8122112 10.56967661
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:12&quot;
+## [1] 9
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.199645721 0.002750472 0.139007226 5.812002984 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00001039536  0.00275047247 -0.00005008302 -0.00020822997
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.4875719   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02148711   Extrapolation:  TRUE   Steplength:  1.910918 
+## Residual:  0.00381999   Extrapolation:  TRUE   Steplength:  2.830006 
+## Residual:  0.00007072134   Extrapolation:  TRUE   Steplength:  1.387436 
+## Residual:  0.000001494613   Extrapolation:  TRUE   Steplength:  3.394014 
+## Residual:  0.00000001849442   Extrapolation:  TRUE   Steplength:  1.628234 
+##    user  system elapsed 
+##    0.92    0.00    0.93 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.0003815 0.0018692 0.0036020 0.0038425 0.0056502 0.0089306 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.58639574  1.49578853 0.199645721
+## sugar   0.06134236  0.01818288 0.002750472
+## mushy  -0.01513338  0.10057758 0.139007226
+## price -22.47945035 12.96203928 5.812002984
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.908724
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:14&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:14&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:14&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.17 
+## [1] &quot;Updated gradient:2017-10-14 22:19:14&quot;
+## [1] 0.003911925 0.151482843 0.012265076 0.083204426
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:14&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.58639574  1.49578853 0.199645721  3.02625016
+## sugar   0.06134236  0.01818288 0.002750472  0.07884419
+## mushy  -0.01513338  0.10057758 0.139007226  0.43757043
+## price -22.47945035 12.96203928 5.812002984 10.91618569
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:14&quot;
+## [1] 10
+## [1] &quot;Updated theta2 estimate:&quot;
+##       ones      sugar      mushy      price 
+## 0.19963716 0.00241912 0.13898040 5.81182098 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000008556924 -0.000331352795 -0.000026828564 -0.000182000935
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.4852926   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02159191   Extrapolation:  TRUE   Steplength:  1.914934 
+## Residual:  0.003826158   Extrapolation:  TRUE   Steplength:  2.822613 
+## Residual:  0.00007244122   Extrapolation:  TRUE   Steplength:  1.388735 
+## Residual:  0.000001504779   Extrapolation:  TRUE   Steplength:  3.393545 
+## Residual:  0.00000001828257   Extrapolation:  TRUE   Steplength:  1.623023 
+##    user  system elapsed 
+##    0.89    0.00    0.90 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## -0.00116502 -0.00070665 -0.00046189 -0.00047991 -0.00022946 -0.00004715 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se  sigma.est
+## ones   -1.58587799  1.49582237 0.19963716
+## sugar   0.06139545  0.01818322 0.00241912
+## mushy  -0.01514808  0.10058019 0.13898040
+## price -22.48336422 12.96232478 5.81182098
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9086486
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:16&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:16&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:16&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:16&quot;
+## [1]  0.00393611874 -0.00009884326  0.01321112120  0.08326142950
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:16&quot;
+##           beta.est     beta.se  sigma.est   sigma.se
+## ones   -1.58587799  1.49582237 0.19963716  3.0286154
+## sugar   0.06139545  0.01818322 0.00241912  0.0802897
+## mushy  -0.01514808  0.10058019 0.13898040  0.4365935
+## price -22.48336422 12.96232478 5.81182098 10.8773193
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:16&quot;
+## [1] 11
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.199628566 0.002419336 0.138951540 5.811639113 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000085977346  0.0000002159051 -0.0000288572886 -0.0001818694317
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.4852542   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02159074   Extrapolation:  TRUE   Steplength:  1.914943 
+## Residual:  0.003825883   Extrapolation:  TRUE   Steplength:  2.822576 
+## Residual:  0.00007244016   Extrapolation:  TRUE   Steplength:  1.388732 
+## Residual:  0.000001504722   Extrapolation:  TRUE   Steplength:  3.393522 
+## Residual:  0.00000001827977   Extrapolation:  TRUE   Steplength:  1.623003 
+##    user  system elapsed 
+##    0.89    0.00    0.90 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000032468 -0.000005865 -0.000002396 -0.000003217  0.000000452 
+##         Max. 
+##  0.000007170 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.58589916  1.49581972 0.199628566
+## sugar   0.06139534  0.01818319 0.002419336
+## mushy  -0.01514233  0.10058004 0.138951540
+## price -22.48317760 12.96230163 5.811639113
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9086373
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:18&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:18&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:18&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:18&quot;
+## [1] 0.0039360317 0.0001165227 0.0132042798 0.0832587328
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:18&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.58589916  1.49581972 0.199628566  3.02848267
+## sugar   0.06139534  0.01818319 0.002419336  0.08028835
+## mushy  -0.01514233  0.10058004 0.138951540  0.43663059
+## price -22.48317760 12.96230163 5.811639113 10.87757206
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:18&quot;
+## [1] 12
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.199566256 0.002417491 0.138742508 5.810321072 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000062310024 -0.000001844633 -0.000209032616 -0.001318041645
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.4849532   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02158332   Extrapolation:  TRUE   Steplength:  1.915046 
+## Residual:  0.003823952   Extrapolation:  TRUE   Steplength:  2.822228 
+## Residual:  0.0000724508   Extrapolation:  TRUE   Steplength:  1.388728 
+## Residual:  0.000001504425   Extrapolation:  TRUE   Steplength:  3.393353 
+## Residual:  0.00000001825762   Extrapolation:  TRUE   Steplength:  1.622806 
+##    user  system elapsed 
+##    0.87    0.00    0.88 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## -0.00024042 -0.00004765 -0.00002265 -0.00002818 -0.00000169  0.00004722 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.58604712  1.49580083 0.199566256
+## sugar   0.06139509  0.01818295 0.002417491
+## mushy  -0.01510087  0.10057899 0.138742508
+## price -22.48186611 12.96213706 5.810321072
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9085548
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:20&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:20&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:20&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:20&quot;
+## [1] 0.0039356575 0.0001166673 0.0131645174 0.0832398096
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:20&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.58604712  1.49580083 0.199566256  3.02755717
+## sugar   0.06139509  0.01818295 0.002417491  0.08029367
+## mushy  -0.01510087  0.10057899 0.138742508  0.43688934
+## price -22.48186611 12.96213706 5.810321072 10.87899937
+## iter:  10  f-value:  0.9085548  pgrad:  0.08323981 
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:20&quot;
+## [1] 13
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1320346664 0.0004156078 0.0000000000 4.3820167228 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.067531590 -0.002001883 -0.138742508 -1.428304349
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.2415592   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01436348   Extrapolation:  TRUE   Steplength:  2.091484 
+## Residual:  0.001340666   Extrapolation:  TRUE   Steplength:  2.194286 
+## Residual:  0.00008018878   Extrapolation:  TRUE   Steplength:  1.842339 
+## Residual:  0.00001512573   Extrapolation:  TRUE   Steplength:  2.825178 
+## Residual:  0.0000001803524   Extrapolation:  TRUE   Steplength:  1.319659 
+##    user  system elapsed 
+##    0.95    0.00    0.95 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.217903 -0.037435 -0.015262 -0.021102  0.003473  0.047651 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.733228566  1.47825734 0.1320346664
+## sugar   0.061185356  0.01796430 0.0004156078
+## mushy   0.008949372  0.09962501 0.0000000000
+## price -21.189609840 12.80919105 4.3820167228
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8299876
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:22&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:22&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:22&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.17 
+## [1] &quot;Updated gradient:2017-10-14 22:19:22&quot;
+## [1]  0.0004774248 -0.2574078336 -0.0062852766  0.0631251330
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:22&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.733228566  1.47825734 0.1320346664  2.29288737
+## sugar   0.061185356  0.01796430 0.0004156078  0.08789238
+## mushy   0.008949372  0.09962501 0.0000000000  0.73161657
+## price -21.189609840 12.80919105 4.3820167228 13.19803138
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:22&quot;
+## [1] 14
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.131805767 0.123828999 0.003013456 4.351751573 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0002288998  0.1234133912  0.0030134565 -0.0302651501
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  4.41594   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.266487   Extrapolation:  TRUE   Steplength:  2.360963 
+## Residual:  0.01355428   Extrapolation:  TRUE   Steplength:  1.732227 
+## Residual:  0.003631684   Extrapolation:  TRUE   Steplength:  3.510065 
+## Residual:  0.00005721778   Extrapolation:  TRUE   Steplength:  1.248054 
+## Residual:  0.000005842905   Extrapolation:  TRUE   Steplength:  3.515499 
+## Residual:  0.0000002456071   Extrapolation:  TRUE   Steplength:  1.978835 
+## Residual:  0.00000005906751   Extrapolation:  TRUE   Steplength:  3.043178 
+##    user  system elapsed 
+##    1.12    0.00    1.13 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.10262  0.02161  0.15680  0.34326  0.58003  1.95785 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##          beta.est     beta.se   sigma.est
+## ones  -2.88856992  1.52790582 0.131805767
+## sugar -0.02035993  0.01873242 0.123828999
+## mushy -0.06590715  0.09881415 0.003013456
+## price -8.90458286 13.26946510 4.351751573
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 5.254152
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:24&quot;
+## [1] 15
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.131920216 0.062122303 0.001506728 4.366884148 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0001144499 -0.0617066956 -0.0015067282  0.0151325751
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  1.532852   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.04042757   Extrapolation:  TRUE   Steplength:  2.011263 
+## Residual:  0.002773034   Extrapolation:  TRUE   Steplength:  2.059495 
+## Residual:  0.0002725674   Extrapolation:  TRUE   Steplength:  2.216393 
+## Residual:  0.0000206227   Extrapolation:  TRUE   Steplength:  1.983857 
+## Residual:  0.000004038626   Extrapolation:  TRUE   Steplength:  2.753319 
+## Residual:  0.000000123234   Extrapolation:  TRUE   Steplength:  1.403156 
+##    user  system elapsed 
+##    1.02    0.00    1.02 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -1.322446 -0.364727 -0.073988 -0.209593  0.001022  0.090715 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -2.13028004  1.47000354 0.131920216
+## sugar   0.03333361  0.01794887 0.062122303
+## mushy  -0.01284223  0.09796807 0.001506728
+## price -17.11529397 12.74986803 4.366884148
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.77407
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:25&quot;
+## [1] 16
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1319774414 0.0312689556 0.0007533641 4.3744504353 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00005722496 -0.03085334781 -0.00075336412  0.00756628754
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.6521579   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01202983   Extrapolation:  TRUE   Steplength:  1.853866 
+## Residual:  0.0005548669   Extrapolation:  TRUE   Steplength:  1.88422 
+## Residual:  0.00004579187   Extrapolation:  TRUE   Steplength:  2.14467 
+## Residual:  0.000002455097   Extrapolation:  TRUE   Steplength:  1.755835 
+## Residual:  0.0000004482514   Extrapolation:  TRUE   Steplength:  2.968191 
+##    user  system elapsed 
+##    0.92    0.00    0.92 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.431348 -0.131461 -0.038615 -0.079440 -0.007941  0.020495 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.853929527  1.47315940 0.1319774414
+## sugar   0.051738602  0.01792885 0.0312689556
+## mushy   0.003802243  0.09900144 0.0007533641
+## price -19.995992278 12.76862049 4.3744504353
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.03945
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:27&quot;
+## [1] 17
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1320060539 0.0158422817 0.0003766821 4.3782335790 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00002861248 -0.01542667390 -0.00037668206  0.00378314377
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.3743262   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.009069548   Extrapolation:  TRUE   Steplength:  1.785241 
+## Residual:  0.001530324   Extrapolation:  TRUE   Steplength:  2.722288 
+## Residual:  0.00002881598   Extrapolation:  TRUE   Steplength:  1.34963 
+## Residual:  0.0000007396998   Extrapolation:  TRUE   Steplength:  3.2487 
+## Residual:  0.00000001697667   Extrapolation:  TRUE   Steplength:  1.877289 
+##    user  system elapsed 
+##    0.87    0.00    0.89 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.132525 -0.048638 -0.018847 -0.030644 -0.006079  0.001511 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.770688674  1.47632927 0.1320060539
+## sugar   0.057709417  0.01794848 0.0158422817
+## mushy   0.007951592  0.09942422 0.0003766821
+## price -20.837207295 12.79348315 4.3782335790
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8789297
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:29&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:29&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:29&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:19:29&quot;
+## [1]  0.0008437491  6.8148693324 -0.0478004330  0.0611158290
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:29&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.770688674  1.47632927 0.1320060539  2.92900609
+## sugar   0.057709417  0.01794848 0.0158422817  0.04314132
+## mushy   0.007951592  0.09942422 0.0003766821  0.81516125
+## price -20.837207295 12.79348315 4.3782335790 14.57990107
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:29&quot;
+## [1] 18
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1320042137 0.0009786982 0.0004809373 4.3781002822 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000001840261 -0.014863583438  0.000104255223 -0.000133296793
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.2428819   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01395858   Extrapolation:  TRUE   Steplength:  2.069568 
+## Residual:  0.001434134   Extrapolation:  TRUE   Steplength:  2.259224 
+## Residual:  0.00007536976   Extrapolation:  TRUE   Steplength:  1.70896 
+## Residual:  0.00001261581   Extrapolation:  TRUE   Steplength:  3.071494 
+## Residual:  0.00000003754457   Extrapolation:  TRUE   Steplength:  1.306856 
+##    user  system elapsed 
+##    0.87    0.00    0.88 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.073295 -0.035413 -0.018014 -0.022868 -0.007597 -0.001637 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.734115245  1.47818078 0.1320042137
+## sugar   0.061102730  0.01796342 0.0009786982
+## mushy   0.008930692  0.09962022 0.0004809373
+## price -21.182526900 12.80853199 4.3781002822
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8297596
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:31&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:31&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:31&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:19:31&quot;
+## [1]  0.0004986635 -0.0078078242 -0.0077029623  0.0629715952
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:31&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.734115245  1.47818078 0.1320042137  2.27941714
+## sugar   0.061102730  0.01796342 0.0009786982  0.08492116
+## mushy   0.008930692  0.09962022 0.0004809373  0.73353737
+## price -21.182526900 12.80853199 4.3781002822 13.26084232
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:31&quot;
+## [1] 19
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1320031273 0.0009957081 0.0004977187 4.3779630945 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000001086371  0.000017009852  0.000016781404 -0.000137187711
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.2429235   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01394669   Extrapolation:  TRUE   Steplength:  2.068908 
+## Residual:  0.00143699   Extrapolation:  TRUE   Steplength:  2.261187 
+## Residual:  0.00007527471   Extrapolation:  TRUE   Steplength:  1.705361 
+## Residual:  0.00001248964   Extrapolation:  TRUE   Steplength:  3.076168 
+## Residual:  0.00000003590916   Extrapolation:  TRUE   Steplength:  1.306731 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000006249  0.000010291  0.000018258  0.000021756  0.000031931 
+##         Max. 
+##  0.000056879 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.734144824  1.47817823 0.1320031273
+## sugar   0.061100174  0.01796339 0.0009957081
+## mushy   0.008929878  0.09962006 0.0004977187
+## price -21.182286572 12.80851007 4.3779630945
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8297539
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:33&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:33&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:33&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:19:33&quot;
+## [1]  0.0004997550 -0.0002684427 -0.0077453285  0.0629666911
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:33&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.734144824  1.47817823 0.1320031273  2.27909048
+## sugar   0.061100174  0.01796339 0.0009957081  0.08483425
+## mushy   0.008929878  0.09962006 0.0004977187  0.73358613
+## price -21.182286572 12.80851007 4.3779630945 13.26275807
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:33&quot;
+## [1] 20
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1320020002 0.0009963135 0.0005151873 4.3778210814 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000011271319  0.0000006054373  0.0000174685730 -0.0001420131169
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.2429101   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0139453   Extrapolation:  TRUE   Steplength:  2.06888 
+## Residual:  0.001436995   Extrapolation:  TRUE   Steplength:  2.261257 
+## Residual:  0.00007526494   Extrapolation:  TRUE   Steplength:  1.70522 
+## Residual:  0.00001248368   Extrapolation:  TRUE   Steplength:  3.076334 
+## Residual:  0.00000003584487   Extrapolation:  TRUE   Steplength:  1.306723 
+##    user  system elapsed 
+##    0.88    0.01    0.91 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0000153288 -0.0000013736  0.0000007021  0.0000002984  0.0000024835 
+##          Max. 
+##  0.0000069904 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.734159113  1.47817672 0.1320020002
+## sugar   0.061100038  0.01796337 0.0009963135
+## mushy   0.008928471  0.09961998 0.0005151873
+## price -21.182161964 12.80849693 4.3778210814
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8297469
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:35&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:35&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:35&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:35&quot;
+## [1]  0.00050264826 -0.00002280627 -0.00774367263  0.06296438164
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:35&quot;
+##            beta.est     beta.se    sigma.est   sigma.se
+## ones   -1.734159113  1.47817672 0.1320020002  2.2790350
+## sugar   0.061100038  0.01796337 0.0009963135  0.0848314
+## mushy   0.008928471  0.09961998 0.0005151873  0.7335231
+## price -21.182161964 12.80849693 4.3778210814 13.2631734
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:35&quot;
+## [1] 21
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1319978164 0.0009965034 0.0005796412 4.3772970019 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000041837564  0.0000001898263  0.0000644538986 -0.0005240794731
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.242854   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0139415   Extrapolation:  TRUE   Steplength:  2.068858 
+## Residual:  0.001436658   Extrapolation:  TRUE   Steplength:  2.261282 
+## Residual:  0.00007523946   Extrapolation:  TRUE   Steplength:  1.705128 
+## Residual:  0.00001247676   Extrapolation:  TRUE   Steplength:  3.076393 
+## Residual:  0.00000003579721   Extrapolation:  TRUE   Steplength:  1.306706 
+##    user  system elapsed 
+##    0.89    0.00    0.89 
+##           Min.        1st Qu.         Median           Mean        3rd Qu. 
+## -0.00005956507 -0.00000721853  0.00000000142 -0.00000157064  0.00000682900 
+##           Max. 
+##  0.00002253028 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.734209872  1.47817128 0.1319978164
+## sugar   0.061099840  0.01796331 0.0009965034
+## mushy   0.008923211  0.09961968 0.0005796412
+## price -21.181717130 12.80844958 4.3772970019
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8297209
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:37&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:37&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:37&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:37&quot;
+## [1]  0.00051352077 -0.00002516699 -0.00773209327  0.06295619248
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:37&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.734209872  1.47817128 0.1319978164  2.27886406
+## sugar   0.061099840  0.01796331 0.0009965034  0.08483134
+## mushy   0.008923211  0.09961968 0.0005796412  0.73327725
+## price -21.181717130 12.80844958 4.3772970019 13.26451766
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:37&quot;
+## [1] 22
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.124108130 0.001383167 0.119374824 3.410043742 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0078896867  0.0003866634  0.1187951833 -0.9672532603
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1607379   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.007310662   Extrapolation:  TRUE   Steplength:  1.929928 
+## Residual:  0.001094188   Extrapolation:  TRUE   Steplength:  2.586793 
+## Residual:  0.0000237307   Extrapolation:  TRUE   Steplength:  1.355268 
+## Residual:  0.0000006438403   Extrapolation:  TRUE   Steplength:  3.15561 
+##    user  system elapsed 
+##    0.77    0.00    0.77 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0995159 -0.0113135  0.0012223 -0.0007467  0.0138243  0.0407937 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.81854467  1.46946024 0.124108130
+## sugar   0.06076446  0.01785502 0.001383167
+## mushy  -0.00491039  0.09915261 0.119374824
+## price -20.44351203 12.73254890 3.410043742
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7879389
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:39&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:39&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:39&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:39&quot;
+## [1] 0.01816864 0.02611807 0.01380927 0.04812735
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:39&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.81854467  1.46946024 0.124108130  2.01799985
+## sugar   0.06076446  0.01785502 0.001383167  0.08446442
+## mushy  -0.00491039  0.09915261 0.119374824  0.45154418
+## price -20.44351203 12.73254890 3.410043742 16.57221649
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:39&quot;
+## [1] 23
+## [1] &quot;Updated theta2 estimate:&quot;
+##     ones    sugar    mushy    price 
+## 0.000000 0.000000 0.000000 2.929283 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.124108130 -0.001383167 -0.119374824 -0.480760447
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1056502   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005961687   Extrapolation:  TRUE   Steplength:  2.064028 
+## Residual:  0.0005280933   Extrapolation:  TRUE   Steplength:  2.159667 
+## Residual:  0.00002882424   Extrapolation:  TRUE   Steplength:  1.796486 
+## Residual:  0.000005122535   Extrapolation:  TRUE   Steplength:  2.769992 
+## Residual:  0.00000004925943   Extrapolation:  TRUE   Steplength:  1.285521 
+##    user  system elapsed 
+##    0.92    0.00    0.92 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.058093 -0.012686 -0.003222 -0.005260  0.003099  0.015779 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se sigma.est
+## ones   -1.85251389  1.46559259  0.000000
+## sugar   0.06086920  0.01780593  0.000000
+## mushy   0.01246322  0.09893957  0.000000
+## price -20.18411586 12.69874133  2.929283
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7716817
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:41&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:41&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:41&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:41&quot;
+## [1] -0.046625555 -0.195653355 -0.002523674  0.044025061
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:41&quot;
+##           beta.est     beta.se sigma.est    sigma.se
+## ones   -1.85251389  1.46559259  0.000000  1.74472582
+## sugar   0.06086920  0.01780593  0.000000  0.08860247
+## mushy   0.01246322  0.09893957  0.000000  0.73051068
+## price -20.18411586 12.69874133  2.929283 18.31567250
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:41&quot;
+## [1] 24
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0106607749 0.0447354756 0.0005770295 2.9192171140 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0106607749  0.0447354756  0.0005770295 -0.0100661808
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.8871064   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02065855   Extrapolation:  TRUE   Steplength:  1.938755 
+## Residual:  0.001962587   Extrapolation:  TRUE   Steplength:  2.267889 
+## Residual:  0.00009322464   Extrapolation:  TRUE   Steplength:  1.626177 
+## Residual:  0.00001216657   Extrapolation:  TRUE   Steplength:  3.136869 
+## Residual:  0.00000004511372   Extrapolation:  TRUE   Steplength:  1.296441 
+##    user  system elapsed 
+##    0.87    0.00    0.91 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.006795  0.010526  0.050503  0.082658  0.134765  0.380965 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##             beta.est     beta.se    sigma.est
+## ones   -2.0510328332  1.45983203 0.0106607749
+## sugar   0.0440867096  0.01778520 0.0447354756
+## mushy  -0.0006575463  0.09798272 0.0005770295
+## price -18.0707708135 12.65565339 2.9192171140
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.23956
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:42&quot;
+## [1] 25
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0053303875 0.0223677378 0.0002885147 2.9242502044 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0053303875 -0.0223677378 -0.0002885147  0.0050330904
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.3765477   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.006989832   Extrapolation:  TRUE   Steplength:  1.837237 
+## Residual:  0.0005401978   Extrapolation:  TRUE   Steplength:  2.147414 
+## Residual:  0.00002354941   Extrapolation:  TRUE   Steplength:  1.623436 
+## Residual:  0.000003006239   Extrapolation:  TRUE   Steplength:  2.96344 
+## Residual:  0.00000001447517   Extrapolation:  TRUE   Steplength:  1.278409 
+##    user  system elapsed 
+##    0.90    0.00    0.91 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.255016 -0.080549 -0.025067 -0.048307 -0.003498  0.010884 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -1.908433675  1.46322475 0.0053303875
+## sugar   0.055055500  0.01779098 0.0223677378
+## mushy   0.009304615  0.09863851 0.0002885147
+## price -19.603789217 12.68008120 2.9242502044
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.8786681
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:44&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:44&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:44&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:44&quot;
+## [1] -0.04770394 10.23333590 -0.05619404  0.04082224
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:44&quot;
+##            beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.908433675  1.46322475 0.0053303875  2.51357275
+## sugar   0.055055500  0.01779098 0.0223677378  0.03331386
+## mushy   0.009304615  0.09863851 0.0002885147  0.85084009
+## price -19.603789217 12.68008120 2.9242502044 20.44786888
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:44&quot;
+## [1] 26
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0054326963 0.0004206952 0.0004090319 2.9241626545 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00010230880 -0.02194704260  0.00012051719 -0.00008754989
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1058735   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005762966   Extrapolation:  TRUE   Steplength:  2.041653 
+## Residual:  0.0005651086   Extrapolation:  TRUE   Steplength:  2.226044 
+## Residual:  0.00002679992   Extrapolation:  TRUE   Steplength:  1.660685 
+## Residual:  0.000004045191   Extrapolation:  TRUE   Steplength:  2.992443 
+## Residual:  0.00000000905914   Extrapolation:  TRUE   Steplength:  1.274351 
+##    user  system elapsed 
+##    0.91    0.00    0.92 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.125215 -0.054056 -0.025279 -0.034073 -0.008131 -0.001262 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85301255  1.46551133 0.0054326963
+## sugar   0.06080869  0.01780496 0.0004206952
+## mushy   0.01244454  0.09893507 0.0004090319
+## price -20.17814019 12.69803574 2.9241626545
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.771265
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:46&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:46&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:46&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:19:46&quot;
+## [1] -0.043196935 -0.012774470 -0.003424264  0.043755578
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:46&quot;
+##           beta.est     beta.se    sigma.est   sigma.se
+## ones   -1.85301255  1.46551133 0.0054326963  1.7359583
+## sugar   0.06080869  0.01780496 0.0004206952  0.0864034
+## mushy   0.01244454  0.09893507 0.0004090319  0.7316118
+## price -20.17814019 12.69803574 2.9241626545 18.4140196
+## iter:  20  f-value:  0.771265  pgrad:  0.04375558 
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:46&quot;
+## [1] 27
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0055252238 0.0004480580 0.0004163667 2.9240689304 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.000092527526  0.000027362824  0.000007334748 -0.000093724135
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1059429   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005747855   Extrapolation:  TRUE   Steplength:  2.039574 
+## Residual:  0.0005688598   Extrapolation:  TRUE   Steplength:  2.232234 
+## Residual:  0.00002668712   Extrapolation:  TRUE   Steplength:  1.649575 
+## Residual:  0.000003901819   Extrapolation:  TRUE   Steplength:  3.004424 
+## Residual:  0.000000007935035   Extrapolation:  TRUE   Steplength:  1.273975 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000008631  0.000009890  0.000026359  0.000029463  0.000046773 
+##         Max. 
+##  0.000077431 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85303033  1.46550936 0.0055252238
+## sugar   0.06080479  0.01780494 0.0004480580
+## mushy   0.01244447  0.09893494 0.0004163667
+## price -20.17796549 12.69801884 2.9240689304
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7712589
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:48&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:48&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:48&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:48&quot;
+## [1] -0.0431434260 -0.0007973963 -0.0034868150  0.0437482911
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:48&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.85303033  1.46550936 0.0055252238  1.73524226
+## sugar   0.06080479  0.01780494 0.0004480580  0.08625783
+## mushy   0.01244447  0.09893494 0.0004163667  0.73177164
+## price -20.17796549 12.69801884 2.9240689304 18.41741923
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:48&quot;
+## [1] 28
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0056253410 0.0004499084 0.0004244581 2.9239674096 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.000100117187  0.000001850411  0.000008091386 -0.000101520816
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1059292   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005747783   Extrapolation:  TRUE   Steplength:  2.039656 
+## Residual:  0.0005686428   Extrapolation:  TRUE   Steplength:  2.231987 
+## Residual:  0.00002668803   Extrapolation:  TRUE   Steplength:  1.650005 
+## Residual:  0.000003906997   Extrapolation:  TRUE   Steplength:  3.003965 
+## Residual:  0.000000007973627   Extrapolation:  TRUE   Steplength:  1.273985 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0000129240 -0.0000034830 -0.0000018717 -0.0000020614 -0.0000004946 
+##          Max. 
+##  0.0000043169 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85303786  1.46550800 0.0056253410
+## sugar   0.06080449  0.01780492 0.0004499084
+## mushy   0.01244397  0.09893487 0.0004244581
+## price -20.17786666 12.69800702 2.9239674096
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7712518
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:50&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:50&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:50&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.17 
+## [1] &quot;Updated gradient:2017-10-14 22:19:50&quot;
+## [1] -0.04307868297 -0.00001603215 -0.00348954687  0.04374399192
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:50&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.85303786  1.46550800 0.0056253410  1.73528073
+## sugar   0.06080449  0.01780492 0.0004499084  0.08624998
+## mushy   0.01244397  0.09893487 0.0004244581  0.73174788
+## price -20.17786666 12.69800702 2.9239674096 18.41874595
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:50&quot;
+## [1] 29
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.006209916 0.000450126 0.000471811 2.923373806 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0005845749390  0.0000002175553  0.0000473529251 -0.0005936031384
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1058157   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005753587   Extrapolation:  TRUE   Steplength:  2.041026 
+## Residual:  0.0005657449   Extrapolation:  TRUE   Steplength:  2.227891 
+## Residual:  0.00002674043   Extrapolation:  TRUE   Steplength:  1.657286 
+## Residual:  0.000003998386   Extrapolation:  TRUE   Steplength:  2.996124 
+## Residual:  0.000000008685008   Extrapolation:  TRUE   Steplength:  1.274206 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0000959408 -0.0000311020 -0.0000228984 -0.0000249852 -0.0000156833 
+##          Max. 
+##  0.0000001666 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.85307737  1.46550038 0.006209916
+## sugar   0.06080419  0.01780483 0.000450126
+## mushy   0.01244088  0.09893447 0.000471811
+## price -20.17732395 12.69794066 2.923373806
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7712098
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:52&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:52&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:52&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:52&quot;
+## [1] -0.04269810452 -0.00009857235 -0.00348072370  0.04372025601
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:52&quot;
+##           beta.est     beta.se   sigma.est   sigma.se
+## ones   -1.85307737  1.46550038 0.006209916  1.7358140
+## sugar   0.06080419  0.01780483 0.000450126  0.0862611
+## mushy   0.01244088  0.09893447 0.000471811  0.7315340
+## price -20.17732395 12.69794066 2.923373806 18.4256020
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:52&quot;
+## [1] 30
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0726472092 0.0006035024 0.0058877390 2.8553460684 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0664372933  0.0001533764  0.0054159280 -0.0680277381
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.09831249   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.006828592   Extrapolation:  TRUE   Steplength:  2.202107 
+## Residual:  0.0003548909   Extrapolation:  TRUE   Steplength:  1.79737 
+## Residual:  0.00006123989   Extrapolation:  TRUE   Steplength:  2.759837 
+## Residual:  0.0000006018325   Extrapolation:  TRUE   Steplength:  1.289283 
+## Residual:  0.00000001527181   Extrapolation:  TRUE   Steplength:  3.129236 
+##    user  system elapsed 
+##    0.90    0.00    0.91 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0093042 -0.0031712 -0.0023815 -0.0026318 -0.0017397 -0.0005018 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85756660  1.46494677 0.0726472092
+## sugar   0.06075294  0.01779819 0.0006035024
+## mushy   0.01207170  0.09890321 0.0058877390
+## price -20.11603420 12.69314831 2.8553460684
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.767598
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:54&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:54&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:54&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:54&quot;
+## [1] -0.0003793197  0.0488534111 -0.0028735171  0.0411279897
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:54&quot;
+##           beta.est     beta.se    sigma.est   sigma.se
+## ones   -1.85756660  1.46494677 0.0726472092  1.8050189
+## sugar   0.06075294  0.01779819 0.0006035024  0.0866471
+## mushy   0.01207170  0.09890321 0.0058877390  0.7087188
+## price -20.11603420 12.69314831 2.8553460684 19.2176718
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:54&quot;
+## [1] 31
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.072918404 0.000000000 0.007942159 2.825941626 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.0002711945 -0.0006035024  0.0020544201 -0.0294044424
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.09585886   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.00721351   Extrapolation:  TRUE   Steplength:  2.257609 
+## Residual:  0.0003306289   Extrapolation:  TRUE   Steplength:  1.689021 
+## Residual:  0.00005170935   Extrapolation:  TRUE   Steplength:  2.935698 
+## Residual:  0.0000001832495   Extrapolation:  TRUE   Steplength:  1.277339 
+##    user  system elapsed 
+##    0.75    0.00    0.75 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0034600 -0.0012890 -0.0008161 -0.0008220 -0.0002377  0.0006390 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.85928643  1.46476628 0.072918404
+## sugar   0.06083009  0.01779591 0.000000000
+## mushy   0.01189685  0.09889363 0.007942159
+## price -20.10060901 12.69157208 2.825941626
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7666623
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:56&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:56&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:56&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:19:56&quot;
+## [1]  0.0005133945 -0.2174507394 -0.0010567883  0.0407529812
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:56&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.85928643  1.46476628 0.072918404  1.81855459
+## sugar   0.06083009  0.01779591 0.000000000  0.09014041
+## mushy   0.01189685  0.09889363 0.007942159  0.69718830
+## price -20.10060901 12.69157208 2.825941626 19.36815649
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:56&quot;
+## [1] 32
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0729171317 0.0005387554 0.0079447774 2.8258406564 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000001271985  0.000538755430  0.000002618296 -0.000100969488
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.09625167   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.006754478   Extrapolation:  TRUE   Steplength:  2.209307 
+## Residual:  0.0003439804   Extrapolation:  TRUE   Steplength:  1.780932 
+## Residual:  0.0000593885   Extrapolation:  TRUE   Steplength:  2.790691 
+## Residual:  0.0000004979916   Extrapolation:  TRUE   Steplength:  1.285885 
+## Residual:  0.00000001458502   Extrapolation:  TRUE   Steplength:  3.126575 
+##    user  system elapsed 
+##    0.91    0.00    0.91 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## 0.00001871 0.00025760 0.00064172 0.00065626 0.00099280 0.00152977 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85949882  1.46475163 0.0729171317
+## sugar   0.06075551  0.01779575 0.0005387554
+## mushy   0.01190643  0.09889261 0.0079447774
+## price -20.09904439 12.69144735 2.8258406564
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7666204
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:19:58&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:19:58&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:19:58&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:19:58&quot;
+## [1]  0.0004127541  0.0192451253 -0.0023452852  0.0406820146
+## [1] &quot;Updated coefficients table:2017-10-14 22:19:58&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.85949882  1.46475163 0.0729171317  1.80174437
+## sugar   0.06075551  0.01779575 0.0005387554  0.08704744
+## mushy   0.01190643  0.09889261 0.0079447774  0.70079685
+## price -20.09904439 12.69144735 2.8258406564 19.40617513
+## [1] &quot;GMM Loop number: 2017-10-14 22:19:58&quot;
+## [1] 33
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0729161922 0.0004949506 0.0079501156 2.8257480580 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000009394912 -0.0000438048398  0.0000053382268 -0.0000925984684
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.09619763   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.006791638   Extrapolation:  TRUE   Steplength:  2.213342 
+## Residual:  0.0003425004   Extrapolation:  TRUE   Steplength:  1.772534 
+## Residual:  0.00005904594   Extrapolation:  TRUE   Steplength:  2.806667 
+## Residual:  0.0000004560532   Extrapolation:  TRUE   Steplength:  1.28461 
+## Residual:  0.0000000143208   Extrapolation:  TRUE   Steplength:  3.125951 
+##    user  system elapsed 
+##    0.89    0.00    0.91 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0001253651 -0.0000827189 -0.0000536405 -0.0000539585 -0.0000214634 
+##          Max. 
+## -0.0000002907 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.85948611  1.46475223 0.0729161922
+## sugar   0.06076168  0.01779576 0.0004949506
+## mushy   0.01190540  0.09889267 0.0079501156
+## price -20.09913670 12.69145226 2.8257480580
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7666158
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:00&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:00&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:00&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:00&quot;
+## [1]  0.000422248488 -0.000005013795 -0.002239509260  0.040686282641
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:00&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.85948611  1.46475223 0.0729161922  1.80291156
+## sugar   0.06076168  0.01779576 0.0004949506  0.08729196
+## mushy   0.01190540  0.09889267 0.0079501156  0.70048413
+## price -20.09913670 12.69145226 2.8257480580 19.40380069
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:00&quot;
+## [1] 34
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.072915231 0.000494962 0.007955213 2.825655459 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00000096100523  0.00000001141101  0.00000509695160 -0.00009259886398
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.09619136   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.006791202   Extrapolation:  TRUE   Steplength:  2.213344 
+## Residual:  0.0003424745   Extrapolation:  TRUE   Steplength:  1.772527 
+## Residual:  0.00005904118   Extrapolation:  TRUE   Steplength:  2.806674 
+## Residual:  0.0000004559871   Extrapolation:  TRUE   Steplength:  1.284608 
+## Residual:  0.00000001431962   Extrapolation:  TRUE   Steplength:  3.125945 
+##    user  system elapsed 
+##    0.89    0.00    0.91 
+##           Min.        1st Qu.         Median           Mean        3rd Qu. 
+## -0.00000722119 -0.00000085502 -0.00000001628 -0.00000023174  0.00000074277 
+##           Max. 
+##  0.00000249836 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.85949224  1.46475161 0.072915231
+## sugar   0.06076166  0.01779575 0.000494962
+## mushy   0.01190503  0.09889263 0.007955213
+## price -20.09908346 12.69144684 2.825655459
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7666128
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:02&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:02&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:02&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:02&quot;
+## [1]  0.00042360229607 -0.00000006246439 -0.00223857987690  0.04068489602887
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:02&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.85949224  1.46475161 0.072915231  1.80289295
+## sugar   0.06076166  0.01779575 0.000494962  0.08729198
+## mushy   0.01190503  0.09889263 0.007955213  0.70046588
+## price -20.09908346 12.69144684 2.825655459 19.40440374
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:02&quot;
+## [1] 35
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0709976209 0.0004952448 0.0180890668 2.6414785131 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0019176103373  0.0000002827708  0.0101338542134 -0.1841769459728
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.08415589   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.005950069   Extrapolation:  TRUE   Steplength:  2.216597 
+## Residual:  0.000293714   Extrapolation:  TRUE   Steplength:  1.759026 
+## Residual:  0.00005006879   Extrapolation:  TRUE   Steplength:  2.818978 
+## Residual:  0.0000003429045   Extrapolation:  TRUE   Steplength:  1.280467 
+## Residual:  0.00000001208453   Extrapolation:  TRUE   Steplength:  3.113197 
+##    user  system elapsed 
+##    0.94    0.00    0.94 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## -0.01394905 -0.00164803 -0.00004901 -0.00044377  0.00144133  0.00486790 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.87131156  1.46355802 0.0709976209
+## sugar   0.06072259  0.01778084 0.0004952448
+## mushy   0.01112388  0.09882770 0.0180890668
+## price -19.99654382 12.68104266 2.6414785131
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.760786
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:04&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:04&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:04&quot;
+##    user  system elapsed 
+##    0.19    0.02    0.21 
+## [1] &quot;Updated gradient:2017-10-14 22:20:04&quot;
+## [1]  0.0030340892 -0.0002858708 -0.0003482638  0.0379369569
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:04&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.87131156  1.46355802 0.0709976209  1.76791460
+## sugar   0.06072259  0.01778084 0.0004952448  0.08746119
+## mushy   0.01112388  0.09882770 0.0180890668  0.66578174
+## price -19.99654382 12.68104266 2.6414785131 20.69147522
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:04&quot;
+## [1] 36
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.000000000 0.008748287 0.028143383 1.546244960 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.070997621  0.008253042  0.010054316 -1.095233553
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.1176632   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.002326377   Extrapolation:  TRUE   Steplength:  1.833946 
+## Residual:  0.000240547   Extrapolation:  TRUE   Steplength:  2.364409 
+## Residual:  0.000007120766   Extrapolation:  TRUE   Steplength:  1.412897 
+## Residual:  0.0000003045467   Extrapolation:  TRUE   Steplength:  3.030394 
+##    user  system elapsed 
+##    0.69    0.00    0.69 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.04568  0.00257  0.01099  0.01032  0.01837  0.04399 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.93513047  1.45774836 0.000000000
+## sugar   0.05900753  0.01771023 0.008748287
+## mushy   0.01107543  0.09848687 0.028143383
+## price -19.45191441 12.63067013 1.546244960
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7502466
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:06&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:06&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:06&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:06&quot;
+## [1] -0.01921206  3.80176887 -0.01551792  0.02196697
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:06&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.93513047  1.45774836 0.000000000  1.43982773
+## sugar   0.05900753  0.01771023 0.008748287  0.05527613
+## mushy   0.01107543  0.09848687 0.028143383  0.68023014
+## price -19.45191441 12.63067013 1.546244960 34.82412246
+## iter:  30  f-value:  0.7502466  pgrad:  0.02196697 
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:06&quot;
+## [1] 37
+## [1] &quot;Updated theta2 estimate:&quot;
+##          ones         sugar         mushy         price 
+## 0.00006684111 0.00000000000 0.02819737192 1.54616853410 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00006684111 -0.00874828686  0.00005398876 -0.00007642578
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02953359   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.001542382   Extrapolation:  TRUE   Steplength:  2.030128 
+## Residual:  0.0001463979   Extrapolation:  TRUE   Steplength:  2.212359 
+## Residual:  0.000006470633   Extrapolation:  TRUE   Steplength:  1.632516 
+## Residual:  0.0000009072544   Extrapolation:  TRUE   Steplength:  2.944962 
+##    user  system elapsed 
+##    0.76    0.00    0.77 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0339589 -0.0180225 -0.0098361 -0.0113838 -0.0033338 -0.0001062 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se     sigma.est
+## ones   -1.92737578  1.45806333 0.00006684111
+## sugar   0.06061661  0.01771195 0.00000000000
+## mushy   0.01157261  0.09852928 0.02819737192
+## price -19.53497864 12.63311803 1.54616853410
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7343226
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:08&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:08&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:08&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:08&quot;
+## [1] -0.017673030 -0.116029143  0.003628001  0.022847543
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:08&quot;
+##           beta.est     beta.se     sigma.est    sigma.se
+## ones   -1.92737578  1.45806333 0.00006684111  1.57406899
+## sugar   0.06061661  0.01771195 0.00000000000  0.08939378
+## mushy   0.01157261  0.09852928 0.02819737192  0.63169473
+## price -19.53497864 12.63311803 1.54616853410 34.20011723
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:08&quot;
+## [1] 38
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0001063046 0.0002590903 0.0281892707 1.5461175161 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.000039463452  0.000259090296 -0.000008101238 -0.000051018016
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.03046795   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.001425366   Extrapolation:  TRUE   Steplength:  1.958983 
+## Residual:  0.0001782051   Extrapolation:  TRUE   Steplength:  2.417467 
+## Residual:  0.000005047027   Extrapolation:  TRUE   Steplength:  1.393749 
+## Residual:  0.0000001912233   Extrapolation:  TRUE   Steplength:  3.050519 
+##    user  system elapsed 
+##    0.72    0.00    0.72 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## 0.0000005219 0.0001073593 0.0002980098 0.0003027210 0.0004646619 
+##         Max. 
+## 0.0007036889 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92739981  1.45806175 0.0001063046
+## sugar   0.06058151  0.01771193 0.0002590903
+## mushy   0.01157595  0.09852918 0.0281892707
+## price -19.53479609 12.63310441 1.5461175161
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7343074
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:10&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:10&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:10&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:10&quot;
+## [1] -0.017704392 -0.001362016  0.003064158  0.022826524
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:10&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92739981  1.45806175 0.0001063046  1.55846047
+## sugar   0.06058151  0.01771193 0.0002590903  0.08788621
+## mushy   0.01157595  0.09852918 0.0281892707  0.63327340
+## price -19.53479609 12.63310441 1.5461175161 34.22010365
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:10&quot;
+## [1] 39
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0001463126 0.0002621682 0.0281823464 1.5460659332 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.000040008018  0.000003077856 -0.000006924320 -0.000051582907
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.03047189   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.001424632   Extrapolation:  TRUE   Steplength:  1.958568 
+## Residual:  0.0001783374   Extrapolation:  TRUE   Steplength:  2.418585 
+## Residual:  0.000005034922   Extrapolation:  TRUE   Steplength:  1.39301 
+## Residual:  0.0000001897849   Extrapolation:  TRUE   Steplength:  3.050584 
+##    user  system elapsed 
+##     0.7     0.0     0.7 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000003611 -0.000000801  0.000001448  0.000001488  0.000003600 
+##         Max. 
+##  0.000006445 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92740098  1.45806142 0.0001463126
+## sugar   0.06058108  0.01771193 0.0002621682
+## mushy   0.01157687  0.09852916 0.0281823464
+## price -19.53477145 12.63310157 1.5460659332
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7343059
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:11&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:11&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:12&quot;
+##    user  system elapsed 
+##    0.20    0.00    0.21 
+## [1] &quot;Updated gradient:2017-10-14 22:20:12&quot;
+## [1] -0.0176816602  0.0000107931  0.0030564613  0.0228248555
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:12&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92740098  1.45806142 0.0001463126  1.55832713
+## sugar   0.06058108  0.01771193 0.0002621682  0.08786928
+## mushy   0.01157687  0.09852916 0.0281823464  0.63331088
+## price -19.53477145 12.63310157 1.5460659332 34.22208119
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:12&quot;
+## [1] 40
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0001957802 0.0002621380 0.0281737954 1.5460020765 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.00004946767189 -0.00000003019567 -0.00000855100843 -0.00006385669974
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.03046108   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.001425161   Extrapolation:  TRUE   Steplength:  1.959057 
+## Residual:  0.0001781321   Extrapolation:  TRUE   Steplength:  2.417237 
+## Residual:  0.000005048084   Extrapolation:  TRUE   Steplength:  1.393895 
+## Residual:  0.000000191461   Extrapolation:  TRUE   Steplength:  3.050498 
+##    user  system elapsed 
+##    0.67    0.00    0.69 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000007330 -0.000003171 -0.000002563 -0.000002688 -0.000002080 
+##         Max. 
+## -0.000001091 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92740200  1.45806104 0.0001957802
+## sugar   0.06058108  0.01771192 0.0002621380
+## mushy   0.01157799  0.09852914 0.0281737954
+## price -19.53474439 12.63309824 1.5460020765
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7343039
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:13&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:13&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:13&quot;
+##    user  system elapsed 
+##    0.21    0.00    0.20 
+## [1] &quot;Updated gradient:2017-10-14 22:20:13&quot;
+## [1] -0.0176527523  0.0000105554  0.0030552768  0.0228230842
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:13&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92740200  1.45806104 0.0001957802  1.55838647
+## sugar   0.06058108  0.01771192 0.0002621380  0.08787035
+## mushy   0.01157799  0.09852914 0.0281737954  0.63333415
+## price -19.53474439 12.63309824 1.5460020765 34.22426331
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:14&quot;
+## [1] 41
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.032827415 0.000242626 0.022526026 1.503812930 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.03263163523 -0.00001951197 -0.00564776970 -0.04218914692
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02708769   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.002168659   Extrapolation:  TRUE   Steplength:  2.33194 
+## Residual:  0.00007841683   Extrapolation:  TRUE   Steplength:  1.554692 
+## Residual:  0.000008241588   Extrapolation:  TRUE   Steplength:  2.983746 
+## Residual:  0.00000002358107   Extrapolation:  TRUE   Steplength:  1.257072 
+##    user  system elapsed 
+##    0.67    0.01    0.69 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0044623 -0.0020287 -0.0016763 -0.0017489 -0.0013595 -0.0009066 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.92806959  1.45788366 0.032827415
+## sugar   0.06057594  0.01770975 0.000242626
+## mushy   0.01230768  0.09851919 0.022526026
+## price -19.51706230 12.63155754 1.503812930
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7332826
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:15&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:15&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:15&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:15&quot;
+## [1] 0.0011506767 0.0006758594 0.0022733159 0.0216882902
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:15&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.92806959  1.45788366 0.032827415  1.60183896
+## sugar   0.06057594  0.01770975 0.000242626  0.08851636
+## mushy   0.01230768  0.09851919 0.022526026  0.64908662
+## price -19.51706230 12.63155754 1.503812930 35.69691291
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:15&quot;
+## [1] 42
+## [1] &quot;Updated theta2 estimate:&quot;
+##       ones      sugar      mushy      price 
+## 0.03067464 0.00000000 0.01827293 1.46323677 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.002152777 -0.000242626 -0.004253099 -0.040576164
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02616056   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.002194147   Extrapolation:  TRUE   Steplength:  2.409618 
+## Residual:  0.000067307   Extrapolation:  TRUE   Steplength:  1.483369 
+## Residual:  0.00000520701   Extrapolation:  TRUE   Steplength:  3.010785 
+## Residual:  0.00000003511019   Extrapolation:  TRUE   Steplength:  1.281345 
+##    user  system elapsed 
+##    0.68    0.00    0.70 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0027469 -0.0006957 -0.0003687 -0.0004467 -0.0001296  0.0004925 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se  sigma.est
+## ones   -1.92956186  1.45773697 0.03067464
+## sugar   0.06060415  0.01770790 0.00000000
+## mushy   0.01284634  0.09851115 0.01827293
+## price -19.50497427 12.63027757 1.46323677
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7325752
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:17&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:17&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:17&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:17&quot;
+## [1]  0.0006078039 -0.0941090923  0.0021942653  0.0211414242
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:17&quot;
+##           beta.est     beta.se  sigma.est    sigma.se
+## ones   -1.92956186  1.45773697 0.03067464  1.61482499
+## sugar   0.06060415  0.01770790 0.00000000  0.08984256
+## mushy   0.01284634  0.09851115 0.01827293  0.66098251
+## price -19.50497427 12.63027757 1.46323677 36.64968795
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:17&quot;
+## [1] 43
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0306714801 0.0004890637 0.0182615239 1.4631268984 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00000315862  0.00048906373 -0.00001140310 -0.00010986721
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02556126   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.00196071   Extrapolation:  TRUE   Steplength:  2.293077 
+## Residual:  0.00007662654   Extrapolation:  TRUE   Steplength:  1.600141 
+## Residual:  0.000009469574   Extrapolation:  TRUE   Steplength:  2.953829 
+## Residual:  0.00000002196712   Extrapolation:  TRUE   Steplength:  1.25724 
+##    user  system elapsed 
+##     0.7     0.0     0.7 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## 0.000004492 0.000205023 0.000565918 0.000576321 0.000883391 0.001346281 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92962265  1.45773339 0.0306714801
+## sugar   0.06053717  0.01770787 0.0004890637
+## mushy   0.01285014  0.09851088 0.0182615239
+## price -19.50448891 12.63024745 1.4631268984
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.732583
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:19&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:19&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:19&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:19&quot;
+## [1] 0.0005247269 0.1227923328 0.0011151053 0.0211037382
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:19&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92962265  1.45773339 0.0306714801  1.58416302
+## sugar   0.06053717  0.01770787 0.0004890637  0.08698975
+## mushy   0.01285014  0.09851088 0.0182615239  0.66414528
+## price -19.50448891 12.63024745 1.4631268984 36.67906831
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:19&quot;
+## [1] 44
+## [1] &quot;Updated theta2 estimate:&quot;
+##        ones       sugar       mushy       price 
+## 0.030670297 0.000212158 0.018259009 1.463079308 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000001183298 -0.000276905687 -0.000002514644 -0.000047590472
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02576847   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.002120678   Extrapolation:  TRUE   Steplength:  2.365938 
+## Residual:  0.00007114838   Extrapolation:  TRUE   Steplength:  1.519154 
+## Residual:  0.000006475232   Extrapolation:  TRUE   Steplength:  2.999204 
+## Residual:  0.00000002651579   Extrapolation:  TRUE   Steplength:  1.260801 
+##    user  system elapsed 
+##    0.69    0.00    0.68 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## -0.00076945 -0.00050314 -0.00031949 -0.00032762 -0.00011689 -0.00000178 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se   sigma.est
+## ones   -1.92958669  1.45773524 0.030670297
+## sugar   0.06057542  0.01770788 0.000212158
+## mushy   0.01284960  0.09851104 0.018259009
+## price -19.50479213 12.63026278 1.463079308
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7325637
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:21&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:21&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:21&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:21&quot;
+## [1]  0.00057131166268 -0.00000001249878  0.00172481278178  0.02112368997489
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:21&quot;
+##           beta.est     beta.se   sigma.est    sigma.se
+## ones   -1.92958669  1.45773524 0.030670297  1.60105448
+## sugar   0.06057542  0.01770788 0.000212158  0.08858488
+## mushy   0.01284960  0.09851104 0.018259009  0.66238359
+## price -19.50479213 12.63026278 1.463079308 36.66534573
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:21&quot;
+## [1] 45
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0306690086 0.0002121581 0.0182551201 1.4630316772 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00000128822129151  0.00000000002818286 -0.00000388919165228
+## [4] -0.00004763072235048
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.025767   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0021206   Extrapolation:  TRUE   Steplength:  2.36597 
+## Residual:  0.00007114076   Extrapolation:  TRUE   Steplength:  1.519124 
+## Residual:  0.000006473703   Extrapolation:  TRUE   Steplength:  2.999215 
+## Residual:  0.00000002651924   Extrapolation:  TRUE   Steplength:  1.260808 
+##    user  system elapsed 
+##    0.70    0.00    0.71 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0000025177 -0.0000004006 -0.0000001301 -0.0000001952  0.0000001006 
+##          Max. 
+##  0.0000006076 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92958842  1.45773507 0.0306690086
+## sugar   0.06057541  0.01770788 0.0002121581
+## mushy   0.01285010  0.09851104 0.0182551201
+## price -19.50477779 12.63026131 1.4630316772
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7325629
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:22&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:22&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:23&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:23&quot;
+## [1] 0.00057130136 0.00001229526 0.00172426206 0.02112300785
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:23&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92958842  1.45773507 0.0306690086  1.60105385
+## sugar   0.06057541  0.01770788 0.0002121581  0.08858479
+## mushy   0.01285010  0.09851104 0.0182551201  0.66239609
+## price -19.50477779 12.63026131 1.4630316772 36.66653344
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:23&quot;
+## [1] 46
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0305390042 0.0002093602 0.0178627499 1.4582249614 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000130004365 -0.000002797888 -0.000392370141 -0.004806715723
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.02562377   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.002113814   Extrapolation:  TRUE   Steplength:  2.369791 
+## Residual:  0.00007031958   Extrapolation:  TRUE   Steplength:  1.515524 
+## Residual:  0.000006300814   Extrapolation:  TRUE   Steplength:  3.000493 
+## Residual:  0.00000002697811   Extrapolation:  TRUE   Steplength:  1.26173 
+##    user  system elapsed 
+##     0.7     0.0     0.7 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000259532 -0.000044798 -0.000016570 -0.000022952  0.000006747 
+##         Max. 
+##  0.000058893 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.92976176  1.45771807 0.0305390042
+## sugar   0.06057524  0.01770767 0.0002093602
+## mushy   0.01290054  0.09851010 0.0178627499
+## price -19.50333483 12.63011303 1.4582249614
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7324796
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:24&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:24&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:24&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:24&quot;
+## [1] 0.00057068253 0.00001140775 0.00167488778 0.02105437541
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:24&quot;
+##           beta.est     beta.se    sigma.est    sigma.se
+## ones   -1.92976176  1.45771807 0.0305390042  1.60117340
+## sugar   0.06057524  0.01770767 0.0002093602  0.08859185
+## mushy   0.01290054  0.09851010 0.0178627499  0.66364170
+## price -19.50333483 12.63011303 1.4582249614 36.78665175
+## iter:  40  f-value:  0.7324796  pgrad:  0.02105438 
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:24&quot;
+## [1] 47
+## [1] &quot;Updated theta2 estimate:&quot;
+##       ones      sugar      mushy      price 
+## 0.00265284 0.00000000 0.00000000 0.42941166 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0278861647 -0.0002093602 -0.0178627499 -1.0288133064
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.004547597   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.000137083   Extrapolation:  TRUE   Steplength:  2.338031 
+## Residual:  0.000007079236   Extrapolation:  TRUE   Steplength:  2.058258 
+## Residual:  0.0000008454461   Extrapolation:  TRUE   Steplength:  2.362676 
+##    user  system elapsed 
+##    0.63    0.00    0.63 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0301421 -0.0029401  0.0002580 -0.0006336  0.0028998  0.0090727 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se  sigma.est
+## ones   -1.95444440  1.45538428 0.00265284
+## sugar   0.06052617  0.01767841 0.00000000
+## mushy   0.01559489  0.09838266 0.00000000
+## price -19.30526709 12.60976160 0.42941166
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7209522
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:26&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:26&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:26&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:26&quot;
+## [1] -0.001954705407 -0.003571417512 -0.000009422618  0.006261304196
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:26&quot;
+##           beta.est     beta.se  sigma.est     sigma.se
+## ones   -1.95444440  1.45538428 0.00265284   3.09689991
+## sugar   0.06052617  0.01767841 0.00000000   0.08619256
+## mushy   0.01559489  0.09838266 0.00000000   0.72099105
+## price -19.30526709 12.60976160 0.42941166 130.51523049
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:26&quot;
+## [1] 48
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.1269738385 0.2271453238 0.0005992868 0.0311871506 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1]  0.1243209989  0.2271453238  0.0005992868 -0.3982245044
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  9.413957   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  2.522914   Extrapolation:  TRUE   Steplength:  3.372588 
+## Residual:  0.08882007   Extrapolation:  TRUE   Steplength:  1.47208 
+## Residual:  0.008420138   Extrapolation:  TRUE   Steplength:  3.218897 
+## Residual:  0.001329668   Extrapolation:  TRUE   Steplength:  2.355034 
+## Residual:  0.0004665245   Extrapolation:  TRUE   Steplength:  3.074357 
+## Residual:  0.00003738467   Extrapolation:  TRUE   Steplength:  1.638308 
+## Residual:  0.000008891537   Extrapolation:  TRUE   Steplength:  4 
+## Residual:  0.0000007664555   Extrapolation:  TRUE   Steplength:  1.709075 
+## Residual:  0.0000004536155   Extrapolation:  TRUE   Steplength:  5.167046 
+##    user  system elapsed 
+##    1.47    0.00    1.47 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.40575 -0.08081  0.23732  0.72960  1.36481  4.83572 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##         beta.est     beta.se    sigma.est
+## ones  -3.9233768  1.88049596 0.1269738385
+## sugar -0.1319819  0.02276196 0.2271453238
+## mushy -0.1692359  0.11423835 0.0005992868
+## price  4.3138602 16.32807325 0.0311871506
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 14.95564
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:28&quot;
+## [1] 49
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0648133390 0.1135726619 0.0002996434 0.2302994028 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0621604995 -0.1135726619 -0.0002996434  0.1991122522
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  3.722437   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.1740051   Extrapolation:  TRUE   Steplength:  2.260951 
+## Residual:  0.008891309   Extrapolation:  TRUE   Steplength:  1.792121 
+## Residual:  0.002156605   Extrapolation:  TRUE   Steplength:  3.27627 
+## Residual:  0.00002523249   Extrapolation:  TRUE   Steplength:  1.288177 
+## Residual:  0.000003475628   Extrapolation:  TRUE   Steplength:  3.545574 
+## Residual:  0.00000007643988   Extrapolation:  TRUE   Steplength:  1.60866 
+##    user  system elapsed 
+##    1.01    0.00    1.02 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -3.03721 -0.85536 -0.13152 -0.44920  0.06053  0.28064 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##          beta.est     beta.se    sigma.est
+## ones  -2.77373450  1.50174634 0.0648133390
+## sugar -0.01269366  0.01839661 0.1135726619
+## mushy -0.06154198  0.09780621 0.0002996434
+## price -9.76542450 13.03917177 0.2302994028
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 4.627376
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:30&quot;
+## [1] 50
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0337330893 0.0567863309 0.0001498217 0.3298555289 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0310802497 -0.0567863309 -0.0001498217  0.0995561261
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  1.1526   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.02895788   Extrapolation:  TRUE   Steplength:  1.981822 
+## Residual:  0.002808435   Extrapolation:  TRUE   Steplength:  2.29371 
+## Residual:  0.000131767   Extrapolation:  TRUE   Steplength:  1.625084 
+## Residual:  0.00001660074   Extrapolation:  TRUE   Steplength:  3.140809 
+## Residual:  0.00000005359364   Extrapolation:  TRUE   Steplength:  1.302506 
+##    user  system elapsed 
+##    0.89    0.00    0.89 
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -1.20834 -0.32572 -0.04927 -0.17329  0.02260  0.10871 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se    sigma.est
+## ones   -2.218718483  1.45250316 0.0337330893
+## sugar   0.035680900  0.01771616 0.0567863309
+## mushy  -0.008751468  0.09725194 0.0001498217
+## price -16.277990311 12.59519026 0.3298555289
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 1.559788
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:31&quot;
+## [1] 51
+## [1] &quot;Updated theta2 estimate:&quot;
+##          ones         sugar         mushy         price 
+## 0.01819296442 0.02839316547 0.00007491085 0.37963359195 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.01554012487 -0.02839316547 -0.00007491085  0.04977806305
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.4144389   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.01005539   Extrapolation:  TRUE   Steplength:  1.939369 
+## Residual:  0.001137583   Extrapolation:  TRUE   Steplength:  2.459839 
+## Residual:  0.0000305329   Extrapolation:  TRUE   Steplength:  1.427557 
+## Residual:  0.000001609158   Extrapolation:  TRUE   Steplength:  3.067791 
+##    user  system elapsed 
+##    0.74    0.00    0.73 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.399426 -0.113245 -0.025395 -0.063749  0.003191  0.026310 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##            beta.est     beta.se     sigma.est
+## ones   -2.026407349  1.45309725 0.01819296442
+## sugar   0.052150070  0.01767200 0.02839316547
+## mushy   0.009066247  0.09799594 0.00007491085
+## price -18.483609523 12.59286464 0.37963359195
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.9106765
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:33&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:33&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:33&quot;
+##    user  system elapsed 
+##    0.17    0.00    0.17 
+## [1] &quot;Updated gradient:2017-10-14 22:20:33&quot;
+## [1]  0.0102335739 14.1505810168 -0.0635452205  0.0002895967
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:33&quot;
+##            beta.est     beta.se     sigma.est     sigma.se
+## ones   -2.026407349  1.45309725 0.01819296442   1.29683665
+## sugar   0.052150070  0.01767200 0.02839316547   0.02149086
+## mushy   0.009066247  0.09799594 0.00007491085   1.05846625
+## price -18.483609523 12.59286464 0.37963359195 178.07635254
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:33&quot;
+## [1] 52
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0181724117 0.0000000000 0.0002025324 0.3796330103 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000205526860 -0.0283931654721  0.0001276215895 -0.0000005816139
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.009316216   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0002566439   Extrapolation:  TRUE   Steplength:  2.163926 
+## Residual:  0.00001574907   Extrapolation:  TRUE   Steplength:  2.278559 
+## Residual:  0.000000743826   Extrapolation:  TRUE   Steplength:  1.862133 
+## Residual:  0.0000001125862   Extrapolation:  TRUE   Steplength:  2.728487 
+##    user  system elapsed 
+##    0.69    0.00    0.70 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## -0.191463 -0.071707 -0.029520 -0.044017 -0.005952  0.001058 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.95431386  1.45534758 0.0181724117
+## sugar   0.06052423  0.01767795 0.0000000000
+## mushy   0.01558984  0.09838054 0.0002025324
+## price -19.30092385 12.60944339 0.3796330103
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.720737
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:34&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:34&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:35&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:35&quot;
+## [1]  0.00630519730 -0.00442816978  0.00006249387  0.00540173972
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:35&quot;
+##           beta.est     beta.se    sigma.est     sigma.se
+## ones   -1.95431386  1.45534758 0.0181724117   3.64697698
+## sugar   0.06052423  0.01767795 0.0000000000   0.08583408
+## mushy   0.01558984  0.09838054 0.0002025324   0.71825118
+## price -19.30092385 12.60944339 0.3796330103 152.38260586
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:35&quot;
+## [1] 53
+## [1] &quot;Updated theta2 estimate:&quot;
+##           ones          sugar          mushy          price 
+## 0.018159764300 0.000008882351 0.000202407089 0.379622175127 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000126474315  0.0000088823507 -0.0000001253548 -0.0000108352094
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.0092229   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0002540754   Extrapolation:  TRUE   Steplength:  2.165481 
+## Residual:  0.0000154842   Extrapolation:  TRUE   Steplength:  2.276294 
+## Residual:  0.000000735252   Extrapolation:  TRUE   Steplength:  1.869225 
+## Residual:  0.0000001108495   Extrapolation:  TRUE   Steplength:  2.717769 
+##    user  system elapsed 
+##     0.7     0.0     0.7 
+##        Min.     1st Qu.      Median        Mean     3rd Qu.        Max. 
+## 0.000000427 0.000004172 0.000010673 0.000010838 0.000016385 0.000024488 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se      sigma.est
+## ones   -1.95431450  1.45534755 0.018159764300
+## sugar   0.06052304  0.01767795 0.000008882351
+## mushy   0.01558985  0.09838054 0.000202407089
+## price -19.30092321 12.60944309 0.379622175127
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7207369
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:36&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:36&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:36&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:36&quot;
+## [1]  0.00629825607 -0.00040733365  0.00004356547  0.00540152676
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:36&quot;
+##           beta.est     beta.se      sigma.est     sigma.se
+## ones   -1.95431450  1.45534755 0.018159764300   3.64594760
+## sugar   0.06052304  0.01767795 0.000008882351   0.08578552
+## mushy   0.01558985  0.09838054 0.000202407089   0.71830579
+## price -19.30092321 12.60944309 0.379622175127 152.38623723
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:36&quot;
+## [1] 54
+## [1] &quot;Updated theta2 estimate:&quot;
+##           ones          sugar          mushy          price 
+## 0.018145815273 0.000009784491 0.000202310603 0.379610212126 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00001394902730  0.00000090213992 -0.00000009648637 -0.00001196300109
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.009209006   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0002536937   Extrapolation:  TRUE   Steplength:  2.165678 
+## Residual:  0.00001544774   Extrapolation:  TRUE   Steplength:  2.276026 
+## Residual:  0.0000007339902   Extrapolation:  TRUE   Steplength:  1.8701 
+## Residual:  0.0000001105977   Extrapolation:  TRUE   Steplength:  2.716451 
+##    user  system elapsed 
+##     0.7     0.0     0.7 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## 0.0000004564 0.0000010040 0.0000016218 0.0000016515 0.0000022441 
+##         Max. 
+## 0.0000031267 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se      sigma.est
+## ones   -1.95431516  1.45534751 0.018145815273
+## sugar   0.06052292  0.01767795 0.000009784491
+## mushy   0.01558987  0.09838054 0.000202310603
+## price -19.30092277 12.60944278 0.379610212126
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7207368
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:38&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:38&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:38&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:38&quot;
+## [1] 0.006291296815 0.000002405902 0.000041605821 0.005401448095
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:38&quot;
+##           beta.est     beta.se      sigma.est     sigma.se
+## ones   -1.95431516  1.45534751 0.018145815273   3.64585764
+## sugar   0.06052292  0.01767795 0.000009784491   0.08578022
+## mushy   0.01558987  0.09838054 0.000202310603   0.71831213
+## price -19.30092277 12.60944278 0.379610212126 152.38916719
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:38&quot;
+## [1] 55
+## [1] &quot;Updated theta2 estimate:&quot;
+##           ones          sugar          mushy          price 
+## 0.018128288845 0.000009777788 0.000202194697 0.379595164657 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000017526428367 -0.000000006702413 -0.000000115906379
+## [4] -0.000015047468892
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.009202957   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0002535285   Extrapolation:  TRUE   Steplength:  2.165728 
+## Residual:  0.00001543463   Extrapolation:  TRUE   Steplength:  2.275978 
+## Residual:  0.0000007334564   Extrapolation:  TRUE   Steplength:  1.870292 
+## Residual:  0.0000001105016   Extrapolation:  TRUE   Steplength:  2.716186 
+##    user  system elapsed 
+##    0.72    0.00    0.72 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## 0.0000004818 0.0000007114 0.0000007473 0.0000007542 0.0000008097 
+##         Max. 
+## 0.0000009060 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se      sigma.est
+## ones   -1.95431599  1.45534747 0.018128288845
+## sugar   0.06052292  0.01767795 0.000009777788
+## mushy   0.01558988  0.09838054 0.000202194697
+## price -19.30092226 12.60944240 0.379595164657
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7207366
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:40&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:40&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:40&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:40&quot;
+## [1] 0.006282641983 0.000001255658 0.000041568588 0.005401369140
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:40&quot;
+##           beta.est     beta.se      sigma.est     sigma.se
+## ones   -1.95431599  1.45534747 0.018128288845   3.64587873
+## sugar   0.06052292  0.01767795 0.000009777788   0.08577974
+## mushy   0.01558988  0.09838054 0.000202194697   0.71831318
+## price -19.30092226 12.60944240 0.379595164657 152.39271695
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:40&quot;
+## [1] 56
+## [1] &quot;Updated theta2 estimate:&quot;
+##          ones         sugar         mushy         price 
+## 0.00552882262 0.00000725964 0.00011883136 0.36876303890 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.012599466230 -0.000002518148 -0.000083363340 -0.010832125762
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.004870687   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0001356603   Extrapolation:  TRUE   Steplength:  2.248592 
+## Residual:  0.000006315834   Extrapolation:  TRUE   Steplength:  2.189035 
+## Residual:  0.0000003979297   Extrapolation:  TRUE   Steplength:  2.22647 
+##    user  system elapsed 
+##    0.63    0.00    0.63 
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+## 0.0003987 0.0005288 0.0005470 0.0005492 0.0005767 0.0006258 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se     sigma.est
+## ones   -1.95492317  1.45532610 0.00552882262
+## sugar   0.06052318  0.01767768 0.00000725964
+## mushy   0.01560088  0.09837947 0.00011883136
+## price -19.30050768 12.60925443 0.36876303890
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206599
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:42&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:42&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:42&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:42&quot;
+## [1] 0.000035442894 0.000254710597 0.000009224673 0.005347154034
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:42&quot;
+##           beta.est     beta.se     sigma.est     sigma.se
+## ones   -1.95492317  1.45532610 0.00552882262   3.66305983
+## sugar   0.06052318  0.01767768 0.00000725964   0.08537558
+## mushy   0.01560088  0.09837947 0.00011883136   0.71908010
+## price -19.30050768 12.60925443 0.36876303890 154.90818363
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:42&quot;
+## [1] 57
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0054569312 0.0000000000 0.0001001203 0.3579170172 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00007189140 -0.00000725964 -0.00001871108 -0.01084602170
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.00483682   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0001344021   Extrapolation:  TRUE   Steplength:  2.237451 
+## Residual:  0.000006396286   Extrapolation:  TRUE   Steplength:  2.202593 
+## Residual:  0.0000003722802   Extrapolation:  TRUE   Steplength:  2.177724 
+##    user  system elapsed 
+##    0.63    0.00    0.63 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000118917 -0.000010221  0.000002288 -0.000001428  0.000012956 
+##         Max. 
+##  0.000039770 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.95502314  1.45531667 0.0054569312
+## sugar   0.06052383  0.01767756 0.0000000000
+## mushy   0.01560582  0.09837896 0.0001001203
+## price -19.29975737 12.60917224 0.3579170172
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206129
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:43&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:43&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:44&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:44&quot;
+## [1]  0.00009150532 -0.00281452498  0.00002329188  0.00518913947
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:44&quot;
+##           beta.est     beta.se    sigma.est     sigma.se
+## ones   -1.95502314  1.45531667 0.0054569312   3.78631696
+## sugar   0.06052383  0.01767756 0.0000000000   0.08522566
+## mushy   0.01560582  0.09837896 0.0001001203   0.71882936
+## price -19.29975737 12.60917224 0.3579170172 160.12948844
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:44&quot;
+## [1] 58
+## [1] &quot;Updated theta2 estimate:&quot;
+##          ones         sugar         mushy         price 
+## 0.00544015921 0.00051587390 0.00009585112 0.35696590054 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000016771998  0.000515873896 -0.000004269165 -0.000951116658
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.00198093   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0000716831   Extrapolation:  TRUE   Steplength:  1.90094 
+## Residual:  0.000008990127   Extrapolation:  TRUE   Steplength:  2.455701 
+## Residual:  0.0000002052051   Extrapolation:  TRUE   Steplength:  1.355956 
+##    user  system elapsed 
+##    0.62    0.00    0.62 
+##         Min.      1st Qu.       Median         Mean      3rd Qu. 
+## -0.000003377  0.000207653  0.000589021  0.000602196  0.000928362 
+##         Max. 
+##  0.001421876 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se     sigma.est
+## ones   -1.95505768  1.45531487 0.00544015921
+## sugar   0.06045301  0.01767754 0.00051587390
+## mushy   0.01560442  0.09837877 0.00009585112
+## price -19.29940928 12.60915759 0.35696590054
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206673
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:45&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:45&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:45&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:45&quot;
+## [1]  0.00004899578  0.23073653019 -0.00106572642  0.00516599149
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:45&quot;
+##           beta.est     beta.se     sigma.est     sigma.se
+## ones   -1.95505768  1.45531487 0.00544015921   3.74097495
+## sugar   0.06045301  0.01767754 0.00051587390   0.08254693
+## mushy   0.01560442  0.09837877 0.00009585112   0.72193026
+## price -19.29940928 12.60915759 0.35696590054 160.70612573
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:45&quot;
+## [1] 59
+## [1] &quot;Updated theta2 estimate:&quot;
+##          ones         sugar         mushy         price 
+## 0.00544005097 0.00000611209 0.00009820560 0.35695448741 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.0000001082454 -0.0005097618067  0.0000023544890 -0.0000114131263
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.004765003   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.000132431   Extrapolation:  TRUE   Steplength:  2.239638 
+## Residual:  0.000006267118   Extrapolation:  TRUE   Steplength:  2.199513 
+## Residual:  0.0000003701886   Extrapolation:  TRUE   Steplength:  2.188756 
+##    user  system elapsed 
+##    0.62    0.00    0.62 
+##          Min.       1st Qu.        Median          Mean       3rd Qu. 
+## -0.0014068268 -0.0009173035 -0.0005804626 -0.0005940304 -0.0002039612 
+##          Max. 
+##  0.0000003267 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se     sigma.est
+## ones   -1.95503233  1.45531585 0.00544005097
+## sugar   0.06052299  0.01767755 0.00000611209
+## mushy   0.01560629  0.09837891 0.00009820560
+## price -19.29969211 12.60916504 0.35695448741
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206087
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:47&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:47&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:47&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:47&quot;
+## [1]  0.00009057102 -0.00002809105  0.00001021377  0.00517510168
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:47&quot;
+##           beta.est     beta.se     sigma.est     sigma.se
+## ones   -1.95503233  1.45531585 0.00544005097   3.79685687
+## sugar   0.06052299  0.01767755 0.00000611209   0.08517559
+## mushy   0.01560629  0.09837891 0.00009820560   0.71884820
+## price -19.29969211 12.60916504 0.35695448741 160.60888721
+## iter:  50  f-value:  0.7206087  pgrad:  0.005175102 
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:47&quot;
+## [1] 60
+## [1] &quot;Updated theta2 estimate:&quot;
+##           ones          sugar          mushy          price 
+## 0.005439850897 0.000006174143 0.000098183042 0.356943055565 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.00000020007223  0.00000006205339 -0.00000002256230 -0.00001143184822
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.004764252   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0001324104   Extrapolation:  TRUE   Steplength:  2.239659 
+## Residual:  0.000006265802   Extrapolation:  TRUE   Steplength:  2.199482 
+## Residual:  0.0000003701664   Extrapolation:  TRUE   Steplength:  2.188864 
+##    user  system elapsed 
+##    0.61    0.00    0.63 
+##           Min.        1st Qu.         Median           Mean        3rd Qu. 
+## -0.00000004803  0.00000004436  0.00000007811  0.00000008478  0.00000012396 
+##           Max. 
+##  0.00000020364 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se      sigma.est
+## ones   -1.95503244  1.45531584 0.005439850897
+## sugar   0.06052298  0.01767755 0.000006174143
+## mushy   0.01560629  0.09837891 0.000098183042
+## price -19.29969133 12.60916496 0.356943055565
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206087
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:49&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:49&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:49&quot;
+##    user  system elapsed 
+##     0.2     0.0     0.2 
+## [1] &quot;Updated gradient:2017-10-14 22:20:49&quot;
+## [1] 0.0000905610066 0.0000002334396 0.0000100807131 0.0051749351185
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:49&quot;
+##           beta.est     beta.se      sigma.est     sigma.se
+## ones   -1.95503244  1.45531584 0.005439850897   3.79698367
+## sugar   0.06052298  0.01767755 0.000006174143   0.08517505
+## mushy   0.01560629  0.09837891 0.000098183042   0.71884836
+## price -19.29969133 12.60916496 0.356943055565 160.61459628
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:49&quot;
+## [1] 61
+## [1] &quot;Updated theta2 estimate:&quot;
+##           ones          sugar          mushy          price 
+## 0.005439437014 0.000006173076 0.000098136971 0.356919405016 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.000000413882970 -0.000000001066869 -0.000000046070993
+## [4] -0.000023650548922
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.004763952   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.0001324016   Extrapolation:  TRUE   Steplength:  2.239645 
+## Residual:  0.000006265577   Extrapolation:  TRUE   Steplength:  2.199498 
+## Residual:  0.0000003701196   Extrapolation:  TRUE   Steplength:  2.188803 
+##    user  system elapsed 
+##    0.62    0.00    0.63 
+##            Min.         1st Qu.          Median            Mean 
+## -0.000000211744  0.000000006552  0.000000033404  0.000000025478 
+##         3rd Qu.            Max. 
+##  0.000000053708  0.000000102954 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se      sigma.est
+## ones   -1.95503266  1.45531582 0.005439437014
+## sugar   0.06052298  0.01767755 0.000006173076
+## mushy   0.01560630  0.09837891 0.000098136971
+## price -19.29968974 12.60916478 0.356919405016
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7206086
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:50&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:50&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:51&quot;
+##    user  system elapsed 
+##    0.18    0.00    0.19 
+## [1] &quot;Updated gradient:2017-10-14 22:20:51&quot;
+## [1] 0.0000905513019 0.0000002469544 0.0000100787760 0.0051745925164
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:51&quot;
+##           beta.est     beta.se      sigma.est     sigma.se
+## ones   -1.95503266  1.45531582 0.005439437014   3.79726037
+## sugar   0.06052298  0.01767755 0.000006173076   0.08517462
+## mushy   0.01560630  0.09837891 0.000098136971   0.71884792
+## price -19.29968974 12.60916478 0.356919405016 160.62638381
+## [1] &quot;GMM Loop number: 2017-10-14 22:20:51&quot;
+## [1] 62
+## [1] &quot;Updated theta2 estimate:&quot;
+##         ones        sugar        mushy        price 
+## 0.0000000000 0.0000000000 0.0000000000 0.0003782367 
+## [1] &quot;Change in theta2 estimate:&quot;
+## [1] -0.005439437014 -0.000006173076 -0.000098136971 -0.356541168285
+## [1] &quot;Running SQUAREM contraction mapping&quot;
+## Squarem-2 
+## Residual:  0.00000363238   Extrapolation:  TRUE   Steplength:  1 
+## Residual:  0.00000009720905   Extrapolation:  TRUE   Steplength:  2.02408 
+##    user  system elapsed 
+##    0.26    0.00    0.26 
+##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -0.0010940  0.0004044  0.0005671  0.0005278  0.0007129  0.0010762 
+## [1] &quot;GMM step 2 updated theta1 estimate:&quot;
+##           beta.est     beta.se    sigma.est
+## ones   -1.95683401  1.45516315 0.0000000000
+## sugar   0.06051864  0.01767563 0.0000000000
+## mushy   0.01566471  0.09837057 0.0000000000
+## price -19.28939245 12.60783363 0.0003782367
+## [1] &quot;made it here&quot;
+## [1] &quot;Updated GMM objective:&quot;
+## [1] 0.7198479
+## [1] &quot;Calculating Jacobian matrix, 2017-10-14 22:20:52&quot;
+## [1] &quot;Calculating dsigma matrix, 2017-10-14 22:20:52&quot;
+## [1] &quot;Calculating ddelta matrices, 2017-10-14 22:20:52&quot;
+##    user  system elapsed 
+##    0.19    0.00    0.18 
+## [1] &quot;Updated gradient:2017-10-14 22:20:52&quot;
+## [1] -0.00000235654127  0.00000113542029  0.00000004525361  0.00000551737959
+## [1] &quot;Updated coefficients table:2017-10-14 22:20:52&quot;
+##           beta.est     beta.se    sigma.est     sigma.se
+## ones   -1.95683401  1.45516315 0.0000000000   33.2179408
+## sugar   0.06051864  0.01767563 0.0000000000    0.1320172
+## mushy   0.01566471  0.09837057 0.0000000000    0.9389388
+## price -19.28939245 12.60783363 0.0003782367 1277.7231879
+##   Successful convergence.
+##    user  system elapsed 
+##  115.11    0.13  115.77</code></pre>
+<pre class="r"><code>  save(theta.est, file = paste0(&quot;theta_est_.RData&quot;))</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
