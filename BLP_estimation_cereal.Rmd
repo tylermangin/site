@@ -5,46 +5,47 @@ output: html_document
 ---
 
 
-Based on code written by [Aviv Nevo](http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm), May 1998
-
-Adapted by [Michael Carniol](https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R), January 2015
-
-Adapted again by Tyler Mangin, May 2017
+The original code was written for Matlab by [Aviv Nevo](http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm) in 1998. [Michael Carniol](https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R) adapted it into R in 2015, to which I owe the functions and set-up I use here. I just became aware of another R package designed to estimate BLP, [BLPestimatoR](https://cran.r-project.org/web/packages/BLPestimatoR/BLPestimatoR.pdf), which I have not had a chance to test.
 
 
-I ran this routine on a canonical data set from Aviv Nevo. I found the data here: http://www.rasmusen.org/zg604/lectures/blp/.
+I ran this routine on a canonical data set from Aviv Nevo. I found the data here: http://www.rasmusen.org/zg604/lectures/blp/. A lot of the description is due to [Nevo's Practitioner's Guide](http://faculty.wcas.northwestern.edu/~ane686/research/RAs_guide.pdf). Any errors are mine.
 
 
 ```{r setup, include=FALSE}
 
-while(!require(AER)){install.packages("AER")}
-while(!require(SQUAREM)){install.packages("SQUAREM")}
-while(!require(BB)){install.packages("BB")}
-while(!require(plyr)){install.packages("plyr")}
 
 knitr::opts_chunk$set(echo = TRUE)
 
 data  = read.csv('/Users/Mangin/Documents/Consumer Model/cereal_ps3.csv')
 
 #Use only one year
-dat = data[(data$quarter == 1 & data$year == 88),]
+ dat = data[(data$quarter == 1 & data$year == 88),]
+
 
 ```
 
-
-The elements we need are: 
-
-1.The share of unit sales of several products
-
-2.Several markets
-
-3.A set of product characterisitcs (including price)
+### Setup
 
 
-In these data, the share has been constructed, the products are indicated by the "brand" field, the markets are cities, and the product characterisitics are price, the "mushiness" of the cereal, and the amount of sugar in the cereal.
+The data elements we need are: 
+
+1. The share of unit sales of several products
+
+2. Several markets
+
+3. A set of product characteristics (including price)
 
 
-```{r}
+In these data, the share has been constructed, the products are indicated by the "brand" field, the markets are cities, and the product characteristics are price, the "mushiness" of the cereal, and the amount of sugar in the cereal.
+
+
+```{r, message = FALSE}
+
+  while(!require(AER)){install.packages("AER")}
+  while(!require(SQUAREM)){install.packages("SQUAREM")}
+  while(!require(BB)){install.packages("BB")}
+  while(!require(plyr)){install.packages("plyr")}
+
 
   share.fld =     "share"
   prod.id.fld =   "brand"
@@ -66,12 +67,12 @@ In these data, the share has been constructed, the products are indicated by the
 
 Let the indirect utility (maximized utility) of consumer $i$, with income $y_i$, of product $j$ in market $m$ be
 
-$$u_{ijm} = \alpha_i(y_i - p_{jm}) + x_{jm}\beta_i + \xi_{jm} + \epsilon_{ijm} $$ ,
+$$u_{ijm} = \alpha_i(y_i - p_{jm}) + x_{jm}\beta_i + \xi_{jm} + \epsilon_{ijm} $$
 
-where $x_{jm}$ is a set of observed product/market characterisitics, $\xi_{jm}$ is a set of unobserved product/market characterisitics, and $\epsilon_{ijm}$ is a mean-zero stochastic term.
+where $x_{jm}$ is a set of observed product/market characteristics, $\xi_{jm}$ is a set of unobserved product/market characteristics, and $\epsilon_{ijm}$ is a mean-zero stochastic term.
 
 
-This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, $p_{jm}$ is seperated out in the above equation, but in practice it can be included in $x_{jm}$, which can cause more confusion than you would think. I will include $p_{jm}$ in the $nxk$ matrix $x$ from here on out, partly by defining $\theta_{i} = [\alpha_{i}, \beta_{i}]$, which becomes useful later.
+This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, $p_{jm}$ is separated out in the above equation, but in practice it can be included in $x_{jm}$, which can cause more confusion than you would think. I will include $p_{jm}$ in the $nxk$ matrix $x$ from here on out, partly by defining $\theta_{i} = [\alpha_{i}, \beta_{i}]$, which becomes useful later.
 
 
 ```{r}
@@ -86,17 +87,17 @@ This equation is written for maximum explanatory power, but is not as useful in 
 
 Additionally, although income $y_i$ is important for theory, it drops out of the estimation (exactly at which step is indicated below), so I will exclude that from here on out as well. 
 
-That makes my simplified, less pedagogic version of the above (Equation 1):
+That makes my simplified, less pedagogic version of the above :
 
-$$u_{ijm} = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} $$
+$$u_{ijm} = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} $$ (Equation 1)
 
 
 ###Defining Markets and Market Shares
 
 
-In  this data set, most of the process has been done, so that we are given the set of $s_{jm}$, and need only construct $s_{m0}$.
+These data are not at an individual level, so we will express demand in terms of market share. In  this data set, most of the process has been done, so that we are given the set of shares.
 
-Observed market shares are defined as $s_{jm} = q_{jm}/M$. Technically, $\sum_J q_{jm} = M$ but, the practice usually used is to define a market $M$ based on some population measure. Almost surely, the sum of observed $q$ across all the choices is smaller than $M$, which creates take a set of $s_{jm}$ that do not sum to 1 across $j$.
+Observed market shares are defined in theory as $s_{jm} = q_{jm}/M$. Technically, $\sum_J q_{jm} = M$ but, the practice usually used is to define a market $M$ based on some population measure. Almost surely, the sum of observed $q$ across all the choices is smaller than $M$, which creates take a set of $s_{jm}$ that do not sum to 1 across $j$.
 
 ```{r}
 
@@ -115,7 +116,7 @@ Observed market shares are defined as $s_{jm} = q_{jm}/M$. Technically, $\sum_J 
 ```
 
 
-So, in this case, the observed unit sales consitituted about 40-55% of the "market", however it was defined. This makes it possible to define an "outside good" $s_{m0}$ as the difference. Having an 'outside good' is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify $j-1$ parameters, so the 'outside good' acts as the reference point for the rest of the goods in the choice set.
+So, in this case, the observed unit sales constituted about 40-55% of the "market", however it was defined. This makes it possible to define an "outside good" $s_{m0}$ as the difference. Having an 'outside good' is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify $j-1$ parameters, so the 'outside good' acts as the reference point for the rest of the goods in the choice set.
 
 
 
@@ -154,9 +155,9 @@ These assumptions make $s_{jm}$ log-linear:
 
 $$ \delta_{jm} = ln(s_{jm}) - log(s_{m0}) = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} $$
 
-In no way have we solved the simultineaity of $p_{jm}$, or dealt with the unobserved variable bias of $\xi_{jm}$, both of which need to be addressed with based on the data available and the situation. 
+In no way have we solved the simultaneity of $p_{jm}$, or dealt with the unobserved variable bias of $\xi_{jm}$, both of which need to be addressed with based on the data available and the situation. 
 
-But, the nice thing about this form is that by tranforming a non-linear problem into a linear problem, we can use straightforward linear estimation. 
+But, the nice thing about this form is that by transforming a non-linear problem into a linear problem, we can use straightforward linear estimation. 
 
 
 
@@ -178,13 +179,9 @@ But, the nice thing about this form is that by tranforming a non-linear problem 
   
 ```
 
-
-One point that seems trival now but becomes important later is that the coefficents here are interpretable as an estimate of mean utility across individuals, and the standard errors as an estimate of the deviations from mean utility.
-
-Since we linearized the problem, 2SLS is also possible. In this dataset, instruments are included ($z_1, z_2, z_3$). I'm not sure what they are.
+Since we linearized the problem, 2SLS is also possible. In this data set, instruments are included ($z_1, z_2, z_3$). I'm not sure what they are.
 
 We are also going to carefully save many of the objects from the 2SLS regression for use later.
-
 
 
 ```{r}
@@ -235,12 +232,12 @@ We are also going to carefully save many of the objects from the 2SLS regression
   
 ###Random Coefficents
 
-If $\alpha_i$ and $\beta_i$ are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume $\alpha_i$ and $\beta_i$ follow a multivariate normal. If $v_i$ is an indivdual's deviation from the average, then this assumption amounts to
+If $\alpha_i$ and $\beta_i$ are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume $\alpha_i$ and $\beta_i$ follow a multivariate normal. If $v_i$ is an individual's deviation from the average, then this assumption amounts to
 
 
 $$ \begin{bmatrix} \alpha_i \\ \beta_i \end{bmatrix}  \sim N(\begin{bmatrix} \alpha \\ \beta \end{bmatrix},\Sigma v_i)$$
 
-In aggregate market data, consumers are not observed, and so $\alpha_i$ and $\beta_i$ are simulated.
+In aggregate market data, consumers are not observed, and so the $v_i$ are simulated.
 
 ```{r}
 
@@ -255,7 +252,7 @@ In aggregate market data, consumers are not observed, and so $\alpha_i$ and $\be
 
 ```
 
-This assumption introduces some nonlinearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to seperate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form
+This assumption introduces some non linearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to separate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form
 
 $$u_{ijm} = \delta_{jm} +  \mu_{ijm}$$
 
@@ -273,7 +270,7 @@ $$\delta_{jm} = x_{jm}\theta^1 + \xi_{jm} + \epsilon_{ijm}$$
 
 Represents the mean-zero deviation from $\delta_{jm}$.
 
-The the nonlinear parameters be $\theta^2 = [\Sigma]$, corresponding to individual deviations from marginal utility of money and of product characteristics. 
+The the nonlinear parameter are $\theta^2 = [\Sigma]$, corresponding to individual deviations from marginal utility of money and of product characteristics. 
 
 $$\mu_{ijm} =  x_{jm}\Sigma v_i $$
 
@@ -284,7 +281,7 @@ The market share of the $j$th product is the integral over the population distri
 $$ s_{jm}(x_m,p_m,\delta_m; \theta_2) = \int_{m_{j}} dP^*(v,\epsilon) $$
 
 
-Let $S$ be the acutal observed shares in the data, as opposed to the model's shares $s$. The estimation algorithm becomes
+Let $S$ be the actual observed shares in the data, as opposed to the model's shares $s$. The estimation algorithm becomes
 
 
 $$ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || $$
@@ -320,7 +317,7 @@ The first input is the parameter vector we are optimizing, which in our case is 
 
 Now, we will set up the functions that run the optimization. We will start at the innermost point in the function and work out. The optimization runs in steps, in which iteratively different estimates of the parameters are used to calculate the objective function, which we are hoping to minimize.
 
-The main reason the BLP algorithim works is the contraction mapping on the "inner loop" of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analgous to the closed form expression from above, in which the market shares are the average over the $n$ observations for the simulated consumers.
+The main reason the BLP algorithm works is the contraction mapping on the "inner loop" of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analogous to the closed form expression from above, in which the market shares are the average over the $n$ observations for the simulated consumers.
 
 
 $$ s_{jm}(x_m,p_m,\delta_m; \theta_2)  =  \frac{1}{r*n} \Sigma_{r*n} s_{jm} =  \frac{1}{r*n} \Sigma_{r*n}  \frac{ exp( x_{jm}\theta_1 + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } $$
@@ -512,7 +509,7 @@ Second, it requires the gradient, evaluated at the mean utility level predicted 
 
 
 
-So, with the functions all set up, all we will need to finalize the procedure are initial values for the parameters. One option, of course, is to guess. But we can potentially do better. Since, as discussed above, in the logit case, mean average value to all consumers, $\delta_{jm}$, is just the fitted values, with parameters $\theta^1$ and $\mu_{ijm}$, the deviations from that mean, with the standard errors as the parameters $\theta^2$. Since we already estimated it, we can use that as our guess.
+So, with the functions all set up, all we will need to finalize the procedure are initial values for the parameters. One option, of course, is to guess. But we can potentially do better. In the logit we already estimated the standard errors for the linear parameters $\theta^1$. Since we already estimated it, we can use that as our guess.
 
 
 ```{r objects}
@@ -532,9 +529,9 @@ So, with the functions all set up, all we will need to finalize the procedure ar
 
 With an initial value guess, we can put it all together by passing multistart the parameter vector we are optimizing, the objective function to be optimized. and the gradient. 
 
-At that point, we need only sit back and hope for convergence.
+At that point, we need only sit back and hope for convergence. 
 
-```{r}
+```{r, eval = FALSE}
 
 
     # Break X and v matrices into list variables 

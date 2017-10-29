@@ -11,7 +11,7 @@ navbar:
         - text: "About Me"
           href: aboutme.html
         - text: "Resume"
-          href: resume.pdf
+          href: Resume.html
     - text: "Projects"
       href: projects.html
       menu:
