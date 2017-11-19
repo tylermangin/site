@@ -7,11 +7,11 @@ output: html_document
 
 ## Work Experience
 
-### Economist
+### Senior Analyst/Economist
 Comlinkdata
 July 2016 to Present
 
-* Developed new revenue from marketing and audience engagement estimation and forecasting product 
+* Developed new revenue from digital audience engagement forecasting and estimation product
 * Created individual-level model of consumer demand and applied predictions to millions of consumers
 * Improved and extended forecasting for financial services clients 
 * Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, and Spark, in the AWS ecosystem
@@ -48,8 +48,8 @@ February 2006 to July 2006
 
 ## Education
 
-### PhD Candidate (ABD)
-Economics (Current)
+### PhD Candidate 
+Economics (Expected May 2018)
 The University of Colorado
 
 
@@ -65,8 +65,12 @@ The University of Colorado
 
 ## Research
 
-"The USDA Organic Label and Nutritional Quality"
+"USDA Organic Labels and Nutritional Quality"
+
 Working paper
+
+Presented at 2016 Summer Conference 
+of the Association of Environmental and Resource Economists 
 
 
 ## Computer Skills 
@@ -74,11 +78,9 @@ Working paper
 Basic 
 
 * Amazon Web Services 
-  + (S3, EC2, EMR, Athena) 
 * Hive
 * Bash
 * Spark 
-  + (SparkR) 
 * ArcGIS
 * Git 
 * Python 
@@ -86,8 +88,11 @@ Basic
 Advanced 
 
 * Excel 
-  + (VBA)
 * STATA 
 * SQL 
 * R 
-  + (RMarkdown, Shiny)
+
+## Awards
+
+Graduate Award for Public Policy Research, 2016 
+UNIVERSITY OF COLORADO ECONOMICS
