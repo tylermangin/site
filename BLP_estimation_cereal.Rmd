@@ -16,7 +16,7 @@ I ran this routine on a canonical data set from Aviv Nevo. I found the data here
 
 knitr::opts_chunk$set(echo = TRUE)
 
-data  = read.csv('/Users/Mangin/Documents/Consumer Model/cereal_ps3.csv')
+data  = read.csv('/Users/tmangin/Documents/Consumer Model/cereal_ps3.csv')
 
 #Use only one year
  dat = data[(data$quarter == 1 & data$year == 88),]

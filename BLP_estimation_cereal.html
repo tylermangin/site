@@ -252,7 +252,7 @@ $(document).ready(function () {
 </div>
 
 
-<p>The original code was written for Matlab by <a href="http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm">Aviv Nevo</a> in 1998. <a href="https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R">Michael Carniol</a> adapted it into R in 2015, to which I owe the functions and set-up I use here. I just became aware of another R package designde to estimate BLP, <a href="https://cran.r-project.org/web/packages/BLPestimatoR/BLPestimatoR.pdf">BLPestimatoR</a>, which I have not had a chance to test.</p>
+<p>The original code was written for Matlab by <a href="http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm">Aviv Nevo</a> in 1998. <a href="https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R">Michael Carniol</a> adapted it into R in 2015, to which I owe the functions and set-up I use here. I just became aware of another R package designed to estimate BLP, <a href="https://cran.r-project.org/web/packages/BLPestimatoR/BLPestimatoR.pdf">BLPestimatoR</a>, which I have not had a chance to test.</p>
 <p>I ran this routine on a canonical data set from Aviv Nevo. I found the data here: <a href="http://www.rasmusen.org/zg604/lectures/blp/" class="uri">http://www.rasmusen.org/zg604/lectures/blp/</a>. A lot of the description is due to <a href="http://faculty.wcas.northwestern.edu/~ane686/research/RAs_guide.pdf">Nevo’s Practitioner’s Guide</a>. Any errors are mine.</p>
 <div id="setup" class="section level3">
 <h3>Setup</h3>
@@ -260,9 +260,9 @@ $(document).ready(function () {
 <ol style="list-style-type: decimal">
 <li><p>The share of unit sales of several products</p></li>
 <li><p>Several markets</p></li>
-<li><p>A set of product characterisitcs (including price)</p></li>
+<li><p>A set of product characteristics (including price)</p></li>
 </ol>
-<p>In these data, the share has been constructed, the products are indicated by the “brand” field, the markets are cities, and the product characterisitics are price, the “mushiness” of the cereal, and the amount of sugar in the cereal.</p>
+<p>In these data, the share has been constructed, the products are indicated by the “brand” field, the markets are cities, and the product characteristics are price, the “mushiness” of the cereal, and the amount of sugar in the cereal.</p>
 <pre class="r"><code>  while(!require(AER)){install.packages(&quot;AER&quot;)}
   while(!require(SQUAREM)){install.packages(&quot;SQUAREM&quot;)}
   while(!require(BB)){install.packages(&quot;BB&quot;)}
@@ -283,8 +283,8 @@ $(document).ready(function () {
   JM &lt;- nrow(dat)</code></pre>
 <p>Let the indirect utility (maximized utility) of consumer <span class="math inline">\(i\)</span>, with income <span class="math inline">\(y_i\)</span>, of product <span class="math inline">\(j\)</span> in market <span class="math inline">\(m\)</span> be</p>
 <p><span class="math display">\[u_{ijm} = \alpha_i(y_i - p_{jm}) + x_{jm}\beta_i + \xi_{jm} + \epsilon_{ijm} \]</span></p>
-<p>where <span class="math inline">\(x_{jm}\)</span> is a set of observed product/market characterisitics, <span class="math inline">\(\xi_{jm}\)</span> is a set of unobserved product/market characterisitics, and <span class="math inline">\(\epsilon_{ijm}\)</span> is a mean-zero stochastic term.</p>
-<p>This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, <span class="math inline">\(p_{jm}\)</span> is seperated out in the above equation, but in practice it can be included in <span class="math inline">\(x_{jm}\)</span>, which can cause more confusion than you would think. I will include <span class="math inline">\(p_{jm}\)</span> in the <span class="math inline">\(nxk\)</span> matrix <span class="math inline">\(x\)</span> from here on out, partly by defining <span class="math inline">\(\theta_{i} = [\alpha_{i}, \beta_{i}]\)</span>, which becomes useful later.</p>
+<p>where <span class="math inline">\(x_{jm}\)</span> is a set of observed product/market characteristics, <span class="math inline">\(\xi_{jm}\)</span> is a set of unobserved product/market characteristics, and <span class="math inline">\(\epsilon_{ijm}\)</span> is a mean-zero stochastic term.</p>
+<p>This equation is written for maximum explanatory power, but is not as useful in thinking about estimation. For instance, <span class="math inline">\(p_{jm}\)</span> is separated out in the above equation, but in practice it can be included in <span class="math inline">\(x_{jm}\)</span>, which can cause more confusion than you would think. I will include <span class="math inline">\(p_{jm}\)</span> in the <span class="math inline">\(nxk\)</span> matrix <span class="math inline">\(x\)</span> from here on out, partly by defining <span class="math inline">\(\theta_{i} = [\alpha_{i}, \beta_{i}]\)</span>, which becomes useful later.</p>
 <pre class="r"><code>  #Number of characteristics (including constant and price)
   X &lt;- as.matrix(cbind(ones = rep(1, JM), dat[, c(x.var.flds, prc.fld)]));
   K &lt;- ncol(X)</code></pre>
@@ -313,7 +313,7 @@ $(document).ready(function () {
 ##  Mean   :32.34   Mean   :0.4700  
 ##  3rd Qu.:46.00   3rd Qu.:0.5501  
 ##  Max.   :65.00   Max.   :0.6728</code></pre>
-<p>So, in this case, the observed unit sales consitituted about 40-55% of the “market”, however it was defined. This makes it possible to define an “outside good” <span class="math inline">\(s_{m0}\)</span> as the difference. Having an ‘outside good’ is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify <span class="math inline">\(j-1\)</span> parameters, so the ‘outside good’ acts as the reference point for the rest of the goods in the choice set.</p>
+<p>So, in this case, the observed unit sales constituted about 40-55% of the “market”, however it was defined. This makes it possible to define an “outside good” <span class="math inline">\(s_{m0}\)</span> as the difference. Having an ‘outside good’ is not just useful for creating shares, but also solves an identification problem in the final estimation: the estimation can only identify <span class="math inline">\(j-1\)</span> parameters, so the ‘outside good’ acts as the reference point for the rest of the goods in the choice set.</p>
 <pre class="r"><code>  #Compute the outside good market share by market
 
   sum1 &lt;- temp$x[match(mkt.id, temp$mkt.id)];
@@ -333,8 +333,8 @@ $(document).ready(function () {
 <p>In this and all following formulations, if the the term <span class="math inline">\(\alpha_i y_i\)</span> is included from the beginning, it drops out here since it does not vary across options.</p>
 <p>These assumptions make <span class="math inline">\(s_{jm}\)</span> log-linear:</p>
 <p><span class="math display">\[ \delta_{jm} = ln(s_{jm}) - log(s_{m0}) = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} \]</span></p>
-<p>In no way have we solved the simultineaity of <span class="math inline">\(p_{jm}\)</span>, or dealt with the unobserved variable bias of <span class="math inline">\(\xi_{jm}\)</span>, both of which need to be addressed with based on the data available and the situation.</p>
-<p>But, the nice thing about this form is that by tranforming a non-linear problem into a linear problem, we can use straightforward linear estimation.</p>
+<p>In no way have we solved the simultaneity of <span class="math inline">\(p_{jm}\)</span>, or dealt with the unobserved variable bias of <span class="math inline">\(\xi_{jm}\)</span>, both of which need to be addressed with based on the data available and the situation.</p>
+<p>But, the nice thing about this form is that by transforming a non-linear problem into a linear problem, we can use straightforward linear estimation.</p>
 <pre class="r"><code>  # delta object
   dat[, &quot;delta&quot;] &lt;- Y &lt;- log(s.jm) - log(s.j0);
 
@@ -368,7 +368,7 @@ $(document).ready(function () {
 ## Residual standard error: 1.128 on 1124 degrees of freedom
 ## Multiple R-squared:  0.09366,    Adjusted R-squared:  0.09125 
 ## F-statistic: 38.72 on 3 and 1124 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>Since we linearized the problem, 2SLS is also possible. In this dataset, instruments are included (<span class="math inline">\(z_1, z_2, z_3\)</span>). I’m not sure what they are.</p>
+<p>Since we linearized the problem, 2SLS is also possible. In this data set, instruments are included (<span class="math inline">\(z_1, z_2, z_3\)</span>). I’m not sure what they are.</p>
 <p>We are also going to carefully save many of the objects from the 2SLS regression for use later.</p>
 <pre class="r"><code>#2SLS
   
@@ -433,7 +433,7 @@ $(document).ready(function () {
 </div>
 <div id="random-coefficents" class="section level3">
 <h3>Random Coefficents</h3>
-<p>If <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> follow a multivariate normal. If <span class="math inline">\(v_i\)</span> is an indivdual’s deviation from the average, then this assumption amounts to</p>
+<p>If <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> follow a multivariate normal. If <span class="math inline">\(v_i\)</span> is an individual’s deviation from the average, then this assumption amounts to</p>
 <p><span class="math display">\[ \begin{bmatrix} \alpha_i \\ \beta_i \end{bmatrix}  \sim N(\begin{bmatrix} \alpha \\ \beta \end{bmatrix},\Sigma v_i)\]</span></p>
 <p>In aggregate market data, consumers are not observed, and so the <span class="math inline">\(v_i\)</span> are simulated.</p>
 <pre class="r"><code>## Matrix of individuals&#39; characteristics ##
@@ -443,7 +443,7 @@ $(document).ready(function () {
   #Standard normal distribution draws, one for each characteristic in X
     #columns are simulated consumers, rows are variables in X (including constant and price)
   v = matrix(rnorm(K * n.sim), nrow = K, ncol = n.sim)</code></pre>
-<p>This assumption introduces some nonlinearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to seperate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form</p>
+<p>This assumption introduces some non linearity, so linear estimation is no longer an option. However, there still are linear portions, so it will be useful to separate out the linear and non-linear parts going forward. Our simplified equation can be written in the following useful form</p>
 <p><span class="math display">\[u_{ijm} = \delta_{jm} +  \mu_{ijm}\]</span></p>
 <p>1.) Linear Terms <span class="math inline">\(\delta_{jm}\)</span></p>
 <p>Represents the mean average value to all consumers.</p>
@@ -455,7 +455,7 @@ $(document).ready(function () {
 <p><span class="math display">\[\mu_{ijm} =  x_{jm}\Sigma v_i \]</span></p>
 <p>The market share of the <span class="math inline">\(j\)</span>th product is the integral over the population distribution <span class="math inline">\(P^*(v,\epsilon)\)</span> of consumers in market <span class="math inline">\(M\)</span> which bought product <span class="math inline">\(j\)</span>:</p>
 <p><span class="math display">\[ s_{jm}(x_m,p_m,\delta_m; \theta_2) = \int_{m_{j}} dP^*(v,\epsilon) \]</span></p>
-<p>Let <span class="math inline">\(S\)</span> be the acutal observed shares in the data, as opposed to the model’s shares <span class="math inline">\(s\)</span>. The estimation algorithm becomes</p>
+<p>Let <span class="math inline">\(S\)</span> be the actual observed shares in the data, as opposed to the model’s shares <span class="math inline">\(s\)</span>. The estimation algorithm becomes</p>
 <p><span class="math display">\[ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || \]</span></p>
 </div>
 </div>
@@ -476,7 +476,7 @@ $(document).ready(function () {
              details=FALSE)</code></pre>
 <p>The first input is the parameter vector we are optimizing, which in our case is values of <span class="math inline">\(\theta^2\)</span>. The second input is a non-linear objective function to be optimized. In our case this will be a function that takes the <span class="math inline">\(\theta^2\)</span> vector as an input and returns the value of the objective function <span class="math inline">\(f\)</span> ( gmm_obj, defined below). Next, multiStart takes a gradient input, which is another function taking the <span class="math inline">\(\theta^2\)</span> parameter vector as an input and returning the gradient vector of the objective function at that point.</p>
 <p>Now, we will set up the functions that run the optimization. We will start at the innermost point in the function and work out. The optimization runs in steps, in which iteratively different estimates of the parameters are used to calculate the objective function, which we are hoping to minimize.</p>
-<p>The main reason the BLP algorithim works is the contraction mapping on the “inner loop” of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analgous to the closed form expression from above, in which the market shares are the average over the <span class="math inline">\(n\)</span> observations for the simulated consumers.</p>
+<p>The main reason the BLP algorithm works is the contraction mapping on the “inner loop” of the optimization. The contraction mapping takes as an input the estimated market shares using the whatever the estimated parameters are in the current step. It uses a formula analogous to the closed form expression from above, in which the market shares are the average over the <span class="math inline">\(n\)</span> observations for the simulated consumers.</p>
 <p><span class="math display">\[ s_{jm}(x_m,p_m,\delta_m; \theta_2)  =  \frac{1}{r*n} \Sigma_{r*n} s_{jm} =  \frac{1}{r*n} \Sigma_{r*n}  \frac{ exp( x_{jm}\theta_1 + \xi_{jm} + \epsilon_{ijm} )}{1 + \sum_{k \neq j} exp( x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} ) } \]</span></p>
 <pre class="r"><code>  ind_sh &lt;- function(delta.in, mu.in){
     # This function computes the &quot;individual&quot; probabilities of choosing each brand
