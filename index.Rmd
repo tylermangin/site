@@ -9,12 +9,12 @@ title: ""
 
 #### [Resume](Resume.html)
 
-```{r, out.width = "300px", echo = FALSE, fig.align='center'}
-knitr::include_graphics("tyler-resized-final.png")
+```{r, echo = FALSE, fig.align='center'}
+knitr::include_graphics("tyler-resized-final.png",dpi =300)
 ```
 
 
-```{r, out.width = "900px", echo =FALSE, warning=FALSE, fig.align='center'}
+```{r,  echo =FALSE, warning=FALSE, fig.align='center'}
 
 library(leaflet)
 
