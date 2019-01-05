@@ -1,0 +1,30 @@
+---
+title: "Research"
+---
+
+### Demand for USDA Organic Labeled Junk Food
+
+[.pdf](Chapter 1.pdf)
+
+> The USDA Organic label, like other labels that make environmental claims, is meant to clearly communicate information about production methods. In theory, these labels allow informed consumers to indicate their willingness-to-pay for an environmental benefit by paying a premium for an eco-labeled item. However, well-established evidence from both surveys and experiments indicate that consumers also perceive a 'health halo' around eco-labeled items, which leads them to both consistently underestimate the amount of calories, and consume more of those items as a result. Existing estimates of willingness-to-pay for USDA Organic labeling do not take nutritional quality into account. Utilizing a novel scanner data set, my results for USDA Organic labeled chocolate bars and ice cream items show demand for USDA Organic labeling is positively associated with calorie content. This interaction effect between calories and USDA label accounts for between 7%-15% of the price of items. This means the USDA Organic program's stated informational content, which is limited to production methods, is not driving the entirety of consumer's evaluation of USDA organic labeled items. Further, consumers' evaluations of the informational content of USDA organic labels might have an adverse effect on consumers' health.
+
+### The Salience of Promotional Prices with In-Store Advertising
+
+[.pdf](Chapter 2.pdf)
+
+> Using a data set from a natural field experiment conducted by a food retailer, this study estimates the effect of promotional signage on consumer demand for items on promotion. In the study, products were placed on a promotional discount for a two week period, but at treatment locations the items also received promotional signage, where at control locations the items had standard, non-promotional signage. The unique setting allows for us to provide a contribution to research on how attributes like promotional price are made 'salient' by contextual features, like point-of-sale advertising. We find placing promotional signage on an item increased the amount sold by 20-25%, independent of the effect of the promotional price.
+
+### Learning Costs and Peer Effects in Mobile Phone Service Provision
+
+[.pdf](Chapter 3.pdf)
+
+> I estimate the extent of learning costs and peer and advertising effects in the market for postpaid wireless service. Switching costs and peer effects could create market power in the wireless market, which is preernnially of interest in an industry which is dominated by a small number of firms, often searching for merger opportunities. Using a individual-level panel of 4.8 million consumers across two years, I find a large effect for learning costs, where consumers are only half as likely to choose a wireless service provider with which they have no prior experience. For peer and advertising effects, I consider the unique position of consumers who have moved between markets. Consumers who moved between markets are more likely to choose a provider with a larger market share in their home market. Both effects are robust to controls for consumer purchase history, individual-level demographic factors, and interactive effects based migration status. The results are consistent with consumers facing large switching costs due to learning, and forming long-lasting impressions of the quality of service providers from peers or advertising in different markets.
+
+
+
+
+
+
+
+
+

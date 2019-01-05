@@ -1,0 +1,35 @@
+---
+title: "Statistics"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+
+
+### [Categorical Outcomes](individual_categorial_choices.html)
+
+Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it a bit dry, but I use it mostly as a reference and a laboratory.
+
+ [Continue Reading](individual_categorial_choices.html)
+ 
+<br>
+<br>
+<br>
+
+
+
+### [BLP Estimation Example in R](BLP_estimation_cereal.html)
+
+The original code was written for Matlab by [Aviv Nevo](http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm) in 1998. [Michael Carniol](https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R) adapted it into R in 2015, to which I owe the functions and set-up I use here. I just became aware of another R package designed to estimate BLP, [BLPestimatoR](https://cran.r-project.org/web/packages/BLPestimatoR/BLPestimatoR.pdf), which I have not had a chance to test.
+
+
+I ran this routine on a canonical data set from Aviv Nevo. I found the data here: http://www.rasmusen.org/zg604/lectures/blp/. A lot of the description is due to [Nevo's Practitioner's Guide](http://faculty.wcas.northwestern.edu/~ane686/research/RAs_guide.pdf). Any errors are mine.
+
+
+ [Continue Reading](BLP_estimation_cereal.html)
+
+
+
+

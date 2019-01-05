@@ -1,0 +1,261 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Version 1.1 (24/1/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Alessandro (The CV Inn)
+%
+% IMPORTANT: THIS TEMPLATE NEEDS TO BE COMPILED WITH XeLaTeX
+%
+% This template uses several fonts not included with Windows/Linux by
+% default. If you get compilation errors saying a font is missing, find the line
+% on which the font is used and either change it to a font included with your
+% operating system or comment the line out to use the default font.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%---------------------------------------------------------------------------------------
+% PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[10pt]{article} % Font size - 10pt, 11pt or 12pt
+\usepackage[hmargin=1.25cm, vmargin=1.5cm]{geometry} % Document margins
+\usepackage{marvosym} % Required for symbols in the colored box
+\usepackage{ifsym} % Required for symbols in the colored box
+\usepackage[usenames,dvipsnames]{xcolor} % Allows the definition of hex colors
+
+% Colors for links, text and headings
+\usepackage{hyperref}
+\definecolor{linkcolor}{HTML}{FFFFFF} % Blue-gray color for links
+\definecolor{shade}{HTML}{505050} % Peach color for the contact information box
+\definecolor{text1}{HTML}{2b2b2b} % Main document font color, off-black
+\definecolor{headings}{HTML}{800033} % Dark red color for headings
+% Other color palettes: shade=B9D7D9 and linkcolor=A40000; shade=D4D7FE and linkcolor=FF0080
+
+\hypersetup{colorlinks,breaklinks, urlcolor=linkcolor, linkcolor=linkcolor} % Set up links and colors
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+% Headers and footers can be added with the \lhead{} \rhead{} \lfoot{} \rfoot{} commands
+% Example footer:
+%\rfoot{\color{headings} {\sffamily Last update: \today}. Typeset with Xe\LaTeX}
+
+\renewcommand{\headrulewidth}{0pt} % Get rid of the default rule in the header
+
+\usepackage{titlesec} % Allows creating custom \section's
+\usepackage{enumitem}
+
+% Format of the section titles
+\titleformat{\section}{\color{headings}
+\scshape\large\raggedright}{}{0em}{}[\color{black}\titlerule]
+
+\titlespacing{\section}{0pt}{0pt}{0pt} % Spacing around titles
+
+\usepackage[]{helvet}
+\renewcommand*{\familydefault}{\sfdefault}
+\begin{document}
+
+\color{text1} % Sets the default text color for the whole document to the color defined as 'text1'
+
+
+\begin{minipage}[t]{0.46\textwidth} % Start the left-hand side of the page
+
+  
+%---------------------------------------------------------------------------------------
+% WORK EXPERIENCE
+%---------------------------------------------------------------------------------------
+
+\par{\centering{\usefont{OT1}{phv}{b}{n} \selectfont \Huge Tyler Mangin}}\\
+\vspace{16pt} 
+
+\section{}
+
+\vspace{2mm} 
+
+words words words words words words words words words words words words words words words words words words words words words words words words words words words words words
+
+\vspace{2mm}
+
+\section{Work Experience} 
+\vspace{3mm}
+
+{\raggedright \Large Economist (Manager)} \hfill
+{\raggedleft Comlinkdata \\}
+{\raggedright \normalsize July 2017 to Present\par}
+
+\small{{\begin{itemize}
+
+\item Developed new revenue from digital audience engagement forecasting and estimation product 
+\item Improved and extended forecasting for financial services clients 
+\item Deployed Bayesian industry-level model... 
+
+\end{itemize}}}
+
+{\raggedright \Large Senior Analyst} \hfill
+{\raggedleft Comlinkdata \\}
+{\raggedright \normalsize July 2016 to July 2017\par}
+
+\small{{\begin{itemize}
+
+\item Created and productized individual-level model of consumer demand
+\item Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem
+
+\end{itemize}}}
+
+{\raggedright \Large Instructor} \hfill
+{\raggedleft University of Colorado\\}
+{\raggedright \normalsize August 2014 to May 2016\par}
+
+\small{{\begin{itemize}
+
+\item Taught four semester-length introductory lecture sections of between 150-250 students each
+\item Above average scores on student Faculty Course Questionnaires
+\item Four semesters of Teaching Assistantships for Economics and Statistics Courses
+\end{itemize}}}
+
+{\raggedright \Large Accounting Intern} \hfill
+{\raggedleft \normalsize Whole Foods\\}
+{\raggedright \normalsize February 2012 to July 2013\par}
+
+\small{{\begin{itemize}
+
+\item Created ARMIA sales forecasting models  for regional store and department level weekly sales
+\item Organized and streamlined process of cost-discrepancy resolution
+\end{itemize}}}
+
+{\raggedright \Large Produce Buyer} \hfill
+{\raggedleft \normalsize Whole Foods\\}
+{\raggedright \normalsize March 2009 to February 2012\par}
+
+\small{{\begin{itemize}
+
+\item Purchased \$1 million of produce each month
+\item Created a partially automated statistical-based ordering system with underlying sales modeling, leading to a  10\% reduction in spoilage and waste
+
+
+\end{itemize}}}
+
+
+\end{minipage} % End the left-hand side of the page
+\hfill
+\begin{minipage}[t]{0.46\textwidth} % Start the right-hand side of the page
+
+
+%---------------------------------------------------------------------------------------
+% COLORED BOX
+%---------------------------------------------------------------------------------------
+
+\colorbox{shade}{\textcolor{white}{
+\begin{tabular}{c|p{7cm}}
+\raisebox{-4pt}{\textifsymbol{18}} & 237 Shawmut Ave. Apt 2, Boston MA 02118 \\ % Address
+\raisebox{-3pt}{\Mobilefone} & (303) 884 5006 \\ % Phone number
+\raisebox{-1pt}{\Letter} & \href{mailto:tyler.mangin@gmail.com}{tyler.mangin@gmail.com} \\ % Email address
+\Keyboard & \href{https://www.tylermangin.com}{tylermangin.com} \\ % Website
+\end{tabular}
+}
+}\\[1mm]
+
+%---------------------------------------------------------------------------------------
+% EDUCATION
+%---------------------------------------------------------------------------------------
+
+\section{Education} 
+\vspace{2mm}
+
+\begin{tabular}{p{2cm} | p{6cm}}
+
+%------------------------------------------------
+% EDUCATION 1
+%------------------------------------------------
+
+May 2019 & {\Large PhD }\\
+& \textsc{Economics}\\
+& \textit{The University of Colorado}\\
+&\\
+
+%------------------------------------------------
+% EDUCATION 2
+%------------------------------------------------
+
+May 2014 & {\Large Master of Arts}\\
+& \textsc{Economics}\\
+& \textit{The University of Colorado}\\
+&\\
+%------------------------------------------------
+% EDUCATION 3
+%------------------------------------------------
+
+May 2008 & {\Large Bachelor of Arts}  \\ 
+& \textsc{History}\\
+& \textit{The University of Colorado}\\
+&\\
+   
+\end{tabular}\\
+
+%---------------------------------------------------------------------------------------
+% COMPUTER SKILLS
+%---------------------------------------------------------------------------------------
+
+\section{Computer Skills} 
+
+
+\large {\begin{tabular}{p{2cm} | p{6cm}}
+\\
+Basic 
+& AWS (EC2, EMR, S3, Athena) \\
+& Hive/HQL\\
+& Bash\\
+& Spark (scala, sparkR)\\
+& Git \\
+& Python \\
+& \\
+Advanced 
+& STATA \\
+& SQL (Microsoft, PostgreSQL)\\
+& R (data.table, markdown)\\
+\end{tabular} } 
+
+
+%---------------------------------------------------------------------------------------
+% HONORS
+%---------------------------------------------------------------------------------------
+
+\section{Awards} 
+
+\vspace{3mm}
+
+{\raggedright\large Graduate Award for Public Policy Research, 2016 } \\
+{\normalsize \textsc{The University of Colorado Economics}\\}
+
+
+\vspace{-2mm}
+
+%---------------------------------------------------------------------------------------
+% RESEARCH
+%---------------------------------------------------------------------------------------
+
+\section{Research} 
+
+\vspace{3mm}
+
+\begin{itemize}
+    \item USDA Organic Labels and Nutritional Quality
+    \begin{itemize}
+        \item Presented at 2016 Summer Conference 
+of the Association of Environmental and Resource Economists
+    \end{itemize}
+    \item Salience of Promotional Prices with In-Store Advertising
+    \item Learning Costs and Peer Effects in Mobile Phone Service Provision
+\end{itemize}   
+
+\vspace{-2mm}
+
+
+
+\end{minipage} % End right-hand side of the page
+
+\end{document}  

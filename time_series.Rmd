@@ -1,0 +1,185 @@
+---
+title: "Time Series"
+author: "Tyler Mangin"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup,warning = FALSE}
+
+library(data.table) # the best R package
+library(pander) # for tables
+library(highcharter)
+
+# ARIMA
+library(forecast)
+# Bayes
+library(rstan)
+
+```
+
+```{r, echo = FALSE}
+
+knitr::opts_chunk$set(
+  warning = FALSE
+  ,message = FALSE
+  )
+
+wd <- "C:/Users/tmangin/Downloads/"
+
+```
+
+I will use a canonical dataset of shampoo sales originally from Makridakis, Wheelwright and Hyndman (1998). I found it [here](https://datamarket.com/data/set/22r0/sales-of-shampoo-over-a-three-year-period#!ds=22r0&display=line). 
+
+
+```{r}
+
+d <- fread(paste0(wd,'sales-of-shampoo-over-a-three-ye.csv'), data.table = TRUE)
+
+#time frame
+time_frame <- 24:36
+
+
+```
+
+```{r}
+
+hchart(
+  d
+  ,"line"
+  ,hcaes(
+    x = Month
+    ,y = `Sales of shampoo over a three year period`
+  )
+)  %>% 
+hc_exporting(enabled = TRUE)
+
+
+```
+
+arima$(0,1,q)(0,1,Q)_4$ Seasonal Random Trend with smoothing
+
+$$ y_{t} = y_{t-1} + y_{t-4} - y_{t-5} + \sum_q\theta_q\epsilon_{t-q} + \sum_Q\theta_Q\epsilon_{t-Q} $$
+
+```{r}
+
+d[,"arima"] <- as.numeric(NA)
+
+order <- c(0,1,1)
+season <- c(0,1,1)
+
+coef <- NA
+
+coef[[1]] <- list(NA)
+
+for(i in time_frame)
+{  
+  arima_m <- 
+    Arima(
+      y = d[1:i-1,"Sales of shampoo over a three year period"]
+      ,order = order
+      ,seasonal = 
+        list(
+          order = season
+          ,period = 12
+        )
+      )
+  d[i,"arima"] <- forecast(arima_m, h=1)$mean
+  coef[[i]] <- arima_m$coef
+}
+
+coef[[1]] <- NULL
+
+
+```
+
+```{r}
+
+g <- melt(d[,c("Month","Sales of shampoo over a three year period","arima")],id.vars = "Month")
+
+hchart(
+  g
+  ,"line"
+  ,hcaes(
+    x = Month
+    ,y = value
+    ,group = variable
+  )
+)  %>% 
+hc_exporting(enabled = TRUE)
+
+```
+
+
+
+
+
+
+
+
+```{r}
+
+d[
+  ,month := as.numeric(substr(Month,3,4))
+]
+
+d[
+  ,time := seq(1,36)
+]
+
+d[
+  ,time_sq := time^2
+]
+
+for(i in time_frame)
+{  
+seasonal_a <-
+  lm(
+    `Sales of shampoo over a three year period` ~ 0 + factor(month) + time + time_sq
+    ,data = d[1:i-1,]
+    )
+
+d[
+  i
+  ,ols:= 
+    tail(
+      predict(
+        seasonal_a
+        ,newdata = d[1:i]
+      )
+      ,1
+    )
+] 
+}
+
+
+
+```
+
+```{r}
+
+g <- melt(d[,c("Month","Sales of shampoo over a three year period","ols")],id.vars = "Month")
+
+hchart(
+  g
+  ,"line"
+  ,hcaes(
+    x = Month
+    ,y = value
+    ,group = variable
+  )
+)  %>% 
+hc_exporting(enabled = TRUE)
+
+```
+
+
+```{r}
+
+autoplot(decompose(ts(d[,"Sales of shampoo over a three year period"],frequency = 12)))
+
+```
+
+

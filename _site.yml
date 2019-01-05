@@ -5,20 +5,16 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "About Me"
-      href: aboutme.html
-      menu:
-        - text: "About Me"
-          href: aboutme.html
-        - text: "Resume"
-          href: Resume.html
     - text: "Projects"
       href: projects.html
       menu:
+        - text: "Research"
+          href: research.html
+        - text: "Statistics"
+          href: statistics.html
         - text: "Teaching"
-          href: https://sites.google.com/a/colorado.edu/tylermangin/home
-        - text: "BLP Estimation on Cereal Data"
-          href: BLP_estimation_cereal.html
+          href: Teaching.html
+
   right:
     - icon: fa-envelope-o fa-2x
       href: mailto:tyler.mangin@gmail.com
@@ -31,4 +27,4 @@ navbar:
 
 output:
     html_document:
-        css: style.css
+        theme: flatly

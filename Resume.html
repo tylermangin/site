@@ -9,20 +9,20 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Tyler Mangin" />
 
 
-<title>Resume</title>
+<title>resume_pdf</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -31,10 +31,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -67,7 +69,6 @@ h6 {
 }
 </style>
 
-<link rel="stylesheet" href="style.css" type="text/css" />
 
 </head>
 
@@ -90,6 +91,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -99,34 +103,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 51px;
+  padding-top: 60px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 
 .section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 </style>
 
@@ -182,31 +186,19 @@ $(document).ready(function () {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    About Me
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="aboutme.html">About Me</a>
-    </li>
-    <li>
-      <a href="Resume.html">Resume</a>
-    </li>
-  </ul>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Projects
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="https://sites.google.com/a/colorado.edu/tylermangin/home">Teaching</a>
+      <a href="research.html">Research</a>
     </li>
     <li>
-      <a href="BLP_estimation_cereal.html">BLP Estimation on Cereal Data</a>
+      <a href="statistics.html">Statistics</a>
+    </li>
+    <li>
+      <a href="Teaching.html">Teaching</a>
     </li>
   </ul>
 </li>
@@ -245,103 +237,15 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Resume</h1>
+<h1 class="title toc-ignore">resume_pdf</h1>
+<h4 class="author"><em>Tyler Mangin</em></h4>
+<h4 class="date"><em>January 5, 2019</em></h4>
 
 </div>
 
 
-<p><a href="Resume.pdf">.pdf version</a></p>
-<div id="work-experience" class="section level2">
-<h2>Work Experience</h2>
-<div id="senior-analysteconomist" class="section level3">
-<h3>Senior Analyst/Economist</h3>
-<p>Comlinkdata July 2016 to Present</p>
-<ul>
-<li>Developed new revenue from digital audience engagement forecasting and estimation product</li>
-<li>Created individual-level model of consumer demand and applied predictions to millions of consumers</li>
-<li>Improved and extended forecasting for financial services clients</li>
-<li>Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, and Spark, in the AWS ecosystem</li>
-</ul>
-</div>
-<div id="instructor" class="section level3">
-<h3>Instructor</h3>
-<p>University of Colorado August 2014 to May 2016</p>
-<ul>
-<li>Taught four semester-length introductory lecture sections of between 150-250 students each</li>
-<li>Above average scores on student Faculty Course Questionnaires</li>
-<li>Four semesters of Teaching Assistantships for Economics and Statistics Courses</li>
-</ul>
-</div>
-<div id="accounting-intern" class="section level3">
-<h3>Accounting Intern</h3>
-<p>Whole Foods February 2012 to July 2013</p>
-<ul>
-<li>Created ARMIA sales forecasting modelsfor regional store and department level weekly sales</li>
-<li>Organized and streamlined process of cost-discrepancy resolution</li>
-</ul>
-</div>
-<div id="produce-buyer" class="section level3">
-<h3>Produce Buyer</h3>
-<p>Whole Foods March 2009 to February 2012</p>
-<ul>
-<li>Purchased $1 million of produce each month</li>
-<li>Created a partially automated statistical-based ordering system with underlying sales modeling, leading to a 10% reduction in spoilage and waste</li>
-</ul>
-</div>
-<div id="researcher" class="section level3">
-<h3>Researcher</h3>
-<p>PsiPhen Laboratories February 2006 to July 2006</p>
-<ul>
-<li>Designed, organized and executed an experimental protocol and statistical analysis on 100 subjects</li>
-<li>Presented study to the Annual Conference of the Society for Scientific Investigation (SSE), the publishing body for the Journal of Scientific Exploration</li>
-</ul>
-</div>
-</div>
-<div id="education" class="section level2">
-<h2>Education</h2>
-<div id="phd-candidate" class="section level3">
-<h3>PhD Candidate</h3>
-<p>Economics (Expected May 2018) The University of Colorado</p>
-</div>
-<div id="master-of-arts" class="section level3">
-<h3>Master of Arts</h3>
-<p>Economics (May 2014) The University of Colorado</p>
-</div>
-<div id="bachelor-of-arts" class="section level3">
-<h3>Bachelor of Arts</h3>
-<p>History (May 2008) The University of Colorado</p>
-</div>
-</div>
-<div id="research" class="section level2">
-<h2>Research</h2>
-<p>“USDA Organic Labels and Nutritional Quality”</p>
-<p>Working paper</p>
-<p>Presented at 2016 Summer Conference of the Association of Environmental and Resource Economists</p>
-</div>
-<div id="computer-skills" class="section level2">
-<h2>Computer Skills</h2>
-<p>Basic</p>
-<ul>
-<li>Amazon Web Services</li>
-<li>Hive</li>
-<li>Bash</li>
-<li>Spark</li>
-<li>ArcGIS</li>
-<li>Git</li>
-<li>Python</li>
-</ul>
-<p>Advanced</p>
-<ul>
-<li>Excel</li>
-<li>STATA</li>
-<li>SQL</li>
-<li>R</li>
-</ul>
-</div>
-<div id="awards" class="section level2">
-<h2>Awards</h2>
-<p>Graduate Award for Public Policy Research, 2016 UNIVERSITY OF COLORADO ECONOMICS</p>
-</div>
+<p>%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% % Version 1.1 (24/1/13) % % This template has been downloaded from: % <a href="http://www.LaTeXTemplates.com" class="uri">http://www.LaTeXTemplates.com</a> % % Original author: % Alessandro (The CV Inn) % % IMPORTANT: THIS TEMPLATE NEEDS TO BE COMPILED WITH XeLaTeX % % This template uses several fonts not included with Windows/Linux by % default. If you get compilation errors saying a font is missing, find the line % on which the font is used and either change it to a font included with your % operating system or comment the line out to use the default font. % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</p>
+<p>%————————————————————————————— % PACKAGES AND OTHER DOCUMENT CONFIGURATIONS %—————————————————————————————-</p>
 
 
 

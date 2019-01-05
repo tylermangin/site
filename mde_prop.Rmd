@@ -1,0 +1,140 @@
+---
+title: "Minimum Detectable Effects for Proportions"
+output: html_document
+---
+
+I think standard power calulations are difficult to explain in a clear way. And, I don't think its because don't understand the basic idea - they know that a smaller n means that you won't be able to find realitvely large effects if they exist. Or in a formal way, it increases the probabilty of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true. 
+
+But power caclualtions don't really frame the question that way, becauase they calculate a observeation size for a given effect size. Try asking someone who has been away from staistics for a while what a "meaningful effect size" is. If you ask someone who leanred a power calculation sometime back in college, "How large of an effect are you trying to find?" they will just look at you like you are crazy. First, how should they know? Second, don't they want to find 'any' effect?
+
+So, another way to look at a power calculation is to taken n as a given and return an efect size. This is referred to as 'minimum detectable effect,' and I'm a little disappionted how much of the discussion about it seems confined to medical work and statistical education theory. (Thomas Leeper)[http://thomasleeper.com/Rcourse/Tutorials/power.html] has a good descirption about this approach. 
+
+For instance, let's say we have a known proportion $p$. But, also have some subgroup of size $n$ with a proportion of $p_1$, and we would like to know if $n$ is "large enough" to say that $p_0$ and $p_1$ are different.    
+
+A standard power calculation in this case would find $n$ required under the alternative hypothesis with a given probability of type 1 error $\alpha$ and probability of Type II error $\beta$:
+
+$$ n = p_1(1-p_1) \Bigg(\frac{Z_{\frac{1-\alpha}{2}} - Z_{\frac{1-\beta}{2}}}{p_1-p_0}\Bigg)^2  $$
+
+Instead, if we solve for $p_1-p_0$,
+
+$$ p_0- p_1  = \Bigg(\frac{Z_{\frac{1-\alpha}{2}} - Z_{\frac{1-\beta}{2}}}{\sqrt{\frac{n}{p_0(1-p_0)}}}\Bigg)  $$
+
+Which is nice, simple little caclulation, that makes a lot of sense. Let's take it for a test run. Let's say we know that overall 25% of people buy persimmons every week. We want to know if Coloradans who move to the east coast are more likely. But our sample only has 10 people. Is that "enough"? Well, the smallest difference we could detect, if we are being conservative about making errors, is 
+
+
+```{r}
+
+p=0.25
+n = 10
+alpha=0.01
+beta=0.05
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+
+print(diff)
+
+```
+
+That would make the East Coast Coloradans likelihood need to be 0.827948 or greater for us to be able to say they are different.
+
+It decreases as n increases, the tolerance loosens, or the known proportion is farther from 50%.
+
+```{r}
+
+p=0.5
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+##increase in n
+
+p=0.5
+n = 500
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+## Tighter Tolerance
+#decrease in alpha
+
+p=0.5
+n = 100
+alpha=0.05
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+#decrease in beta
+
+p=0.5
+n = 100
+alpha=0.10
+beta=0.10
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+##small p
+
+p=0.05
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+##large p
+
+p=0.90
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+##super large p
+
+p=0.9999999
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+##super small p
+
+p=0.001
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff <- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)
+
+
+
+```
+
+Now, I cheated a little bit by assuming the population proportion was known - we are rarely so lucky.

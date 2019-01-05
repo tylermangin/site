@@ -13,18 +13,25 @@
 
 <title></title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
-<script src="site_libs/htmlwidgets-0.8/htmlwidgets.js"></script>
-<script src="site_libs/d3-4.5.0/d3.min.js"></script>
-<script src="site_libs/forceNetwork-binding-0.4/forceNetwork.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.2/htmlwidgets.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4-compressed.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-binding-2.0.0/leaflet.js"></script>
+<script src="site_libs/leaflet-providers-1.1.17/leaflet-providers.js"></script>
+<script src="site_libs/leaflet-providers-plugin-2.0.0/leaflet-providers-plugin.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -34,10 +41,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -70,7 +79,6 @@ h6 {
 }
 </style>
 
-<link rel="stylesheet" href="style.css" type="text/css" />
 
 </head>
 
@@ -102,34 +110,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 51px;
+  padding-top: 60px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 
 .section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 </style>
 
@@ -185,31 +193,19 @@ $(document).ready(function () {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    About Me
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="aboutme.html">About Me</a>
-    </li>
-    <li>
-      <a href="Resume.html">Resume</a>
-    </li>
-  </ul>
-</li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Projects
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="https://sites.google.com/a/colorado.edu/tylermangin/home">Teaching</a>
+      <a href="research.html">Research</a>
     </li>
     <li>
-      <a href="BLP_estimation_cereal.html">BLP Estimation on Cereal Data</a>
+      <a href="statistics.html">Statistics</a>
+    </li>
+    <li>
+      <a href="Teaching.html">Teaching</a>
     </li>
   </ul>
 </li>
@@ -252,9 +248,16 @@ $(document).ready(function () {
 </div>
 
 
-<p><img src="tyler-resized-final.png" width="300px" /></p>
-<div id="htmlwidget-6782c2cbfbb79e3c4df7" style="width:672px;height:480px;" class="forceNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6782c2cbfbb79e3c4df7">{"x":{"links":{"source":[0,1,2,3],"target":[1,2,0,4],"value":[1,1,1,1],"colour":["#666","#666","#666","#666"]},"nodes":{"name":["","","","",""],"group":["1","1","1","2","2"]},"options":{"NodeID":"name","Group":"group","colourScale":"d3.scaleOrdinal(d3.schemeCategory20);","fontSize":20,"fontFamily":"serif","clickTextSize":50,"linkDistance":50,"linkWidth":"function(d) { return Math.sqrt(d.value); }","charge":-100,"opacity":0.8,"zoom":true,"legend":false,"arrows":false,"nodesize":false,"radiusCalculation":" Math.sqrt(d.nodesize)+6","bounded":true,"opacityNoHover":0,"clickAction":null}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<div id="from-gold-hill-colorado.-currently-living-in-boston-mass." class="section level4">
+<h4>From <a href="https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183">Gold Hill, Colorado</a>. Currently living in <a href="https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178">Boston, Mass</a>.</h4>
+</div>
+<div id="resume" class="section level4">
+<h4><a href="Resume.html">Resume</a></h4>
+<p><img src="tyler-resized-final.png" width="300px" style="display: block; margin: auto;" /></p>
+<div id="htmlwidget-9144aa364b9f747a250e" style="width:900px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9144aa364b9f747a250e">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircles","args":[[40.7796493,42.3520064,42.3531965,42.9182383,42.3545968,42.3544439,42.3839845,41.2283908,42.3529708,42.3536601,41.1494728,42.3518593,42.3488614,41.7314535,42.3443363,42.3452908,40.0085601,42.3531254,38.5348768,42.3529349,42.3525254,36.131402,42.3542071,36.1438522,39.9953175,42.3501365,42.3527285,42.3535997,42.3512831,42.3497983,43.0796001,42.3631307,42.354195,39.6747141,42.3491031,40.0077606,42.3533281,40.0010582,42.348741,42.3453365,42.3551113,42.3485158,40.7951365,42.3530754,42.3604734,42.3533648,42.3493044,42.3607108,41.8071732,41.1500334,42.3737388,42.3473963,42.4147181,42.3529117,42.3666869,42.3500157,42.3529027,42.3553745,42.3534987,42.3553908,42.3607306,41.1490324,42.1915245,42.3528942,42.3533015,39.8424616,42.3529656,42.3528608,42.3487052,42.3610269,42.3522934,42.3593777,41.161777,42.354507,40.0070301,39.6691728,42.3620539,41.8625769,42.3683825,42.3528283,41.1499682,42.3336692,42.3536692,42.3554336,42.3554261,42.3554772,41.1487314,42.3531064,42.3533029,42.3531973,41.5238095,42.3528735,39.9953723,39.9983893,40.0193875,41.1396656,42.3525522,41.1615844,42.3518218,40.0075018,42.3529419,42.3516383,42.3528608,42.3548794,42.2226981,42.3530066,42.2502287,38.7708855,36.1589195,40.0171494,42.351392,43.5866397,42.3534866,39.5954442,38.4603234,42.3649066,42.5164395,42.3529026,40.0100939,40.0188388,36.146356,42.9815652,42.3578514,42.3532606,42.3562296,36.1619244,40.0069693,42.3508867,42.3542545,42.3554213,42.3550873,42.3532684,42.3541194,42.3572254,42.3529388,40.0147373,42.3529131,42.3536323,42.3508209,39.8417875,38.9832123,40.0092238,42.3536133,38.7701575,42.3555726,42.3531482,42.3528694,36.1465517,41.1500552,42.3470176,42.3536649,39.9954761,42.3515004,42.352918,42.997546,42.3574486,38.7148865,42.3545161,40.0078024,39.7293947,42.3441023,40.0074967,42.3529755,40.0071228,42.3631127,42.3613613,40.7652975,42.3537499,42.3552799,42.3418254,41.1495901,42.3533476,41.1622254,42.3531384,42.3548942,39.8537809,42.3530635,42.1958821,42.3511293,41.1600703,42.3513687,42.3656903,41.1462472,42.3528079,40.0100477,42.3594684,42.3563221,42.360892,42.3530656,42.3532047,43.4994716,42.3592114,42.3529797,42.3554316,42.356465,38.5349504,42.3285251,42.3528381,42.3528936,40.0000053],[-111.9807543,-71.0779954,-71.0536923,-111.4472756,-71.0663169,-71.0732664,-71.048196,-112.0141429,-71.0628368,-71.0758342,-8.6164913,-71.0514601,-71.0743916,-111.8350388,-71.0999948,-71.0630016,-105.270698,-71.0766699,-28.5290889,-71.0766412,-71.108091,-86.6685587,-71.0702128,-86.6652456,-105.1396524,-71.0773019,-71.0677397,-71.0758242,-71.0756209,-71.0816841,-111.0136531,-71.0246794,-71.0696129,-105.0813284,-71.0744941,-105.2745014,-71.062999,-105.2643878,-71.0857768,-71.0629684,-71.0551773,-71.0737396,-111.9494719,-71.0766292,-71.1174643,-71.0803029,-71.0640085,-71.0274912,-111.8333547,-8.6196895,-71.1298786,-71.0684939,-71.1541285,-71.0766009,-71.0641646,-71.0810918,-71.0765489,-71.0554789,-71.0713165,-71.0601419,-71.0502215,-8.5862986,-111.8332763,-71.0627023,-71.0594508,-105.0830387,-71.0765838,-71.0750279,-71.0960457,-71.067919,-71.0784767,-71.1168353,-7.7893715,-71.0724021,-105.2706976,-105.0908362,-71.0626184,-111.8301157,-71.1231199,-71.0765468,-8.6196463,-71.0734699,-71.0579276,-71.0601856,-71.0615093,-71.0602259,-8.6205789,-71.0572022,-71.0768906,-71.0641744,-111.9468566,-71.0765518,-105.1402276,-105.2622168,-105.2757401,-8.6087318,-71.0596003,-7.7911709,-71.0904081,-105.275099,-71.0766407,-71.0780946,-71.068263,-71.0683027,-71.0026956,-71.0740625,-71.0375463,-9.1289055,-86.7762118,-105.270483,-71.0757664,-110.8285659,-71.0615604,-104.8808887,-28.1798765,-71.1027361,-71.0483967,-71.0765366,-105.2692928,-105.275862,-86.6681427,-111.0477266,-71.070379,-71.0635827,-71.0696364,-86.7775837,-105.2735868,-71.0748959,-71.0696949,-71.0643834,-71.0551109,-71.0630055,-71.0693324,-71.0700218,-71.0765217,-105.2637013,-71.0766261,-71.0758186,-71.0948797,-105.0816214,-105.0642211,-105.2721999,-71.0568466,-9.1271065,-71.064221,-71.0568558,-71.0765862,-86.6728367,-8.6172666,-71.0803674,-71.0572729,-105.1405086,-71.0756587,-71.0764981,-111.012381,-71.0525444,-9.1361919,-71.0681688,-105.2742937,-105.2065078,-71.0869981,-105.275611,-71.076545,-105.2736622,-71.0246615,-71.0738837,-111.960011,-71.0821102,-71.0622901,-71.0752336,-8.6169143,-71.0614764,-7.8125367,-71.07664,-71.0549935,-104.6713954,-71.0766535,-70.5845216,-71.075415,-7.7884039,-71.0933645,-71.1036917,-8.6141448,-71.0762251,-105.274168,-71.0692602,-71.0624718,-71.049696,-71.0766574,-71.0591766,-110.8673059,-71.0443856,-71.0783217,-71.0708458,-71.07161,-28.5290977,-71.0628626,-71.0765104,-71.0767287,-105.1434875],8,null,null,{"interactive":true,"className":"","stroke":true,"color":"#000000","weight":5,"opacity":0.5,"fill":true,"fillColor":"#000000","fillOpacity":0.2},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]}],"limits":{"lat":[36.131402,43.5866397],"lng":[-112.0141429,-7.7884039]}},"evals":[],"jsHooks":[]}</script>
+</div>
 
 
 

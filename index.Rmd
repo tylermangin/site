@@ -1,35 +1,35 @@
+---
+title: ""
+---
 
-```{r, out.width = "300px", echo = FALSE}
+<br>
+
+
+#### From [Gold Hill, Colorado](https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183). Currently living in [Boston, Mass](https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178). 
+
+#### [Resume](Resume.html)
+
+```{r, out.width = "300px", echo = FALSE, fig.align='center'}
 knitr::include_graphics("tyler-resized-final.png")
 ```
 
 
+```{r, out.width = "900px", echo =FALSE, warning=FALSE, fig.align='center'}
 
-```{r, echo =FALSE, warning=FALSE}
+library(leaflet)
 
-library(networkD3)
-
-
-Pages <- data.frame(cbind(name = c("","","","",""),group = c(1,1,1,2,2), size = c(20,20,20,20,20)))
-Links <-  data.frame(cbind(source = c(0,1,2,3),target = c(1,2,0,4), value = c(1,1,1,1)))
+load("map.Rdata")
 
 
-MyClickScript <- 'window.open("d.name");'
+sample <- sample(1:7000,200)
 
-forceNetwork(
-  Links = Links
-  ,Nodes = Pages
-  ,Source = "source"
-  ,Target = "target"
-  ,Value = "value"
-  ,NodeID = "name"
-  ,Group = "group"
-  ,opacity = 0.8
-  ,fontSize = 20
-  ,charge = -100
-#  ,clickAction = MyClickScript
-  ,bounded = TRUE
-  ,zoom = TRUE)
+map <- leaflet() %>% addProviderTiles(
+    providers$CartoDB.Positron) %>% addCircles(
+    lng = locations$longitudeE7[sample]/10000000
+    ,lat = locations$latitudeE7[sample]/10000000
+    ,color = "#000000"
+    ,radius = 8)
+map
 
 
 ```

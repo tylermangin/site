@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Tyler Mangin" />
+
+
+<title>Models for Categorical Outcomes</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Tyler Mangin</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Projects
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="research.html">Research</a>
+    </li>
+    <li>
+      <a href="statistics.html">Statistics</a>
+    </li>
+    <li>
+      <a href="Teaching.html">Teaching</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:tyler.mangin@gmail.com">
+    <span class="fa fa-envelope-o fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/tylermangin">
+    <span class="fa fa-github fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/RealTylerMangin">
+    <span class="fa fa-twitter fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
+    <span class="fa fa-linkedin fa-2x"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Models for Categorical Outcomes</h1>
+<h4 class="author"><em>Tyler Mangin</em></h4>
+
+</div>
+
+
+<pre class="r"><code>library(data.table) # the best R package</code></pre>
+<pre><code>## Warning: package &#39;data.table&#39; was built under R version 3.6.0</code></pre>
+<pre class="r"><code>library(pander) # for tables</code></pre>
+<p>Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I’m sorry if it a bit dry, but I use it mostly as a reference and a laboratory.</p>
+<div id="multinomial-choice" class="section level2">
+<h2>Multinomial Choice</h2>
+<p>I’ll use the example of a individual-level choice between four outcomes (<span class="math inline">\(j \in \{A,B,C,D\}\)</span>). A reasonable starting point might be to estimate four seperate models on the <span class="math inline">\(\{0,1\}\)</span> outcome of choosing <span class="math inline">\(j\)</span> against choosing <span class="math inline">\(k \neq j\)</span>. This is an easy way out - you can use a logistic model, or a linear probability model and probably wouldn’t crash your computer. Perhaps a later version of the following will include a comparison of when those two models really differ much from each other. The typical justification is that with four seperate models, some factor could be estimated to make choosing every outcome more likely, which seems wrong, since what we really care about is which choice the factor makes relatively more likely. As I discuss below, this seems like a bigger deal to me for individual-level variation and less important for variation between alternatives.</p>
+<div id="themes" class="section level3">
+<h3>Themes</h3>
+<ul>
+<li>Linear Dependence: If you estimate the probability of choosing all but one alternative, you can find the last probability by using the fact they all must sum to one. In practice this means for <span class="math inline">\(J\)</span> alternatives we generally estimate the likelihood for <span class="math inline">\(J-1\)</span>, and take the last alternative as a reference.</li>
+<li>Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R, the mnlogit package, and Rstan for Bayesian estimation</li>
+</ul>
+<pre class="r"><code>library(mnlogit) # estimation package
+library(rstan) # estimation package</code></pre>
+</div>
+<div id="the-math" class="section level3">
+<h3>The Math</h3>
+<p>For now, consider the four outcomes (<span class="math inline">\(j \in \{A,B,C,D\}\)</span>). Let <span class="math inline">\(u_{ij}\)</span> be person <span class="math inline">\(i\)</span>’s valuation of <span class="math inline">\(j\)</span>. Although never observed directly, we observe <span class="math inline">\(i\)</span> choosing <span class="math inline">\(j\)</span> in the case that <span class="math inline">\(u_{ij} \geq u_{ik}\)</span> for all <span class="math inline">\(k \neq j\)</span>. Then, we specify <span class="math inline">\(u_{ij}\)</span>. Typically, the specification is something like :</p>
+<p><span class="math display">\[u_{ij} = \mu_{ij} + \epsilon_{ij}\]</span> ,</p>
+<p>where <span class="math inline">\(\mu\)</span> is the observed part, and <span class="math inline">\(\epsilon\)</span> is the unobserved part.</p>
+<p>The standard assumption is that <span class="math inline">\(\epsilon_{ij}\)</span> is a type I extreme value (gumbel) distribution. As a quick demonstration of why this distributional choice is made, consider</p>
+<p><span class="math display">\[ P(\text{i chooses A over B}) = P(u_{iA} &gt; u_{iB}) = P( \mu_{iA} + \epsilon_{iA} &gt; \mu_{iB} + \epsilon_{iB} )\]</span> <span class="math display">\[  = P( \mu_{iA} - \mu_{iB} &gt; \epsilon_{iB} - \epsilon_{iA} )\]</span></p>
+<p>which depends on the cumulative distribution function of the random variable <span class="math inline">\(\epsilon_{iB} - \epsilon_{iA}\)</span>. The difference of two Gumbel distributions has a logistic distribution, which makes estimation easier.</p>
+<pre class="r"><code>library(evd) # for gumbel distributions</code></pre>
+</div>
+<div id="types-of-factors" class="section level3">
+<h3>Types of Factors</h3>
+<p>Predictors can be broken up broadly into indvidual-specific factors like income or age, and alternative-specific factors lke price. There is also the possibility of a ‘context-specific’ factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won’t consider them here.</p>
+</div>
+<div id="types-of-effects" class="section level3">
+<h3>Types of Effects</h3>
+<p>The first type of effect I’ll call generic, meaning a factor affects all of the alternatives the same way. I think of this as being the default choice for alternative-specific factors. All things being equal, if the price of something increases people will choose it less.</p>
+<p>I’ll call the second type of effects alternative-specific. These tend to be applied individual-level factors. Being old, for instance, might make you more likely to chose one alterative, and less likely to choose another.</p>
+<p>Effects can also be individual-specific. These are much more difficult to estimate. I have an example of the <a href="http://www.tylermangin.com/BLP_estimation_cereal.html">BLP algorithm</a> for solving a class of these problems, and I’m working on a Bayesian ‘mixed logit’ version next.</p>
+</div>
+</div>
+<div id="individual-specific-factors" class="section level2">
+<h2>Individual-Specific Factors</h2>
+<p>Let’s create five Individual-level factors (think age, income, ect.) <span class="math inline">\(x_{ik} \in \{x_{i1},x_{i2},x_{i3},x_{i4}\}\)</span> across 1000 individuals.</p>
+<pre class="r"><code>X &lt;- replicate(5,rnorm(1000))</code></pre>
+<table style="width:68%;">
+<colgroup>
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">x1</th>
+<th align="center">x2</th>
+<th align="center">x3</th>
+<th align="center">x4</th>
+<th align="center">x5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">1.57</td>
+<td align="center">0.92</td>
+<td align="center">0.58</td>
+<td align="center">0.57</td>
+<td align="center">2.03</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">0.84</td>
+<td align="center">-0.32</td>
+<td align="center">-0.67</td>
+<td align="center">1.69</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">-0.96</td>
+<td align="center">1.21</td>
+<td align="center">-1.07</td>
+<td align="center">-0.23</td>
+<td align="center">-0.2</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">-0.66</td>
+<td align="center">-0.57</td>
+<td align="center">-0.39</td>
+<td align="center">0.13</td>
+<td align="center">-0.67</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">-1.47</td>
+<td align="center">-0.57</td>
+<td align="center">1.45</td>
+<td align="center">-1.48</td>
+<td align="center">-0.33</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">-0.64</td>
+<td align="center">0.34</td>
+<td align="center">-0.14</td>
+<td align="center">0.87</td>
+<td align="center">-1.02</td>
+</tr>
+</tbody>
+</table>
+<p>Assume that the effects of <span class="math inline">\(x_{ik}\)</span> are alternative-specific, and common across people, so that it influences <span class="math inline">\(u\)</span> as <span class="math inline">\(X_i\beta_j\)</span>. Linear dependence matters here. The standard strategy is to set <span class="math inline">\(\mu\)</span> for one alternative to be zero. This is the reference alternative. Since we don’t ultimately care about the value of <span class="math inline">\(\mu\)</span>, this is a normalization that is helpful, and doesn’t lose any information.</p>
+<pre class="r"><code>betaA &lt;- rep(0, 5) #reference outcome
+betaB &lt;- rnorm(5)
+betaC &lt;- rnorm(5)
+betaD &lt;- rnorm(5)</code></pre>
+<table style="width:72%;">
+<colgroup>
+<col width="16%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">x1</th>
+<th align="center">x2</th>
+<th align="center">x3</th>
+<th align="center">x4</th>
+<th align="center">x5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>betaA</strong></td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>betaB</strong></td>
+<td align="center">-1.12</td>
+<td align="center">-1.25</td>
+<td align="center">-0.12</td>
+<td align="center">-0.44</td>
+<td align="center">1.07</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>betaC</strong></td>
+<td align="center">0.14</td>
+<td align="center">-1.18</td>
+<td align="center">0.53</td>
+<td align="center">-0.45</td>
+<td align="center">-1.1</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>betaD</strong></td>
+<td align="center">0.3</td>
+<td align="center">0.48</td>
+<td align="center">1.81</td>
+<td align="center">-0.9</td>
+<td align="center">2.53</td>
+</tr>
+</tbody>
+</table>
+<p>That makes the utility/value specification</p>
+<p><span class="math display">\[ u_{ij} = X_i\beta_j + \epsilon_{ij} \]</span></p>
+<p>where <span class="math inline">\(\epsilon_{ij}\)</span> is a type I extreme value (gumbel) distribution.</p>
+<pre class="r"><code>U &lt;- 
+  cbind(
+    0 + rgumbel(1000) #Ua
+    ,X%*%betaB + rgumbel(1000) #Ub
+    ,X%*%betaC + rgumbel(1000) #Uc
+    ,X%*%betaD + rgumbel(1000) #Ud
+    )</code></pre>
+<p>Each person makes the choice based on which alternative has the largest value for them.</p>
+<pre class="r"><code>U[
+  Ua &gt; Ub &amp; Ua &gt; Uc &amp; Ua &gt; Ud
+  ,choice := &quot;A&quot;
+]
+
+U[
+  Ub &gt; Ua &amp; Ub &gt; Uc &amp; Ub &gt; Ud
+  ,choice := &quot;B&quot;
+]
+
+U[
+  Uc &gt; Ua &amp; Uc &gt; Ub &amp; Uc &gt; Ud
+  ,choice := &quot;C&quot;
+]
+
+U[
+  Ud &gt; Ua &amp; Ud &gt; Ub &amp; Ud &gt; Uc
+  ,choice := &quot;D&quot;
+]</code></pre>
+<table style="width:69%;">
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">choice</th>
+<th align="center">Ua</th>
+<th align="center">Ub</th>
+<th align="center">Uc</th>
+<th align="center">Ud</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">D</td>
+<td align="center">-0.09</td>
+<td align="center">-1.52</td>
+<td align="center">-2.28</td>
+<td align="center">8.58</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">B</td>
+<td align="center">-0.47</td>
+<td align="center">1.88</td>
+<td align="center">-0.74</td>
+<td align="center">-2.82</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">C</td>
+<td align="center">-0.8</td>
+<td align="center">-0.76</td>
+<td align="center">-0.23</td>
+<td align="center">-1.57</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">A</td>
+<td align="center">1.87</td>
+<td align="center">1.59</td>
+<td align="center">1.23</td>
+<td align="center">-3.69</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">B</td>
+<td align="center">0.24</td>
+<td align="center">3</td>
+<td align="center">1.15</td>
+<td align="center">0.9</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">A</td>
+<td align="center">-0.1</td>
+<td align="center">-1.56</td>
+<td align="center">-1.34</td>
+<td align="center">-1.51</td>
+</tr>
+</tbody>
+</table>
+<div id="estimation-with-mnlogit" class="section level3">
+<h3>Estimation with mnlogit</h3>
+<p>To use mnlogit, we need to reshape the data into a format where we have every alternative for every individual. Notice that the variables are fixed across individuals.</p>
+<pre class="r"><code>d_mnl &lt;- 
+  CJ(
+    person = seq(1,1000,1)
+    ,alt = c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;)
+  )
+
+d_mnl[
+  U
+  ,choice := 1
+  ,on = c(person = &quot;person&quot;,alt = &quot;choice&quot;)
+]
+
+d_mnl[
+  is.na(choice)
+  ,choice := 0
+]
+
+X &lt;- data.table(X)
+
+X[
+  ,person := rownames(X)
+]
+
+X[
+  ,person := as.numeric(person)
+]
+
+d_mnl[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = c(person = &quot;person&quot;)
+]</code></pre>
+<table style="width:85%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="12%" />
+<col width="9%" />
+<col width="11%" />
+<col width="11%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">alt</th>
+<th align="center">choice</th>
+<th align="center">x1</th>
+<th align="center">x2</th>
+<th align="center">x3</th>
+<th align="center">x4</th>
+<th align="center">x5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">1.57</td>
+<td align="center">0.92</td>
+<td align="center">0.58</td>
+<td align="center">0.57</td>
+<td align="center">2.03</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">1.57</td>
+<td align="center">0.92</td>
+<td align="center">0.58</td>
+<td align="center">0.57</td>
+<td align="center">2.03</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">C</td>
+<td align="center">0</td>
+<td align="center">1.57</td>
+<td align="center">0.92</td>
+<td align="center">0.58</td>
+<td align="center">0.57</td>
+<td align="center">2.03</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">D</td>
+<td align="center">1</td>
+<td align="center">1.57</td>
+<td align="center">0.92</td>
+<td align="center">0.58</td>
+<td align="center">0.57</td>
+<td align="center">2.03</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">0.84</td>
+<td align="center">-0.32</td>
+<td align="center">-0.67</td>
+<td align="center">1.69</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">B</td>
+<td align="center">1</td>
+<td align="center">0.84</td>
+<td align="center">-0.32</td>
+<td align="center">-0.67</td>
+<td align="center">1.69</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">C</td>
+<td align="center">0</td>
+<td align="center">0.84</td>
+<td align="center">-0.32</td>
+<td align="center">-0.67</td>
+<td align="center">1.69</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">D</td>
+<td align="center">0</td>
+<td align="center">0.84</td>
+<td align="center">-0.32</td>
+<td align="center">-0.67</td>
+<td align="center">1.69</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>frm &lt;-
+  formula(
+    &quot;choice ~ 0 | x1 + x2 + x3 + x4 + x5&quot; 
+  )
+
+mn_u &lt;-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = &quot;alt&quot;
+  )</code></pre>
+<table style="width:47%;">
+<colgroup>
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">True Model</th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>x1:B</strong></td>
+<td align="center">-1.12</td>
+<td align="center">-1.58</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x2:B</strong></td>
+<td align="center">-1.25</td>
+<td align="center">-1.45</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x3:B</strong></td>
+<td align="center">-0.12</td>
+<td align="center">-0.41</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x4:B</strong></td>
+<td align="center">-0.44</td>
+<td align="center">-0.46</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x5:B</strong></td>
+<td align="center">1.07</td>
+<td align="center">0.85</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x1:C</strong></td>
+<td align="center">0.14</td>
+<td align="center">-0.07</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x2:C</strong></td>
+<td align="center">-1.18</td>
+<td align="center">-1.25</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x3:C</strong></td>
+<td align="center">0.53</td>
+<td align="center">0.44</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x4:C</strong></td>
+<td align="center">-0.45</td>
+<td align="center">-0.35</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x5:C</strong></td>
+<td align="center">-1.1</td>
+<td align="center">-1.36</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x1:D</strong></td>
+<td align="center">0.3</td>
+<td align="center">0.22</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x2:D</strong></td>
+<td align="center">0.48</td>
+<td align="center">0.67</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x3:D</strong></td>
+<td align="center">1.81</td>
+<td align="center">1.77</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x4:D</strong></td>
+<td align="center">-0.9</td>
+<td align="center">-0.81</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x5:D</strong></td>
+<td align="center">2.53</td>
+<td align="center">2.3</td>
+</tr>
+</tbody>
+</table>
+<table style="width:65%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">162</td>
+<td align="center">0.16</td>
+<td align="center">0.16</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">238</td>
+<td align="center">0.24</td>
+<td align="center">0.24</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">258</td>
+<td align="center">0.26</td>
+<td align="center">0.25</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">342</td>
+<td align="center">0.34</td>
+<td align="center">0.35</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estimation-with-rstan" class="section level3">
+<h3>Estimation with rStan</h3>
+<p>Now, for a Bayesian version. Here is a Bayesian model written in stan. The model comes out of example 6.5 of the stan reference guide.</p>
+<p>One downside to this estimation procedure is that it makes much more time to solve.</p>
+<p>(One markdown note : I wasn’t able to supress all of the output, which I think is an open <a href="https://github.com/stan-dev/rstan/issues/49">bug</a>)</p>
+<pre class="r"><code>stan_code &lt;-
+  &quot;
+data {
+int&lt;lower = 2&gt; J; //number of alternatives
+int&lt;lower = 0&gt; N; //number of individuals 
+int&lt;lower = 1&gt; D; //number of factors
+int y[N]; // categorical choices
+vector[D] x[N]; // factors
+}
+transformed data {
+row_vector[D] zeros;
+zeros = rep_row_vector(0, D);
+}
+parameters {
+matrix[J-1,D] beta_raw;
+}
+transformed parameters {
+matrix[J, D] beta;
+beta = append_row(zeros, beta_raw);
+}
+model {
+for (j in 1:J-1)
+beta[j] ~ normal(0,5);
+for (n in 1:N)
+y[n] ~ categorical(softmax(beta * x[n]));
+}
+&quot;</code></pre>
+<pre class="r"><code>standata &lt;- 
+  list(
+    J = 4
+    ,N = 1000
+    ,D = 5
+    ,y = as.vector(U[,as.numeric(factor(choice))])
+    ,x = as.matrix(X[,1:5])
+  )
+  
+  mn_bayes &lt;- 
+    stan(
+      model_code = stan_code
+      ,data = standata
+      ,refresh = -2
+      ,verbose = FALSE
+    )</code></pre>
+<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config.hpp:39:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file15f87ca16b23.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
+## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:44:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file15f87ca16b23.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+##      static void set_zero_all_adjoints() {
+##                  ^
+## 
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## 
+##  Elapsed Time: 17.699 seconds (Warm-up)
+##                16.228 seconds (Sampling)
+##                33.927 seconds (Total)
+## 
+## 
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## 
+##  Elapsed Time: 17.454 seconds (Warm-up)
+##                14.197 seconds (Sampling)
+##                31.651 seconds (Total)
+## 
+## 
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## 
+##  Elapsed Time: 17.639 seconds (Warm-up)
+##                15.068 seconds (Sampling)
+##                32.707 seconds (Total)
+## 
+## 
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## 
+##  Elapsed Time: 19.571 seconds (Warm-up)
+##                15.566 seconds (Sampling)
+##                35.137 seconds (Total)</code></pre>
+<pre class="r"><code>  pars &lt;- 
+    extract(mn_bayes)
+
+
+  beta &lt;- 
+    apply(pars$beta,colSums,MARGIN = 3)/4000
+  
+  pred &lt;- exp(as.matrix(X[,1:5])%*%t(as.matrix(beta)))/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+
+  shares_est &lt;- colSums(pred)/1000</code></pre>
+<table style="width:47%;">
+<colgroup>
+<col width="15%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">True Model</th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>x1:B</strong></td>
+<td align="center">-1.12</td>
+<td align="center">-1.6</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x2:B</strong></td>
+<td align="center">-1.25</td>
+<td align="center">-1.46</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x3:B</strong></td>
+<td align="center">-0.12</td>
+<td align="center">-0.41</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x4:B</strong></td>
+<td align="center">-0.44</td>
+<td align="center">-0.47</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x5:B</strong></td>
+<td align="center">1.07</td>
+<td align="center">0.86</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x1:C</strong></td>
+<td align="center">0.14</td>
+<td align="center">-0.06</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x2:C</strong></td>
+<td align="center">-1.18</td>
+<td align="center">-1.26</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x3:C</strong></td>
+<td align="center">0.53</td>
+<td align="center">0.45</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x4:C</strong></td>
+<td align="center">-0.45</td>
+<td align="center">-0.36</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x5:C</strong></td>
+<td align="center">-1.1</td>
+<td align="center">-1.38</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x1:D</strong></td>
+<td align="center">0.3</td>
+<td align="center">0.22</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x2:D</strong></td>
+<td align="center">0.48</td>
+<td align="center">0.68</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x3:D</strong></td>
+<td align="center">1.81</td>
+<td align="center">1.79</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>x4:D</strong></td>
+<td align="center">-0.9</td>
+<td align="center">-0.82</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>x5:D</strong></td>
+<td align="center">2.53</td>
+<td align="center">2.33</td>
+</tr>
+</tbody>
+</table>
+<table style="width:65%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">162</td>
+<td align="center">0.16</td>
+<td align="center">0.16</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">238</td>
+<td align="center">0.24</td>
+<td align="center">0.24</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">258</td>
+<td align="center">0.26</td>
+<td align="center">0.25</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">342</td>
+<td align="center">0.34</td>
+<td align="center">0.35</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="alternative-specific-factors" class="section level2">
+<h2>Alternative-Specific Factors</h2>
+<p>The case of the individual-level model with only alternative-level variation is a pretty counter-intuitive, but really common case. The setting here is usually some sort of aggregated data that result from individual-level choices. In fact, I’ve seen the multinomial model presented with this as the standard baseline case, which I think is bonkers, because its really an odd duck in comparison to the straight-forward individal-specific factor case. I am still going to present it as if the data were not aggregeated, because that’s how the model treats it. A multinomial logit models the aggregate outcomes as the product of <span class="math inline">\(n\)</span> individual choices whether you have individual-level factors or not.</p>
+<p>Consider two alternative-level factors. <span class="math inline">\(Z_j\)</span>, which is <span class="math inline">\(kx1\)</span> vector for <span class="math inline">\(k\)</span> alterntative-specific variables. One concrete way that the individual-level formulation can trick you in this case is in degrees of freedom. You might be fooled into thinking that the number of individuals determines the degrees of freedom, but as can be more easily seen at the aggregate level, with four alternatives to choose from, we must have fewer than four alternative-level factors</p>
+<pre class="r"><code>Za &lt;- replicate(2,rnorm(1))
+Zb &lt;- replicate(2,rnorm(1))
+Zc &lt;- replicate(2,rnorm(1))
+Zd &lt;- replicate(2,rnorm(1))</code></pre>
+<table style="width:35%;">
+<colgroup>
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Z1</th>
+<th align="center">Z2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>A</strong></td>
+<td align="center">-1.84</td>
+<td align="center">-2.37</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>B</strong></td>
+<td align="center">0.82</td>
+<td align="center">0.71</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>C</strong></td>
+<td align="center">2.48</td>
+<td align="center">2.01</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>D</strong></td>
+<td align="center">0.93</td>
+<td align="center">0.42</td>
+</tr>
+</tbody>
+</table>
+<p>Assume that the effects of <span class="math inline">\(Z_{j}\)</span> are common over alternatives, and common across people, so that it influences <span class="math inline">\(u\)</span> as <span class="math inline">\(Z_j\beta\)</span>.</p>
+<p>That makes the observed portion of utility/value</p>
+<p><span class="math display">\[ \mu_{ij} = Z_j\gamma_j + \epsilon_{ij} \]</span> .</p>
+<p>Linear dependence comes into play now, and as before the standard approach is typically to normalize <span class="math inline">\(\mu\)</span> for one alternative, say <span class="math inline">\(A\)</span>, to zero. This is a little tricky in this case, since the constraint <span class="math inline">\(\gamma_1z_{1A}+\gamma_2z_{2A} = 0\)</span> needs another equation to have a unique solution. Here, we can lean on the fact that multinomial coefficients are all relative and let <span class="math inline">\(\gamma_1 = 1\)</span>, so that <span class="math inline">\(\gamma_2 = \frac{-z_{1A}}{z_{2A}}\)</span></p>
+<pre class="r"><code>gamma1 &lt;- 1
+gamma2 &lt;- -Za[1]/Za[2]</code></pre>
+<p>.</p>
+<table style="width:28%;">
+<colgroup>
+<col width="18%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>gamma1</strong></td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>gamma2</strong></td>
+<td>-0.77</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>U &lt;- 
+  cbind(
+    as.vector(Za%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ua = 0 + rgumbel()
+    ,as.vector(Zb%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ub
+    ,as.vector(Zc%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Uc
+    ,as.vector(Zd%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ud
+    )</code></pre>
+<p>Each person makes the choice based on which alternative has the largest value for them.</p>
+<pre class="r"><code>U[
+  Ua &gt; Ub &amp; Ua &gt; Uc &amp; Ua &gt; Ud
+  ,choice := &quot;A&quot;
+]
+
+U[
+  Ub &gt; Ua &amp; Ub &gt; Uc &amp; Ub &gt; Ud
+  ,choice := &quot;B&quot;
+]
+
+U[
+  Uc &gt; Ua &amp; Uc &gt; Ub &amp; Uc &gt; Ud
+  ,choice := &quot;C&quot;
+]
+
+U[
+  Ud &gt; Ua &amp; Ud &gt; Ub &amp; Ud &gt; Uc
+  ,choice := &quot;D&quot;
+]</code></pre>
+<table style="width:69%;">
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">choice</th>
+<th align="center">Ua</th>
+<th align="center">Ub</th>
+<th align="center">Uc</th>
+<th align="center">Ud</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">C</td>
+<td align="center">-0.82</td>
+<td align="center">0.14</td>
+<td align="center">1.76</td>
+<td align="center">-0.05</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">B</td>
+<td align="center">-0.41</td>
+<td align="center">7.32</td>
+<td align="center">2.54</td>
+<td align="center">0.47</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">B</td>
+<td align="center">-0.2</td>
+<td align="center">1.58</td>
+<td align="center">1</td>
+<td align="center">0.35</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">D</td>
+<td align="center">0.48</td>
+<td align="center">-0.87</td>
+<td align="center">1.4</td>
+<td align="center">2.35</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">C</td>
+<td align="center">2.51</td>
+<td align="center">1.49</td>
+<td align="center">5.23</td>
+<td align="center">4.7</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">B</td>
+<td align="center">-0.06</td>
+<td align="center">2.77</td>
+<td align="center">-0.06</td>
+<td align="center">1.02</td>
+</tr>
+</tbody>
+</table>
+<div id="ols-log-linear-estimation" class="section level3">
+<h3>OLS Log-linear Estimation</h3>
+<p>The first way to estimate in this situation is to use an algebra trick I won’t show directly here - there are lot of places to find the derivation. But, my making the particular choices we did, in particular the specification of utility and the choice of the Type I extreme value errors, we can estimate <span class="math inline">\(\gamma_1\)</span> and <span class="math inline">\(\gamma_2\)</span> with a log-level OLS on the the shares <span class="math inline">\(s_j\)</span> relative to the share of the reference alternative <span class="math inline">\(s_0\)</span>.</p>
+<p><span class="math display">\[ ln(s_j) - ln(s_0) =   Z_j\gamma_j +  \epsilon_j\]</span> Everyone loves OLS, right?</p>
+<pre class="r"><code>d_cl &lt;-
+  U[
+    ,.(
+      count = .N
+    )
+    ,by = choice
+  ]
+
+d_cl[
+  ,share := count/sum(count)
+]
+
+d_cl[
+  Z
+  ,`:=`(
+    Z1 = i.Z1
+    ,Z2 = i.Z2
+  )
+  ,on = c(choice = &quot;alt&quot;)
+]
+
+d_cl[
+  ,y := log(share) - log(d_cl[choice == &quot;A&quot;,share])
+]
+
+cl_u &lt;- lm(y ~ 0 + Z1 + Z2, data = d_cl)
+
+est &lt;-
+  data.frame(
+    &quot;est_share&quot; =
+      exp(predict(cl_u))/sum(exp(predict(cl_u)))
+    )</code></pre>
+<table style="width:44%;">
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">True Model</th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Z1</strong></td>
+<td align="center">1</td>
+<td align="center">1.16</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Z2</strong></td>
+<td align="center">-0.77</td>
+<td align="center">-0.9</td>
+</tr>
+</tbody>
+</table>
+<table style="width:57%;">
+<colgroup>
+<col width="12%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">0.14</td>
+<td align="center">0.14</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">0.22</td>
+<td align="center">0.19</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">0.37</td>
+<td align="center">0.4</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">0.28</td>
+<td align="center">0.28</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estimation-with-mnlogit-1" class="section level3">
+<h3>Estimation with mnlogit</h3>
+<p>Need to reshape the data. Notice that the variables are fixed across alternatives.</p>
+<pre class="r"><code>d_mnl &lt;- 
+  CJ(
+    person = seq(1,1000,1)
+    ,alt = c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;)
+  )
+
+d_mnl[
+  U
+  ,choice := 1
+  ,on = c(person = &quot;person&quot;,alt = &quot;choice&quot;)
+]
+
+d_mnl[
+  is.na(choice)
+  ,choice := 0
+]
+
+d_mnl[
+  Z
+  ,`:=`(
+    z1 = i.Z1
+    ,z2 = i.Z2
+  )
+  ,on = c(alt = &quot;alt&quot;)
+]</code></pre>
+<table style="width:56%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="12%" />
+<col width="11%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">alt</th>
+<th align="center">choice</th>
+<th align="center">z1</th>
+<th align="center">z2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">-1.84</td>
+<td align="center">-2.37</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">0.82</td>
+<td align="center">0.71</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">C</td>
+<td align="center">1</td>
+<td align="center">2.48</td>
+<td align="center">2.01</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">D</td>
+<td align="center">0</td>
+<td align="center">0.93</td>
+<td align="center">0.42</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">-1.84</td>
+<td align="center">-2.37</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">B</td>
+<td align="center">1</td>
+<td align="center">0.82</td>
+<td align="center">0.71</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">C</td>
+<td align="center">0</td>
+<td align="center">2.48</td>
+<td align="center">2.01</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">D</td>
+<td align="center">0</td>
+<td align="center">0.93</td>
+<td align="center">0.42</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>frm &lt;-
+  formula(
+    &quot;choice ~  0 + z1 + z2 &quot; 
+  )
+
+mn_u &lt;-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = &quot;alt&quot;
+  )</code></pre>
+<table style="width:44%;">
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">True Model</th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>z1</strong></td>
+<td align="center">1</td>
+<td align="center">0.73</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>z2</strong></td>
+<td align="center">-0.77</td>
+<td align="center">-0.49</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estimation-with-rstan-1" class="section level3">
+<h3>Estimation with rStan</h3>
+<p>This model comes out of example 9.6 of the stan reference guide.</p>
+<pre class="r"><code>stan_code &lt;-
+  &quot;
+data {
+int&lt;lower = 2&gt; J; //number of alternatives
+int&lt;lower = 0&gt; N; //number of individuals 
+int&lt;lower = 1&gt; D; //number of factors
+int y[N]; // categorical choices
+matrix[J,D] z; // factors
+}
+parameters {
+vector[D] gamma;
+}
+model {
+gamma ~ normal(0,5);
+for (n in 1:N)
+y[n] ~ categorical(softmax( z * gamma ));
+}
+&quot;</code></pre>
+<pre class="r"><code>standata &lt;- 
+  list(
+    J = 4
+    ,N = 1000
+    ,D = 2
+    ,y = as.vector(U[,as.numeric(factor(choice))])
+    ,z = as.matrix(Z[,1:2])
+  )
+  
+  mn_bayes &lt;- 
+    stan(
+      model_code = stan_code
+      ,data = standata
+      # ,refresh = -2
+      # ,verbose = FALSE
+    )</code></pre>
+<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config.hpp:39:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file15f877a51fbe.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
+## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:44:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file15f877a51fbe.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+##      static void set_zero_all_adjoints() {
+##                  ^
+## 
+## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0.001 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 2000 [  0%]  (Warmup)
+## Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Iteration: 2000 / 2000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 24.815 seconds (Warm-up)
+##                30.329 seconds (Sampling)
+##                55.144 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 2).
+## 
+## Gradient evaluation took 0.001 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 2000 [  0%]  (Warmup)
+## Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Iteration: 2000 / 2000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 24.941 seconds (Warm-up)
+##                23.059 seconds (Sampling)
+##                48 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 3).
+## 
+## Gradient evaluation took 0.001 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 2000 [  0%]  (Warmup)
+## Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Iteration: 2000 / 2000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 22.615 seconds (Warm-up)
+##                21.683 seconds (Sampling)
+##                44.298 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 4).
+## 
+## Gradient evaluation took 0.001 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 2000 [  0%]  (Warmup)
+## Iteration:  200 / 2000 [ 10%]  (Warmup)
+## Iteration:  400 / 2000 [ 20%]  (Warmup)
+## Iteration:  600 / 2000 [ 30%]  (Warmup)
+## Iteration:  800 / 2000 [ 40%]  (Warmup)
+## Iteration: 1000 / 2000 [ 50%]  (Warmup)
+## Iteration: 1001 / 2000 [ 50%]  (Sampling)
+## Iteration: 1200 / 2000 [ 60%]  (Sampling)
+## Iteration: 1400 / 2000 [ 70%]  (Sampling)
+## Iteration: 1600 / 2000 [ 80%]  (Sampling)
+## Iteration: 1800 / 2000 [ 90%]  (Sampling)
+## Iteration: 2000 / 2000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 22.732 seconds (Warm-up)
+##                23.373 seconds (Sampling)
+##                46.105 seconds (Total)</code></pre>
+<pre class="r"><code>  pars &lt;- 
+    extract(mn_bayes)
+
+
+  gamma &lt;- 
+    colSums(pars$gamma)/4000
+  
+  pred &lt;- exp(as.matrix(Z[,1:2])%*%as.matrix(gamma))/colSums(exp(as.matrix(Z[,1:2])%*%as.matrix(gamma)))</code></pre>
+<table style="width:44%;">
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">True Model</th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Z1</strong></td>
+<td align="center">1</td>
+<td align="center">0.72</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Z2</strong></td>
+<td align="center">-0.77</td>
+<td align="center">-0.48</td>
+</tr>
+</tbody>
+</table>
+<table style="width:65%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">135</td>
+<td align="center">0.14</td>
+<td align="center">0.14</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">215</td>
+<td align="center">0.22</td>
+<td align="center">0.21</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">373</td>
+<td align="center">0.37</td>
+<td align="center">0.38</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">277</td>
+<td align="center">0.28</td>
+<td align="center">0.27</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="fixed-effects" class="section level3">
+<h3>Fixed Effects</h3>
+<p>There is also the option to use a single fixed effect for each alternative. In this case, you lose any information about the effect of <span class="math inline">\(Z_1\)</span> vs. the effect of <span class="math inline">\(Z_2\)</span>, but but instead get an estimate of whole quantity <span class="math inline">\(Z_j\gamma\)</span>.</p>
+<pre class="r"><code>frm &lt;-
+  formula(
+    &quot;choice ~  1 &quot;
+  )
+
+mn_f &lt;-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = &quot;alt&quot;
+  )
+
+
+mu &lt;- as.matrix(Z[2:4,c(1,2)])%*%as.matrix(c(gamma1,gamma2))</code></pre>
+<table style="width:54%;">
+<colgroup>
+<col width="27%" />
+<col width="12%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center"> </th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept):B</strong></td>
+<td align="center">0.27</td>
+<td align="center">0.47</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>(Intercept):C</strong></td>
+<td align="center">0.92</td>
+<td align="center">1.02</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>(Intercept):D</strong></td>
+<td align="center">0.61</td>
+<td align="center">0.72</td>
+</tr>
+</tbody>
+</table>
+<table style="width:65%;">
+<colgroup>
+<col width="12%" />
+<col width="8%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">135</td>
+<td align="center">0.14</td>
+<td align="center">0.14</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">215</td>
+<td align="center">0.22</td>
+<td align="center">0.21</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">373</td>
+<td align="center">0.37</td>
+<td align="center">0.38</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">277</td>
+<td align="center">0.28</td>
+<td align="center">0.27</td>
+</tr>
+</tbody>
+</table>
+<table style="width:54%;">
+<colgroup>
+<col width="27%" />
+<col width="12%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center"> </th>
+<th align="center">Estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>(Intercept):B</strong></td>
+<td align="center">0.27</td>
+<td align="center">0.47</td>
+</tr>
+<tr class="even">
+<td align="center"><strong>(Intercept):C</strong></td>
+<td align="center">0.92</td>
+<td align="center">1.02</td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>(Intercept):D</strong></td>
+<td align="center">0.61</td>
+<td align="center">0.72</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -72,22 +72,23 @@ Working paper
 Presented at 2016 Summer Conference 
 of the Association of Environmental and Resource Economists 
 
+"The Salience of Promotional Prices with In-Store Advertising"
+
+"Learning Costs and Peer Effects in Mobile Phone Service Provision"
 
 ## Computer Skills 
 
 Basic 
 
-* Amazon Web Services 
-* Hive
+* AWS (EC2, EMR, S3, Athena)
+* Hive/HQ
 * Bash
-* Spark 
-* ArcGIS
+* Spark (scala, sparkR) 
 * Git 
 * Python 
 
 Advanced 
 
-* Excel 
 * STATA 
 * SQL 
 * R 

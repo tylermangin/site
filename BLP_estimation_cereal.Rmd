@@ -1,7 +1,10 @@
 ---
 title: "BLP Estimation on Cereal Data"
 author: "Tyler Mangin"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 
@@ -288,7 +291,7 @@ $$ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || $$
 
 
 
-# Optimization routine
+## Optimization routine
 
 
 To run the optimization, we will use the multiStart function from the BB package. One feature of this function is that starts the optimization from multiple starting points, to test the sensitivity of the results to starting values.

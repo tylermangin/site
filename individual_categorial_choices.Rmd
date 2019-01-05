@@ -1,0 +1,953 @@
+---
+title: "Models for Categorical Outcomes"
+author: "Tyler Mangin"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup}
+
+library(data.table) # the best R package
+library(pander) # for tables
+
+```
+
+```{r, echo = FALSE}
+
+knitr::opts_chunk$set(
+  warning = FALSE
+  ,message = FALSE
+  )
+
+```
+
+Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it a bit dry, but I use it mostly as a reference and a laboratory.
+
+
+## Multinomial Choice
+
+I'll use the example of a individual-level choice between four outcomes ($j \in \{A,B,C,D\}$). A reasonable starting point might be to estimate four seperate models on the $\{0,1\}$ outcome of choosing $j$ against choosing $k \neq j$. This is an easy way out - you can use a logistic model, or a linear probability model and probably wouldn't crash your computer. Perhaps a later version of the following will include a comparison of when those two models really differ much from each other. The typical justification is that with four seperate models, some factor could be estimated as making every outcome more likely, which seems wrong, since what we really care about is which outcome the factor makes relatively more likely. As I discuss below, this seems like a bigger deal to me for individual-level variation and less important for variation between alternatives.     
+
+### Themes
+
+* Linear Dependence: If you estimate the probability of choosing all but one alternative, you can find the last probability by using the fact they all must sum to one. In practice this means for $J$ alternatives we generally estimate the likelihood for $J-1$, and take the last alternative as a reference.
+* Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R for OLS, the mnlogit package for Maximum Likelihood Estimation, and Rstan for Bayesian estimation
+
+
+```{r}
+
+library(mnlogit) # estimation package
+library(rstan) # estimation package
+
+```
+
+
+### The Math
+
+For now, consider the four outcomes ($j \in \{A,B,C,D\}$). Let $u_{ij}$ be person $i$'s valuation of $j$. Although never observed directly, we observe $i$ choosing $j$ in the case that $u_{ij} \geq  u_{ik}$ for all $k \neq j$. Then, we specify $u_{ij}$. Typically, the specification is something like :
+
+$$u_{ij} = \mu_{ij} + \epsilon_{ij}$$
+,
+
+where $\mu$ is the observed part, and $\epsilon$ is the unobserved part.
+
+The standard assumption is that $\epsilon_{ij}$ is a type I extreme value (gumbel) distribution. As a quick demonstration of why this distributional choice is made, consider
+
+$$ P(\text{i chooses A over B}) = P(u_{iA} > u_{iB}) = P( \mu_{iA} + \epsilon_{iA} > \mu_{iB} + \epsilon_{iB} )$$
+$$  = P( \mu_{iA} - \mu_{iB} > \epsilon_{iB} - \epsilon_{iA} )$$
+
+which depends on the cumulative distribution function of the random variable $\epsilon_{iB} - \epsilon_{iA}$. The difference of two Gumbel distributions has a logistic distribution, which makes estimation easier.
+
+```{r}
+
+library(evd) # for gumbel distributions
+
+```
+
+
+### Types of Factors
+
+Predictors can be broken up broadly into indvidual-specific  factors like income or age, and alternative-specific factors lke price. There is also the possibility of a 'context-specific' factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won't consider them here. 
+
+### Types of Effects
+
+The first type of effect I'll call generic, meaning a factor affects all of the alternatives the same way. I think of this as being the default choice for alternative-specific factors. All things being equal, if the price of something increases people will choose it less.  
+
+I'll call the second type of effects alternative-specific. These tend to be applied individual-level factors. Being old, for instance, might make you more likely to choose one alterative, and less likely to choose another.
+
+Effects can also be individual-specific. These are much more difficult to estimate. I have an example of the [BLP algorithm](http://www.tylermangin.com/BLP_estimation_cereal.html) for solving a class of these problems, and I'm working on a Bayesian 'mixed logit' version next.
+
+## Individual-Specific Factors
+
+Let's create five Individual-level factors (think age, income, ect.) $x_{ik} \in \{x_{i1},x_{i2},x_{i3},x_{i4}\}$ across 1000 individuals.
+
+```{r }
+
+X <- replicate(5,rnorm(1000))
+
+```
+
+```{r, echo = FALSE}
+
+
+table <-
+  cbind(
+    seq(1,1000,1)
+    ,X
+  )
+
+colnames(table) <- c("person","x1","x2","x3","x4","x5")
+
+pander(head(table),round = 2)
+
+
+```
+
+Assume that the effects of $x_{ik}$ are alternative-specific, and common across people, so that it influences $u$ as  $X_i\beta_j$. Linear dependence matters here. The standard strategy is to set $\mu$ for one alternative to be zero. This is the reference alternative. Since we don't ultimately care about the value of $\mu$, this is a normalization that is helpful, and doesn't lose any information. 
+
+
+```{r}
+
+betaA <- rep(0, 5) #reference outcome
+betaB <- rnorm(5)
+betaC <- rnorm(5)
+betaD <- rnorm(5)
+
+```
+
+```{r echo = FALSE}
+
+table <-
+  rbind(
+    betaA
+    ,betaB 
+    ,betaC
+    ,betaD
+  )
+  
+colnames(table) <-
+  c("x1","x2","x3","x4","x5")
+
+pander(
+  table
+  ,round = 2
+)
+
+```
+
+That makes the utility/value specification 
+
+$$ u_{ij} = X_i\beta_j + \epsilon_{ij} $$
+
+where $\epsilon_{ij}$ is a type I extreme value (gumbel) distribution.
+
+
+```{r}
+
+U <- 
+  cbind(
+    0 + rgumbel(1000) #Ua
+    ,X%*%betaB + rgumbel(1000) #Ub
+    ,X%*%betaC + rgumbel(1000) #Uc
+    ,X%*%betaD + rgumbel(1000) #Ud
+    )
+
+```
+
+Each person makes the choice based on which alternative has the largest value for them.
+
+```{r, echo = FALSE}
+
+U <- data.table(U)
+
+U[
+  ,person := rownames(U)
+]
+
+U[
+  ,person := as.numeric(person)
+]
+
+colnames(U) <- c("Ua","Ub","Uc","Ud","person")
+
+```
+
+```{r}
+
+U[
+  Ua > Ub & Ua > Uc & Ua > Ud
+  ,choice := "A"
+]
+
+U[
+  Ub > Ua & Ub > Uc & Ub > Ud
+  ,choice := "B"
+]
+
+U[
+  Uc > Ua & Uc > Ub & Uc > Ud
+  ,choice := "C"
+]
+
+U[
+  Ud > Ua & Ud > Ub & Ud > Uc
+  ,choice := "D"
+]
+
+
+
+```
+
+```{r, echo = FALSE}
+
+pander(head(U[,c("person","choice","Ua","Ub","Uc","Ud")]),round =2)
+
+```
+
+### Estimation with mnlogit
+
+To use mnlogit, we need to reshape the data into a format where we have every alternative for every individual. Notice that the variables are fixed across individuals.
+
+
+```{r}
+
+d_mnl <- 
+  CJ(
+    person = seq(1,1000,1)
+    ,alt = c("A","B","C","D")
+  )
+
+d_mnl[
+  U
+  ,choice := 1
+  ,on = c(person = "person",alt = "choice")
+]
+
+d_mnl[
+  is.na(choice)
+  ,choice := 0
+]
+
+X <- data.table(X)
+
+X[
+  ,person := rownames(X)
+]
+
+X[
+  ,person := as.numeric(person)
+]
+
+d_mnl[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = c(person = "person")
+]
+
+```
+
+
+```{r echo = FALSE}
+
+pander(head(data.frame(d_mnl),8), round = 2)
+
+```
+
+
+```{r}
+
+frm <-
+  formula(
+    "choice ~ 0 | x1 + x2 + x3 + x4 + x5" 
+  )
+
+mn_u <-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = "alt"
+  )
+
+```
+
+
+```{r, echo = FALSE}
+
+coef_names <-  names(coefficients(mn_u)) #for later
+
+pander(cbind("True Model" = c(betaB,betaC,betaD),"Estimate" = coefficients(mn_u)), round = 2)
+
+```
+
+
+```{r, echo = FALSE}
+
+shares <- 
+  U[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est <-
+  data.frame(
+    "est_share" =
+      colSums(predict(mn_u))/1000
+    )
+
+```
+
+
+```{r, echo = FALSE}
+
+est$alt <- rownames(est)
+
+est <- data.table(est)
+
+shares[
+  est
+  ,est_share := i.est_share
+  ,on = c(choice = "alt")
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
+
+
+```
+
+### Estimation with rStan
+
+Now, for a Bayesian version. Here is a Bayesian model written in stan. The model comes out of example 6.5 of the stan reference guide.
+
+One downside to this estimation procedure is that it makes much more time to solve. 
+
+
+(One markdown note : I wasn't able to supress all of the output, which I think is an open [bug](https://github.com/stan-dev/rstan/issues/49))
+
+```{r}
+
+stan_code <-
+  "
+data {
+int<lower = 2> J; //number of alternatives
+int<lower = 0> N; //number of individuals 
+int<lower = 1> D; //number of factors
+int y[N]; // categorical choices
+vector[D] x[N]; // factors
+}
+transformed data {
+row_vector[D] zeros;
+zeros = rep_row_vector(0, D);
+}
+parameters {
+matrix[J-1,D] beta_raw;
+}
+transformed parameters {
+matrix[J, D] beta;
+beta = append_row(zeros, beta_raw);
+}
+model {
+for (j in 1:J-1)
+beta[j] ~ normal(0,5);
+for (n in 1:N)
+y[n] ~ categorical(softmax(beta * x[n]));
+}
+"
+
+```
+
+
+```{r }
+
+standata <- 
+  list(
+    J = 4
+    ,N = 1000
+    ,D = 5
+    ,y = as.vector(U[,as.numeric(factor(choice))])
+    ,x = as.matrix(X[,1:5])
+  )
+  
+  mn_bayes <- 
+    stan(
+      model_code = stan_code
+      ,data = standata
+      ,refresh = -2
+      ,verbose = FALSE
+    )
+  
+    
+  pars <- 
+    extract(mn_bayes)
+
+
+  beta <- 
+    apply(pars$beta,colSums,MARGIN = 3)/4000
+  
+  pred <- exp(as.matrix(X[,1:5])%*%t(as.matrix(beta)))/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+
+  shares_est <- colSums(pred)/1000
+  
+
+```
+
+```{r, echo = FALSE}
+
+frame <- cbind("True Model" = c(betaB,betaC,betaD),"Estimate" = c(beta[2,],beta[3,],beta[4,]))
+
+rownames(frame) <- coef_names
+
+pander(frame, round = 2)
+
+
+
+```
+
+```{r, echo = FALSE}
+
+
+  shares_est <- data.table(cbind(c("A","B","C","D"),round(as.numeric(shares_est),2)))
+
+shares <- 
+  U[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+shares[
+  shares_est
+  ,est_share := i.V2
+  ,on = c(choice = "V1")
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
+
+
+```
+
+## Alternative-Specific Factors 
+
+The case of the individual-level model with only alternative-level variation is a pretty counter-intuitive, but really common case. The setting here is usually some sort of aggregated data that result from individual-level choices. In fact, I've seen the multinomial model presented with this as the standard baseline case, which I think is bonkers, because its really an odd duck in comparison to the straight-forward individal-specific factor case. I am still going to present it as if the data were not aggregeated, because that's how the model treats it. A multinomial logit models the aggregate outcomes as the product of $n$ individual choices whether you have individual-level factors or not.
+
+
+Consider two alternative-level factors. $Z_j$, which is $kx1$ vector for $k$ alterntative-specific variables. One concrete way that the individual-level formulation can trick you in this case is in degrees of freedom. You might be fooled into thinking that the number of individuals determines the degrees of freedom, but as can be more easily seen at the aggregate level, with four alternatives to choose from, we must have fewer than four alternative-level factors
+
+```{r }
+
+Za <- replicate(2,rnorm(1))
+Zb <- replicate(2,rnorm(1))
+Zc <- replicate(2,rnorm(1))
+Zd <- replicate(2,rnorm(1))
+
+```
+
+
+```{r, echo = FALSE}
+
+Z <- rbind(Za,Zb,Zc,Zd)
+
+colnames(Z) <- c("Z1","Z2")
+
+rownames(Z) <- c("A","B","C","D")
+
+pander(Z,round = 2)
+
+```
+
+
+Assume that the effects of $Z_{j}$ are common over alternatives, and common across people, so that it influences $u$ as $Z_j\beta$. 
+
+That makes the observed portion of utility/value 
+
+$$ \mu_{ij} = Z_j\gamma_j + \epsilon_{ij} $$
+.
+
+Linear dependence comes into play now, and as before the standard approach is typically to normalize $\mu$ for one alternative, say $A$, to zero. This is a little tricky in this case, since the constraint $\gamma_1z_{1A}+\gamma_2z_{2A} = 0$ needs another equation to have a unique solution. Here, we can lean on the fact that multinomial coefficients are all relative and let $\gamma_1 = 1$, so that $\gamma_2 = \frac{-z_{1A}}{z_{2A}}$
+
+
+```{r}
+
+gamma1 <- 1
+gamma2 <- -Za[1]/Za[2]
+
+```
+.
+
+
+```{r echo = FALSE}
+
+table <-
+  rbind(
+    gamma1
+    ,gamma2 
+  )
+
+colnames(table) <- " "
+
+pander(
+  table
+  ,round = 2
+)
+
+```
+
+
+```{r}
+
+U <- 
+  cbind(
+    as.vector(Za%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ua = 0 + rgumbel()
+    ,as.vector(Zb%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ub
+    ,as.vector(Zc%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Uc
+    ,as.vector(Zd%*%as.vector(c(gamma1,gamma2))) + rgumbel(1000) #Ud
+    )
+                
+    
+```
+
+Each person makes the choice based on which alternative has the largest value for them.
+
+```{r, echo = FALSE}
+
+U <- data.table(U)
+
+U[
+  ,person := rownames(U)
+]
+
+U[
+  ,person := as.numeric(person)
+]
+
+colnames(U) <- c("Ua","Ub","Uc","Ud","person")
+
+Z <- data.table(Z)
+
+rownames(Z) <- c("A","B","C","D")
+
+Z[
+  ,alt := rownames(Z)
+]
+
+```
+
+
+```{r}
+
+U[
+  Ua > Ub & Ua > Uc & Ua > Ud
+  ,choice := "A"
+]
+
+U[
+  Ub > Ua & Ub > Uc & Ub > Ud
+  ,choice := "B"
+]
+
+U[
+  Uc > Ua & Uc > Ub & Uc > Ud
+  ,choice := "C"
+]
+
+U[
+  Ud > Ua & Ud > Ub & Ud > Uc
+  ,choice := "D"
+]
+
+```
+
+```{r, echo = FALSE}
+
+pander(head(U[,c("person","choice","Ua","Ub","Uc","Ud")]),round =2)
+
+```
+
+### OLS Log-linear Estimation
+
+The first way to estimate in this situation is to use an algebra trick I won't show directly here - there are lot of places to find the derivation. But, my making the particular choices we did, in particular the specification of utility and the choice of the Type I extreme value errors, we can estimate $\gamma_1$ and $\gamma_2$ with a log-level OLS on the the shares $s_j$ relative to the share of the reference alternative $s_0$.
+
+$$ ln(s_j) - ln(s_0) =   Z_j\gamma_j +  \epsilon_j$$
+Everyone loves OLS, right?
+
+```{r}
+
+d_cl <-
+  U[
+    ,.(
+      count = .N
+    )
+    ,by = choice
+  ]
+
+d_cl[
+  ,share := count/sum(count)
+]
+
+d_cl[
+  Z
+  ,`:=`(
+    Z1 = i.Z1
+    ,Z2 = i.Z2
+  )
+  ,on = c(choice = "alt")
+]
+
+d_cl[
+  ,y := log(share) - log(d_cl[choice == "A",share])
+]
+
+cl_u <- lm(y ~ 0 + Z1 + Z2, data = d_cl)
+
+est <-
+  data.frame(
+    "est_share" =
+      exp(predict(cl_u))/sum(exp(predict(cl_u)))
+    )
+
+```
+
+
+```{r, echo = FALSE}
+
+pander(cbind("True Model" = c(gamma1,gamma2),"Estimate" = coefficients(cl_u)), round = 2)
+
+```
+
+
+
+```{r, echo = FALSE}
+
+est$row <- rownames(est)
+
+est <- data.table(est)
+
+d_cl$row <- rownames(d_cl)
+
+d_cl[
+  est
+  ,est_share := i.est_share
+  ,on = "row"
+]
+
+colnames(d_cl) <- c("choice","count","Actual Share","Z1","Z2","y","row","Estimated Share")
+
+pander(d_cl[order(choice),c("choice","Actual Share","Estimated Share")],round = 2)
+
+
+```
+
+
+### Estimation with mnlogit
+
+Need to reshape the data. Notice that the variables are fixed across alternatives.
+
+
+```{r, warning = FALSE}
+
+d_mnl <- 
+  CJ(
+    person = seq(1,1000,1)
+    ,alt = c("A","B","C","D")
+  )
+
+d_mnl[
+  U
+  ,choice := 1
+  ,on = c(person = "person",alt = "choice")
+]
+
+d_mnl[
+  is.na(choice)
+  ,choice := 0
+]
+
+d_mnl[
+  Z
+  ,`:=`(
+    z1 = i.Z1
+    ,z2 = i.Z2
+  )
+  ,on = c(alt = "alt")
+]
+
+```
+
+
+```{r echo = FALSE}
+
+table <- data.frame(head(d_mnl,8))
+
+pander(table, round = 2)
+
+```
+
+```{r}
+
+frm <-
+  formula(
+    "choice ~  0 + z1 + z2 " 
+  )
+
+mn_u <-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = "alt"
+  )
+
+
+```
+
+
+```{r, echo = FALSE}
+
+pander(cbind("True Model" = c(gamma1,gamma2),"Estimate" = coefficients(mn_u)), round = 2)
+
+```
+
+### Estimation with rStan
+
+This model comes out of example 9.6 of the stan reference guide.
+
+
+```{r}
+
+stan_code <-
+  "
+data {
+int<lower = 2> J; //number of alternatives
+int<lower = 0> N; //number of individuals 
+int<lower = 1> D; //number of factors
+int y[N]; // categorical choices
+matrix[J,D] z; // factors
+}
+parameters {
+vector[D] gamma;
+}
+model {
+gamma ~ normal(0,5);
+for (n in 1:N)
+y[n] ~ categorical(softmax( z * gamma ));
+}
+"
+
+```
+
+
+```{r }
+
+standata <- 
+  list(
+    J = 4
+    ,N = 1000
+    ,D = 2
+    ,y = as.vector(U[,as.numeric(factor(choice))])
+    ,z = as.matrix(Z[,1:2])
+  )
+  
+  mn_bayes <- 
+    stan(
+      model_code = stan_code
+      ,data = standata
+      # ,refresh = -2
+      # ,verbose = FALSE
+    )
+  
+    
+  pars <- 
+    extract(mn_bayes)
+
+
+  gamma <- 
+    colSums(pars$gamma)/4000
+  
+  pred <- exp(as.matrix(Z[,1:2])%*%as.matrix(gamma))/colSums(exp(as.matrix(Z[,1:2])%*%as.matrix(gamma)))
+
+
+
+```
+
+```{r, echo = FALSE}
+
+frame <- cbind("True Model" = c(gamma1,gamma2),"Estimate" = c(gamma[1],gamma[2]))
+
+rownames(frame) <- c("Z1","Z2")
+
+pander(frame, round = 2)
+
+
+
+```
+
+```{r, echo = FALSE}
+
+
+  shares_est <- data.table(cbind(c("A","B","C","D"),round(as.numeric(pred),2)))
+
+shares <- 
+  U[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+shares[
+  shares_est
+  ,est_share := i.V2
+  ,on = c(choice = "V1")
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
+
+
+```
+
+
+### Fixed Effects
+
+There is also the option to use a single fixed effect for each alternative. In this case, you lose any information about the effect of $Z_1$ vs. the effect of $Z_2$, but but instead get an estimate of whole quantity $Z_j\gamma$.
+
+```{r}
+
+frm <-
+  formula(
+    "choice ~  1 "
+  )
+
+mn_f <-
+  mnlogit(
+    formula = frm
+    ,data = d_mnl
+    ,choiceVar = "alt"
+  )
+
+
+mu <- as.matrix(Z[2:4,c(1,2)])%*%as.matrix(c(gamma1,gamma2))
+
+```
+
+```{r, echo = FALSE}
+
+pander(cbind("True Model" = mu,"Estimate" = coefficients(mn_f)), round = 2)
+
+```
+
+
+```{r, echo = FALSE}
+
+shares <- 
+  U[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est <-
+  data.frame(
+    "est_share" =
+      colSums(predict(mn_u))/1000
+    )
+
+```
+
+
+```{r, echo = FALSE}
+
+est$alt <- rownames(est)
+
+est <- data.table(est)
+
+shares[
+  est
+  ,est_share := i.est_share
+  ,on = c(choice = "alt")
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
+
+d_mnl[
+  alt == "A"
+  , A := 1
+]
+
+d_mnl[
+  alt != "A"
+  , A := 0
+]
+
+d_mnl[
+  alt == "B"
+  , B := 1
+]
+
+d_mnl[
+  alt != "B"
+  , B := 0
+]
+
+d_mnl[
+  alt == "C"
+  , C := 1
+]
+
+d_mnl[
+  alt != "C"
+  , C := 0
+]
+
+d_mnl[
+  alt == "D"
+  , D := 1
+]
+
+d_mnl[
+  alt != "D"
+  , D := 0
+]
+
+
+```
+
+
+
+
+
+
+
