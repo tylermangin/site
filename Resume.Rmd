@@ -7,14 +7,21 @@ output: html_document
 
 ## Work Experience
 
-### Senior Analyst/Economist
+### Economist
 Comlinkdata
 July 2016 to Present
 
-* Developed new revenue from digital audience engagement forecasting and estimation product
-* Created individual-level model of consumer demand and applied predictions to millions of consumers
-* Improved and extended forecasting for financial services clients 
-* Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, and Spark, in the AWS ecosystem
+* Developed new revenue from digital audience engagement forecasting and estimation product 
+
+* Improved and extended market forecasting for financial services clients
+
+### Senior Analyst
+Comlinkdata
+July 2016 to July 2017 
+
+* Created and productized individual-level model of consumer demand 
+
+* Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem 
 
 ### Instructor
 University of Colorado
@@ -22,7 +29,6 @@ August 2014 to May 2016
 
 * Taught four semester-length introductory lecture sections of between 150-250 students each
 * Above average scores on student Faculty Course Questionnaires
-* Four semesters of Teaching Assistantships for Economics and Statistics Courses
 
 
 ### Accounting Intern
@@ -37,19 +43,13 @@ Whole Foods
 March 2009 to February 2012
 
 * Purchased \$1 million of produce each month
-* Created a partially automated statistical-based ordering system with underlying sales modeling, leading to a  10\% reduction in spoilage and waste
+* Created automated ordering system with underlying sales modeling and forecasting, leading to a 10% reduction in spoilage and waste
 
-### Researcher
-PsiPhen Laboratories
-February 2006 to July 2006
-
-* Designed, organized and executed an experimental protocol and statistical analysis on 100 subjects
-* Presented study to the Annual Conference of the Society for Scientific Investigation (SSE), the publishing body for the Journal of Scientific Exploration
 
 ## Education
 
-### PhD Candidate 
-Economics (Expected May 2018)
+### PhD  
+Economics (May 2019)
 The University of Colorado
 
 
@@ -65,14 +65,12 @@ The University of Colorado
 
 ## Research
 
-"USDA Organic Labels and Nutritional Quality"
+Graduate Award for Public Policy Research The University of Colorado Economics (2016)
 
-Working paper
+"USDA Organic Labels and Nutritional Quality" 
+* Presented at 2016 Summer Conference of the Association of Environmental and Resource Economists 
 
-Presented at 2016 Summer Conference 
-of the Association of Environmental and Resource Economists 
-
-"The Salience of Promotional Prices with In-Store Advertising"
+"Salience of Promotional Prices with In-Store Advertising"
 
 "Learning Costs and Peer Effects in Mobile Phone Service Provision"
 
@@ -84,16 +82,14 @@ Basic
 * Hive/HQ
 * Bash
 * Spark (scala, sparkR) 
-* Git 
+* git 
 * Python 
 
 Advanced 
 
+* Stan
 * STATA 
-* SQL 
-* R 
+* SQL (Microsoft, PostgresSQL)
+* R (data.table, markdown)
 
-## Awards
 
-Graduate Award for Public Policy Research, 2016 
-UNIVERSITY OF COLORADO ECONOMICS
