@@ -25,7 +25,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -93,6 +95,9 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -279,6 +284,9 @@ div.tocify {
         <li>
   <a href="index.html">Home</a>
 </li>
+<li>
+  <a href="Resume.html">Resume</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Projects
@@ -287,10 +295,13 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="research.html">Research</a>
+      <a href="statistics.html">Statistics</a>
     </li>
     <li>
-      <a href="statistics.html">Statistics</a>
+      <a href="https://abitenummi.blogspot.com/">Blog</a>
+    </li>
+    <li>
+      <a href="research.html">Research</a>
     </li>
     <li>
       <a href="Teaching.html">Teaching</a>
@@ -337,8 +348,8 @@ div.tocify {
 </div>
 
 
-<div id="models-for-categorical-outcomes" class="section level3">
-<h3><a href="individual_categorial_choices.html">Models for Categorical Outcomes</a></h3>
+<div id="categorical-outcomes" class="section level3">
+<h3><a href="individual_categorial_choices.html">Categorical Outcomes</a></h3>
 <p>Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I’m sorry if it a bit dry, but I use it mostly as a reference and a laboratory.</p>
 <p><a href="individual_categorial_choices.html">Continue Reading</a></p>
 <p><br> <br> <br></p>
@@ -348,6 +359,14 @@ div.tocify {
 <p>The original code was written for Matlab by <a href="http://faculty.wcas.northwestern.edu/~ane686/supplements/rc_dc_code.htm">Aviv Nevo</a> in 1998. <a href="https://github.com/mcarniol/Berry-Levinsohn-and-Pakes-1995-in-R">Michael Carniol</a> adapted it into R in 2015, to which I owe the functions and set-up I use here. I just became aware of another R package designed to estimate BLP, <a href="https://cran.r-project.org/web/packages/BLPestimatoR/BLPestimatoR.pdf">BLPestimatoR</a>, which I have not had a chance to test.</p>
 <p>I ran this routine on a canonical data set from Aviv Nevo. I found the data here: <a href="http://www.rasmusen.org/zg604/lectures/blp/" class="uri">http://www.rasmusen.org/zg604/lectures/blp/</a>. A lot of the description is due to <a href="http://faculty.wcas.northwestern.edu/~ane686/research/RAs_guide.pdf">Nevo’s Practitioner’s Guide</a>. Any errors are mine.</p>
 <p><a href="BLP_estimation_cereal.html">Continue Reading</a></p>
+<p><br> <br> <br></p>
+</div>
+<div id="minimum-detectable-effects-for-proportions" class="section level3">
+<h3><a href="mde_prop.html">Minimum Detectable Effects for Proportions</a></h3>
+<p>I think standard power calculations are difficult to explain in a clear way. And, I don’t think its because people don’t understand the basic idea - they know that a smaller <span class="math inline">\(n\)</span> means that you won’t be able to find relatively large effects if they exist. Or in a formal way, it increases the probability of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true.</p>
+<p>But power calculations don’t really frame the question that way, because they calculate a observation size for a given effect size. Try asking someone who has been away from statistics for a while what a “meaningful effect size” is.I rarely find that people have a good anser for the question “How large of an effect are you trying to find?”. When I’ve asked people who maybe only vaugely remember statistics from college that question, they usually are a bit confused. First, how should they know? Second, don’t they want to find ‘any’ effect?</p>
+<p>So, another way to look at a power calculation is to take <span class="math inline">\(n\)</span> as a given and return an effect size.</p>
+<p><a href="mde_prop.html">Continue Reading</a></p>
 </div>
 
 

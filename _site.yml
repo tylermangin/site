@@ -5,13 +5,17 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+    - text: "Resume"
+      href: Resume.html
     - text: "Projects"
       href: projects.html
       menu:
-        - text: "Research"
-          href: research.html
         - text: "Statistics"
           href: statistics.html
+        - text: "Blog"
+          href: https://abitenummi.blogspot.com/
+        - text: "Research"
+          href: research.html
         - text: "Teaching"
           href: Teaching.html
 

@@ -26,7 +26,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -94,6 +96,9 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -280,6 +285,9 @@ div.tocify {
         <li>
   <a href="index.html">Home</a>
 </li>
+<li>
+  <a href="Resume.html">Resume</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     Projects
@@ -288,10 +296,13 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="research.html">Research</a>
+      <a href="statistics.html">Statistics</a>
     </li>
     <li>
-      <a href="statistics.html">Statistics</a>
+      <a href="https://abitenummi.blogspot.com/">Blog</a>
+    </li>
+    <li>
+      <a href="research.html">Research</a>
     </li>
     <li>
       <a href="Teaching.html">Teaching</a>
@@ -340,20 +351,21 @@ div.tocify {
 
 
 <pre class="r"><code>library(data.table) # the best R package</code></pre>
-<pre><code>## Warning: package &#39;data.table&#39; was built under R version 3.6.0</code></pre>
+<pre><code>## data.table 1.11.8  Latest news: r-datatable.com</code></pre>
 <pre class="r"><code>library(pander) # for tables</code></pre>
 <p>Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I’m sorry if it a bit dry, but I use it mostly as a reference and a laboratory.</p>
 <div id="multinomial-choice" class="section level2">
 <h2>Multinomial Choice</h2>
-<p>I’ll use the example of a individual-level choice between four outcomes (<span class="math inline">\(j \in \{A,B,C,D\}\)</span>). A reasonable starting point might be to estimate four seperate models on the <span class="math inline">\(\{0,1\}\)</span> outcome of choosing <span class="math inline">\(j\)</span> against choosing <span class="math inline">\(k \neq j\)</span>. This is an easy way out - you can use a logistic model, or a linear probability model and probably wouldn’t crash your computer. Perhaps a later version of the following will include a comparison of when those two models really differ much from each other. The typical justification is that with four seperate models, some factor could be estimated to make choosing every outcome more likely, which seems wrong, since what we really care about is which choice the factor makes relatively more likely. As I discuss below, this seems like a bigger deal to me for individual-level variation and less important for variation between alternatives.</p>
+<p>I’ll use the example of a individual-level choice between four outcomes (<span class="math inline">\(j \in \{A,B,C,D\}\)</span>). A reasonable starting point might be to estimate four seperate models on the <span class="math inline">\(\{0,1\}\)</span> outcome of choosing <span class="math inline">\(j\)</span> against choosing <span class="math inline">\(k \neq j\)</span>. This is an easy way out - you can use a logistic model, or a linear probability model and probably wouldn’t crash your computer. Perhaps a later version of the following will include a comparison of when those two models really differ much from each other. The typical justification is that with four seperate models, some factor could be estimated as making every outcome more likely, which seems wrong, since what we really care about is which outcome the factor makes relatively more likely. As I discuss below, this seems like a bigger deal to me for individual-level variation and less important for variation between alternatives.</p>
 <div id="themes" class="section level3">
 <h3>Themes</h3>
 <ul>
 <li>Linear Dependence: If you estimate the probability of choosing all but one alternative, you can find the last probability by using the fact they all must sum to one. In practice this means for <span class="math inline">\(J\)</span> alternatives we generally estimate the likelihood for <span class="math inline">\(J-1\)</span>, and take the last alternative as a reference.</li>
-<li>Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R, the mnlogit package, and Rstan for Bayesian estimation</li>
+<li>Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R for OLS, the mnlogit package for Maximum Likelihood Estimation, Rstan for Bayesian estimation, and caret for machine learning.</li>
 </ul>
 <pre class="r"><code>library(mnlogit) # estimation package
-library(rstan) # estimation package</code></pre>
+library(rstan) # estimation package
+library(caret)  # estimation package</code></pre>
 </div>
 <div id="the-math" class="section level3">
 <h3>The Math</h3>
@@ -367,12 +379,12 @@ library(rstan) # estimation package</code></pre>
 </div>
 <div id="types-of-factors" class="section level3">
 <h3>Types of Factors</h3>
-<p>Predictors can be broken up broadly into indvidual-specific factors like income or age, and alternative-specific factors lke price. There is also the possibility of a ‘context-specific’ factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won’t consider them here.</p>
+<p>Predictors can be broken up broadly into indvidual-specific factors like income or age, and alternative-specific factors like price. There is also the possibility of a ‘context-specific’ factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won’t consider them here.</p>
 </div>
 <div id="types-of-effects" class="section level3">
 <h3>Types of Effects</h3>
 <p>The first type of effect I’ll call generic, meaning a factor affects all of the alternatives the same way. I think of this as being the default choice for alternative-specific factors. All things being equal, if the price of something increases people will choose it less.</p>
-<p>I’ll call the second type of effects alternative-specific. These tend to be applied individual-level factors. Being old, for instance, might make you more likely to chose one alterative, and less likely to choose another.</p>
+<p>I’ll call the second type of effects alternative-specific. These tend to be applied individual-level factors. Being old, for instance, might make you more likely to choose one alterative, and less likely to choose another.</p>
 <p>Effects can also be individual-specific. These are much more difficult to estimate. I have an example of the <a href="http://www.tylermangin.com/BLP_estimation_cereal.html">BLP algorithm</a> for solving a class of these problems, and I’m working on a Bayesian ‘mixed logit’ version next.</p>
 </div>
 </div>
@@ -380,14 +392,14 @@ library(rstan) # estimation package</code></pre>
 <h2>Individual-Specific Factors</h2>
 <p>Let’s create five Individual-level factors (think age, income, ect.) <span class="math inline">\(x_{ik} \in \{x_{i1},x_{i2},x_{i3},x_{i4}\}\)</span> across 1000 individuals.</p>
 <pre class="r"><code>X &lt;- replicate(5,rnorm(1000))</code></pre>
-<table style="width:68%;">
+<table style="width:54%;">
 <colgroup>
 <col width="12%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -402,51 +414,51 @@ library(rstan) # estimation package</code></pre>
 <tbody>
 <tr class="odd">
 <td align="center">1</td>
-<td align="center">1.57</td>
-<td align="center">0.92</td>
-<td align="center">0.58</td>
-<td align="center">0.57</td>
-<td align="center">2.03</td>
+<td align="center">0.99</td>
+<td align="center">0.14</td>
+<td align="center">0.55</td>
+<td align="center">-0.41</td>
+<td align="center">-0.04</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
-<td align="center">0.84</td>
-<td align="center">-0.32</td>
-<td align="center">-0.67</td>
-<td align="center">1.69</td>
-<td align="center">0</td>
+<td align="center">1.88</td>
+<td align="center">1.51</td>
+<td align="center">-0.83</td>
+<td align="center">0.24</td>
+<td align="center">0.16</td>
 </tr>
 <tr class="odd">
 <td align="center">3</td>
-<td align="center">-0.96</td>
-<td align="center">1.21</td>
-<td align="center">-1.07</td>
-<td align="center">-0.23</td>
-<td align="center">-0.2</td>
+<td align="center">1.87</td>
+<td align="center">-0.75</td>
+<td align="center">0.52</td>
+<td align="center">0.28</td>
+<td align="center">2.45</td>
 </tr>
 <tr class="even">
 <td align="center">4</td>
-<td align="center">-0.66</td>
-<td align="center">-0.57</td>
-<td align="center">-0.39</td>
-<td align="center">0.13</td>
-<td align="center">-0.67</td>
+<td align="center">0.96</td>
+<td align="center">-0.96</td>
+<td align="center">-1.58</td>
+<td align="center">-1.18</td>
+<td align="center">-0.09</td>
 </tr>
 <tr class="odd">
 <td align="center">5</td>
-<td align="center">-1.47</td>
-<td align="center">-0.57</td>
-<td align="center">1.45</td>
-<td align="center">-1.48</td>
-<td align="center">-0.33</td>
+<td align="center">1.77</td>
+<td align="center">-1.69</td>
+<td align="center">0.03</td>
+<td align="center">-0.49</td>
+<td align="center">1.82</td>
 </tr>
 <tr class="even">
 <td align="center">6</td>
-<td align="center">-0.64</td>
-<td align="center">0.34</td>
-<td align="center">-0.14</td>
-<td align="center">0.87</td>
-<td align="center">-1.02</td>
+<td align="center">-1.53</td>
+<td align="center">-1.17</td>
+<td align="center">-0.83</td>
+<td align="center">-0.08</td>
+<td align="center">0.06</td>
 </tr>
 </tbody>
 </table>
@@ -455,14 +467,14 @@ library(rstan) # estimation package</code></pre>
 betaB &lt;- rnorm(5)
 betaC &lt;- rnorm(5)
 betaD &lt;- rnorm(5)</code></pre>
-<table style="width:72%;">
+<table style="width:58%;">
 <colgroup>
 <col width="16%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -485,27 +497,27 @@ betaD &lt;- rnorm(5)</code></pre>
 </tr>
 <tr class="even">
 <td align="center"><strong>betaB</strong></td>
-<td align="center">-1.12</td>
-<td align="center">-1.25</td>
-<td align="center">-0.12</td>
-<td align="center">-0.44</td>
-<td align="center">1.07</td>
+<td align="center">1.44</td>
+<td align="center">-0.59</td>
+<td align="center">-1.31</td>
+<td align="center">-0.8</td>
+<td align="center">-0.1</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>betaC</strong></td>
-<td align="center">0.14</td>
-<td align="center">-1.18</td>
-<td align="center">0.53</td>
-<td align="center">-0.45</td>
-<td align="center">-1.1</td>
+<td align="center">-1.08</td>
+<td align="center">-0.17</td>
+<td align="center">1.14</td>
+<td align="center">0.29</td>
+<td align="center">2.08</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>betaD</strong></td>
-<td align="center">0.3</td>
-<td align="center">0.48</td>
-<td align="center">1.81</td>
-<td align="center">-0.9</td>
-<td align="center">2.53</td>
+<td align="center">1.06</td>
+<td align="center">-0.84</td>
+<td align="center">-0.63</td>
+<td align="center">-0.18</td>
+<td align="center">0.28</td>
 </tr>
 </tbody>
 </table>
@@ -539,14 +551,14 @@ U[
   Ud &gt; Ua &amp; Ud &gt; Ub &amp; Ud &gt; Uc
   ,choice := &quot;D&quot;
 ]</code></pre>
-<table style="width:69%;">
+<table style="width:58%;">
 <colgroup>
 <col width="12%" />
 <col width="12%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -561,51 +573,51 @@ U[
 <tbody>
 <tr class="odd">
 <td align="center">1</td>
-<td align="center">D</td>
-<td align="center">-0.09</td>
-<td align="center">-1.52</td>
-<td align="center">-2.28</td>
-<td align="center">8.58</td>
+<td align="center">C</td>
+<td align="center">1.79</td>
+<td align="center">1.85</td>
+<td align="center">2.79</td>
+<td align="center">-0.44</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">B</td>
-<td align="center">-0.47</td>
+<td align="center">1.65</td>
+<td align="center">1.96</td>
+<td align="center">-4.16</td>
 <td align="center">1.88</td>
-<td align="center">-0.74</td>
-<td align="center">-2.82</td>
 </tr>
 <tr class="odd">
 <td align="center">3</td>
 <td align="center">C</td>
-<td align="center">-0.8</td>
-<td align="center">-0.76</td>
-<td align="center">-0.23</td>
-<td align="center">-1.57</td>
+<td align="center">0.26</td>
+<td align="center">0.92</td>
+<td align="center">4.54</td>
+<td align="center">2.68</td>
 </tr>
 <tr class="even">
 <td align="center">4</td>
-<td align="center">A</td>
-<td align="center">1.87</td>
-<td align="center">1.59</td>
-<td align="center">1.23</td>
-<td align="center">-3.69</td>
+<td align="center">B</td>
+<td align="center">-0.58</td>
+<td align="center">5.62</td>
+<td align="center">-2.71</td>
+<td align="center">2.24</td>
 </tr>
 <tr class="odd">
 <td align="center">5</td>
-<td align="center">B</td>
-<td align="center">0.24</td>
-<td align="center">3</td>
-<td align="center">1.15</td>
-<td align="center">0.9</td>
+<td align="center">D</td>
+<td align="center">-0.21</td>
+<td align="center">4.36</td>
+<td align="center">1.93</td>
+<td align="center">6.72</td>
 </tr>
 <tr class="even">
 <td align="center">6</td>
-<td align="center">A</td>
-<td align="center">-0.1</td>
-<td align="center">-1.56</td>
-<td align="center">-1.34</td>
-<td align="center">-1.51</td>
+<td align="center">C</td>
+<td align="center">0.63</td>
+<td align="center">-0.38</td>
+<td align="center">0.66</td>
+<td align="center">0.08</td>
 </tr>
 </tbody>
 </table>
@@ -650,16 +662,16 @@ d_mnl[
   )
   ,on = c(person = &quot;person&quot;)
 ]</code></pre>
-<table style="width:85%;">
+<table style="width:72%;">
 <colgroup>
 <col width="12%" />
 <col width="8%" />
 <col width="12%" />
-<col width="9%" />
-<col width="11%" />
-<col width="11%" />
-<col width="9%" />
-<col width="9%" />
+<col width="6%" />
+<col width="6%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -678,81 +690,81 @@ d_mnl[
 <td align="center">1</td>
 <td align="center">A</td>
 <td align="center">0</td>
-<td align="center">1.57</td>
-<td align="center">0.92</td>
-<td align="center">0.58</td>
-<td align="center">0.57</td>
-<td align="center">2.03</td>
+<td align="center">0.99</td>
+<td align="center">0.14</td>
+<td align="center">0.55</td>
+<td align="center">-0.41</td>
+<td align="center">-0.04</td>
 </tr>
 <tr class="even">
 <td align="center">1</td>
 <td align="center">B</td>
 <td align="center">0</td>
-<td align="center">1.57</td>
-<td align="center">0.92</td>
-<td align="center">0.58</td>
-<td align="center">0.57</td>
-<td align="center">2.03</td>
+<td align="center">0.99</td>
+<td align="center">0.14</td>
+<td align="center">0.55</td>
+<td align="center">-0.41</td>
+<td align="center">-0.04</td>
 </tr>
 <tr class="odd">
 <td align="center">1</td>
 <td align="center">C</td>
-<td align="center">0</td>
-<td align="center">1.57</td>
-<td align="center">0.92</td>
-<td align="center">0.58</td>
-<td align="center">0.57</td>
-<td align="center">2.03</td>
+<td align="center">1</td>
+<td align="center">0.99</td>
+<td align="center">0.14</td>
+<td align="center">0.55</td>
+<td align="center">-0.41</td>
+<td align="center">-0.04</td>
 </tr>
 <tr class="even">
 <td align="center">1</td>
 <td align="center">D</td>
-<td align="center">1</td>
-<td align="center">1.57</td>
-<td align="center">0.92</td>
-<td align="center">0.58</td>
-<td align="center">0.57</td>
-<td align="center">2.03</td>
+<td align="center">0</td>
+<td align="center">0.99</td>
+<td align="center">0.14</td>
+<td align="center">0.55</td>
+<td align="center">-0.41</td>
+<td align="center">-0.04</td>
 </tr>
 <tr class="odd">
 <td align="center">2</td>
 <td align="center">A</td>
 <td align="center">0</td>
-<td align="center">0.84</td>
-<td align="center">-0.32</td>
-<td align="center">-0.67</td>
-<td align="center">1.69</td>
-<td align="center">0</td>
+<td align="center">1.88</td>
+<td align="center">1.51</td>
+<td align="center">-0.83</td>
+<td align="center">0.24</td>
+<td align="center">0.16</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">B</td>
 <td align="center">1</td>
-<td align="center">0.84</td>
-<td align="center">-0.32</td>
-<td align="center">-0.67</td>
-<td align="center">1.69</td>
-<td align="center">0</td>
+<td align="center">1.88</td>
+<td align="center">1.51</td>
+<td align="center">-0.83</td>
+<td align="center">0.24</td>
+<td align="center">0.16</td>
 </tr>
 <tr class="odd">
 <td align="center">2</td>
 <td align="center">C</td>
 <td align="center">0</td>
-<td align="center">0.84</td>
-<td align="center">-0.32</td>
-<td align="center">-0.67</td>
-<td align="center">1.69</td>
-<td align="center">0</td>
+<td align="center">1.88</td>
+<td align="center">1.51</td>
+<td align="center">-0.83</td>
+<td align="center">0.24</td>
+<td align="center">0.16</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">D</td>
 <td align="center">0</td>
-<td align="center">0.84</td>
-<td align="center">-0.32</td>
-<td align="center">-0.67</td>
-<td align="center">1.69</td>
-<td align="center">0</td>
+<td align="center">1.88</td>
+<td align="center">1.51</td>
+<td align="center">-0.83</td>
+<td align="center">0.24</td>
+<td align="center">0.16</td>
 </tr>
 </tbody>
 </table>
@@ -767,6 +779,8 @@ mn_u &lt;-
     ,data = d_mnl
     ,choiceVar = &quot;alt&quot;
   )</code></pre>
+<div id="estimation" class="section level4">
+<h4>Estimation</h4>
 <table style="width:47%;">
 <colgroup>
 <col width="15%" />
@@ -783,85 +797,238 @@ mn_u &lt;-
 <tbody>
 <tr class="odd">
 <td align="center"><strong>x1:B</strong></td>
-<td align="center">-1.12</td>
-<td align="center">-1.58</td>
+<td align="center">1.44</td>
+<td align="center">1.35</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x2:B</strong></td>
-<td align="center">-1.25</td>
-<td align="center">-1.45</td>
+<td align="center">-0.59</td>
+<td align="center">-0.96</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x3:B</strong></td>
-<td align="center">-0.12</td>
-<td align="center">-0.41</td>
+<td align="center">-1.31</td>
+<td align="center">-1.38</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x4:B</strong></td>
-<td align="center">-0.44</td>
-<td align="center">-0.46</td>
+<td align="center">-0.8</td>
+<td align="center">-0.5</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x5:B</strong></td>
-<td align="center">1.07</td>
-<td align="center">0.85</td>
+<td align="center">-0.1</td>
+<td align="center">-0.01</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x1:C</strong></td>
-<td align="center">0.14</td>
-<td align="center">-0.07</td>
+<td align="center">-1.08</td>
+<td align="center">-1.16</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x2:C</strong></td>
-<td align="center">-1.18</td>
-<td align="center">-1.25</td>
+<td align="center">-0.17</td>
+<td align="center">-0.26</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x3:C</strong></td>
-<td align="center">0.53</td>
-<td align="center">0.44</td>
+<td align="center">1.14</td>
+<td align="center">1.01</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x4:C</strong></td>
-<td align="center">-0.45</td>
-<td align="center">-0.35</td>
+<td align="center">0.29</td>
+<td align="center">0.3</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x5:C</strong></td>
-<td align="center">-1.1</td>
-<td align="center">-1.36</td>
+<td align="center">2.08</td>
+<td align="center">1.91</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x1:D</strong></td>
-<td align="center">0.3</td>
-<td align="center">0.22</td>
+<td align="center">1.06</td>
+<td align="center">1.07</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x2:D</strong></td>
-<td align="center">0.48</td>
-<td align="center">0.67</td>
+<td align="center">-0.84</td>
+<td align="center">-0.87</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x3:D</strong></td>
-<td align="center">1.81</td>
-<td align="center">1.77</td>
+<td align="center">-0.63</td>
+<td align="center">-0.65</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x4:D</strong></td>
-<td align="center">-0.9</td>
-<td align="center">-0.81</td>
+<td align="center">-0.18</td>
+<td align="center">-0.05</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x5:D</strong></td>
-<td align="center">2.53</td>
-<td align="center">2.3</td>
+<td align="center">0.28</td>
+<td align="center">0.29</td>
 </tr>
 </tbody>
 </table>
-<table style="width:65%;">
+</div>
+<div id="prediction" class="section level4">
+<h4>Prediction</h4>
+<p>One way to predict is to pick the outcome with the highest probability for each individual.</p>
+<pre class="r"><code>U &lt;-
+  cbind(
+    U
+    ,round(predict(mn_u),2)
+  )
+
+U[
+  ,pred := predict(mn_u,probability = FALSE)
+]
+
+pander(U[1:10,.(person,choice,pred,A,B,C,D)])</code></pre>
+<table style="width:62%;">
 <colgroup>
 <col width="12%" />
-<col width="8%" />
+<col width="12%" />
+<col width="9%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">person</th>
+<th align="center">choice</th>
+<th align="center">pred</th>
+<th align="center">A</th>
+<th align="center">B</th>
+<th align="center">C</th>
+<th align="center">D</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">C</td>
+<td align="center">B</td>
+<td align="center">0.19</td>
+<td align="center">0.37</td>
+<td align="center">0.09</td>
+<td align="center">0.35</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">B</td>
+<td align="center">B</td>
+<td align="center">0.08</td>
+<td align="center">0.64</td>
+<td align="center">0</td>
+<td align="center">0.28</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">C</td>
+<td align="center">C</td>
+<td align="center">0.02</td>
+<td align="center">0.18</td>
+<td align="center">0.47</td>
+<td align="center">0.34</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">B</td>
+<td align="center">B</td>
+<td align="center">0.01</td>
+<td align="center">0.88</td>
+<td align="center">0</td>
+<td align="center">0.11</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">D</td>
+<td align="center">B</td>
+<td align="center">0.01</td>
+<td align="center">0.54</td>
+<td align="center">0.05</td>
+<td align="center">0.4</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">C</td>
+<td align="center">C</td>
+<td align="center">0.14</td>
+<td align="center">0.18</td>
+<td align="center">0.54</td>
+<td align="center">0.13</td>
+</tr>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center">D</td>
+<td align="center">C</td>
+<td align="center">0.22</td>
+<td align="center">0.1</td>
+<td align="center">0.39</td>
+<td align="center">0.29</td>
+</tr>
+<tr class="even">
+<td align="center">8</td>
+<td align="center">D</td>
+<td align="center">B</td>
+<td align="center">0.01</td>
+<td align="center">0.74</td>
+<td align="center">0</td>
+<td align="center">0.25</td>
+</tr>
+<tr class="odd">
+<td align="center">9</td>
+<td align="center">C</td>
+<td align="center">C</td>
+<td align="center">0.23</td>
+<td align="center">0.05</td>
+<td align="center">0.67</td>
+<td align="center">0.06</td>
+</tr>
+<tr class="even">
+<td align="center">10</td>
+<td align="center">D</td>
+<td align="center">B</td>
+<td align="center">0.1</td>
+<td align="center">0.65</td>
+<td align="center">0.04</td>
+<td align="center">0.22</td>
+</tr>
+</tbody>
+</table>
+<p>You could measure the accuracy of the prediction by how many choices were correctly predicted.</p>
+<table style="width:36%;">
+<colgroup>
+<col width="30%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Correctly Predicted</th>
+<th align="center">N</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">0.37</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">0.63</td>
+</tr>
+</tbody>
+</table>
+<p>Or, you could measure the accuracy of the prediction by how close to the actual outcomes shares the estimates were.</p>
+<table style="width:62%;">
+<colgroup>
+<col width="12%" />
+<col width="5%" />
 <col width="20%" />
 <col width="23%" />
 </colgroup>
@@ -876,30 +1043,31 @@ mn_u &lt;-
 <tbody>
 <tr class="odd">
 <td align="center">A</td>
-<td align="center">162</td>
-<td align="center">0.16</td>
-<td align="center">0.16</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.17</td>
 </tr>
 <tr class="even">
 <td align="center">B</td>
-<td align="center">238</td>
-<td align="center">0.24</td>
-<td align="center">0.24</td>
+<td align="center">307</td>
+<td align="center">0.31</td>
+<td align="center">0.36</td>
 </tr>
 <tr class="odd">
 <td align="center">C</td>
-<td align="center">258</td>
-<td align="center">0.26</td>
-<td align="center">0.25</td>
+<td align="center">350</td>
+<td align="center">0.35</td>
+<td align="center">0.41</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">342</td>
-<td align="center">0.34</td>
-<td align="center">0.35</td>
+<td align="center">176</td>
+<td align="center">0.18</td>
+<td align="center">0.07</td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div id="estimation-with-rstan" class="section level3">
 <h3>Estimation with rStan</h3>
@@ -949,59 +1117,48 @@ y[n] ~ categorical(softmax(beta * x[n]));
       ,refresh = -2
       ,verbose = FALSE
     )</code></pre>
-<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config.hpp:39:0,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/math/tools/config.hpp:13,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file15f87ca16b23.cpp:8:
-## C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/config.hpp:39:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file47709aa30e9.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
 ##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
 ##  ^
 ## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
-## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:44:0,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file15f87ca16b23.cpp:8:
-## C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+## In file included from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file47709aa30e9.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
 ##      static void set_zero_all_adjoints() {
 ##                  ^
 ## 
-## Gradient evaluation took 0.002 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Gradient evaluation took 0.003 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 30 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
 ## 
-##  Elapsed Time: 17.699 seconds (Warm-up)
-##                16.228 seconds (Sampling)
-##                33.927 seconds (Total)
+##  Elapsed Time: 40.143 seconds (Warm-up)
+##                31.316 seconds (Sampling)
+##                71.459 seconds (Total)
 ## 
 ## 
-## Gradient evaluation took 0.002 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Gradient evaluation took 0.001 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
 ## 
-##  Elapsed Time: 17.454 seconds (Warm-up)
-##                14.197 seconds (Sampling)
-##                31.651 seconds (Total)
-## 
-## 
-## Gradient evaluation took 0.002 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
-## Adjust your expectations accordingly!
-## 
-## 
-## 
-##  Elapsed Time: 17.639 seconds (Warm-up)
-##                15.068 seconds (Sampling)
-##                32.707 seconds (Total)
+##  Elapsed Time: 38.19 seconds (Warm-up)
+##                31.305 seconds (Sampling)
+##                69.495 seconds (Total)
 ## 
 ## 
 ## Gradient evaluation took 0.002 seconds
@@ -1010,19 +1167,69 @@ y[n] ~ categorical(softmax(beta * x[n]));
 ## 
 ## 
 ## 
-##  Elapsed Time: 19.571 seconds (Warm-up)
-##                15.566 seconds (Sampling)
-##                35.137 seconds (Total)</code></pre>
+##  Elapsed Time: 37.054 seconds (Warm-up)
+##                32.206 seconds (Sampling)
+##                69.26 seconds (Total)
+## 
+## 
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## 
+##  Elapsed Time: 43.444 seconds (Warm-up)
+##                33.32 seconds (Sampling)
+##                76.764 seconds (Total)</code></pre>
 <pre class="r"><code>  pars &lt;- 
     extract(mn_bayes)
 
-
   beta &lt;- 
-    apply(pars$beta,colSums,MARGIN = 3)/4000
+    apply(pars$beta,colSums,MARGIN = 3)/4000</code></pre>
+<pre class="r"><code>  pred &lt;- 
+    data.table(
+    exp(
+      as.matrix(X[,1:5])%*%t(as.matrix(beta))
+    )/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+    )
   
-  pred &lt;- exp(as.matrix(X[,1:5])%*%t(as.matrix(beta)))/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+  for(i in 1:1000){
 
-  shares_est &lt;- colSums(pred)/1000</code></pre>
+  if (pred[i,1] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := &quot;A&quot;
+    ]
+  }
+  
+  if (pred[i,2] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := &quot;B&quot;
+    ]
+  }
+    
+  if (pred[i,3] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := &quot;C&quot;
+    ]
+  }
+    
+  if (pred[i,4] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := &quot;D&quot;
+    ]
+  }
+    
+}
+
+shares_est &lt;-
+  pred[
+    ,.N
+    ,by = &quot;pred&quot;
+  ]</code></pre>
 <table style="width:47%;">
 <colgroup>
 <col width="15%" />
@@ -1039,85 +1246,85 @@ y[n] ~ categorical(softmax(beta * x[n]));
 <tbody>
 <tr class="odd">
 <td align="center"><strong>x1:B</strong></td>
-<td align="center">-1.12</td>
-<td align="center">-1.6</td>
+<td align="center">1.44</td>
+<td align="center">1.37</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x2:B</strong></td>
-<td align="center">-1.25</td>
-<td align="center">-1.46</td>
+<td align="center">-0.59</td>
+<td align="center">-0.97</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x3:B</strong></td>
-<td align="center">-0.12</td>
-<td align="center">-0.41</td>
+<td align="center">-1.31</td>
+<td align="center">-1.39</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x4:B</strong></td>
-<td align="center">-0.44</td>
-<td align="center">-0.47</td>
+<td align="center">-0.8</td>
+<td align="center">-0.51</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x5:B</strong></td>
-<td align="center">1.07</td>
-<td align="center">0.86</td>
+<td align="center">-0.1</td>
+<td align="center">-0.01</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x1:C</strong></td>
-<td align="center">0.14</td>
-<td align="center">-0.06</td>
+<td align="center">-1.08</td>
+<td align="center">-1.17</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x2:C</strong></td>
-<td align="center">-1.18</td>
-<td align="center">-1.26</td>
+<td align="center">-0.17</td>
+<td align="center">-0.26</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x3:C</strong></td>
-<td align="center">0.53</td>
-<td align="center">0.45</td>
+<td align="center">1.14</td>
+<td align="center">1.02</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x4:C</strong></td>
-<td align="center">-0.45</td>
-<td align="center">-0.36</td>
+<td align="center">0.29</td>
+<td align="center">0.3</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x5:C</strong></td>
-<td align="center">-1.1</td>
-<td align="center">-1.38</td>
+<td align="center">2.08</td>
+<td align="center">1.93</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x1:D</strong></td>
-<td align="center">0.3</td>
-<td align="center">0.22</td>
+<td align="center">1.06</td>
+<td align="center">1.09</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x2:D</strong></td>
-<td align="center">0.48</td>
-<td align="center">0.68</td>
+<td align="center">-0.84</td>
+<td align="center">-0.88</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x3:D</strong></td>
-<td align="center">1.81</td>
-<td align="center">1.79</td>
+<td align="center">-0.63</td>
+<td align="center">-0.66</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>x4:D</strong></td>
-<td align="center">-0.9</td>
-<td align="center">-0.82</td>
+<td align="center">-0.18</td>
+<td align="center">-0.06</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>x5:D</strong></td>
-<td align="center">2.53</td>
-<td align="center">2.33</td>
+<td align="center">0.28</td>
+<td align="center">0.29</td>
 </tr>
 </tbody>
 </table>
-<table style="width:65%;">
+<table style="width:62%;">
 <colgroup>
 <col width="12%" />
-<col width="8%" />
+<col width="5%" />
 <col width="20%" />
 <col width="23%" />
 </colgroup>
@@ -1132,30 +1339,261 @@ y[n] ~ categorical(softmax(beta * x[n]));
 <tbody>
 <tr class="odd">
 <td align="center">A</td>
-<td align="center">162</td>
-<td align="center">0.16</td>
-<td align="center">0.16</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.17</td>
 </tr>
 <tr class="even">
 <td align="center">B</td>
-<td align="center">238</td>
-<td align="center">0.24</td>
-<td align="center">0.24</td>
+<td align="center">307</td>
+<td align="center">0.31</td>
+<td align="center">0.36</td>
 </tr>
 <tr class="odd">
 <td align="center">C</td>
-<td align="center">258</td>
-<td align="center">0.26</td>
-<td align="center">0.25</td>
+<td align="center">350</td>
+<td align="center">0.35</td>
+<td align="center">0.41</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">342</td>
-<td align="center">0.34</td>
-<td align="center">0.35</td>
+<td align="center">176</td>
+<td align="center">0.18</td>
+<td align="center">0.07</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="decision-tree-with-caret" class="section level3">
+<h3>Decision Tree with caret</h3>
+<p>“Machine Learning” (Scare quotes intended)</p>
+<pre class="r"><code>d_ml &lt;- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = &quot;person&quot;
+]
+
+trctrl &lt;- 
+  trainControl(
+    method = &quot;repeatedcv&quot;
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit &lt;- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-&quot;person&quot;]
+    ,method = &quot;rpart&quot;
+    ,parms = list(split = &quot;information&quot;)
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]</code></pre>
+<pre class="r"><code>shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;choice&quot;
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;pred&quot;
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = &quot;pred&quot;)
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;Actual Share&quot;,&quot;Estimated Share&quot;)
+
+pander(shares[order(choice)],round = 2)</code></pre>
+<table style="width:62%;">
+<colgroup>
+<col width="12%" />
+<col width="5%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.14</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">307</td>
+<td align="center">0.31</td>
+<td align="center">0.36</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">350</td>
+<td align="center">0.35</td>
+<td align="center">0.47</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">176</td>
+<td align="center">0.18</td>
+<td align="center">0.02</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="knn-with-caret" class="section level3">
+<h3>kNN with caret</h3>
+<pre class="r"><code>d_ml &lt;- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = &quot;person&quot;
+]
+
+trctrl &lt;- 
+  trainControl(
+    method = &quot;repeatedcv&quot;
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit &lt;- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-&quot;person&quot;]
+    ,method = &quot;knn&quot;
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]</code></pre>
+<pre class="r"><code>shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;choice&quot;
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;pred&quot;
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = &quot;pred&quot;)
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;Actual Share&quot;,&quot;Estimated Share&quot;)
+
+pander(shares[order(choice)],round = 2)</code></pre>
+<table style="width:62%;">
+<colgroup>
+<col width="12%" />
+<col width="5%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.12</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">307</td>
+<td align="center">0.31</td>
+<td align="center">0.39</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">350</td>
+<td align="center">0.35</td>
+<td align="center">0.42</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">176</td>
+<td align="center">0.18</td>
+<td align="center">0.08</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;share&quot;,&quot;est_share&quot;)</code></pre>
 </div>
 </div>
 <div id="alternative-specific-factors" class="section level2">
@@ -1166,39 +1604,39 @@ y[n] ~ categorical(softmax(beta * x[n]));
 Zb &lt;- replicate(2,rnorm(1))
 Zc &lt;- replicate(2,rnorm(1))
 Zd &lt;- replicate(2,rnorm(1))</code></pre>
-<table style="width:35%;">
+<table style="width:28%;">
 <colgroup>
-<col width="12%" />
 <col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center"> </th>
+<th align="left"> </th>
 <th align="center">Z1</th>
 <th align="center">Z2</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><strong>A</strong></td>
-<td align="center">-1.84</td>
-<td align="center">-2.37</td>
+<td align="left"><strong>A</strong></td>
+<td align="center">-0.75</td>
+<td align="center">-0.79</td>
 </tr>
 <tr class="even">
-<td align="center"><strong>B</strong></td>
-<td align="center">0.82</td>
-<td align="center">0.71</td>
+<td align="left"><strong>B</strong></td>
+<td align="center">0.4</td>
+<td align="center">0.08</td>
 </tr>
 <tr class="odd">
-<td align="center"><strong>C</strong></td>
-<td align="center">2.48</td>
-<td align="center">2.01</td>
+<td align="left"><strong>C</strong></td>
+<td align="center">0.91</td>
+<td align="center">-0.06</td>
 </tr>
 <tr class="even">
-<td align="center"><strong>D</strong></td>
-<td align="center">0.93</td>
-<td align="center">0.42</td>
+<td align="left"><strong>D</strong></td>
+<td align="center">-0.1</td>
+<td align="center">0.27</td>
 </tr>
 </tbody>
 </table>
@@ -1209,10 +1647,10 @@ Zd &lt;- replicate(2,rnorm(1))</code></pre>
 <pre class="r"><code>gamma1 &lt;- 1
 gamma2 &lt;- -Za[1]/Za[2]</code></pre>
 <p>.</p>
-<table style="width:28%;">
+<table style="width:25%;">
 <colgroup>
 <col width="18%" />
-<col width="9%" />
+<col width="6%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1227,7 +1665,7 @@ gamma2 &lt;- -Za[1]/Za[2]</code></pre>
 </tr>
 <tr class="even">
 <td align="center"><strong>gamma2</strong></td>
-<td>-0.77</td>
+<td>-0.95</td>
 </tr>
 </tbody>
 </table>
@@ -1258,14 +1696,14 @@ U[
   Ud &gt; Ua &amp; Ud &gt; Ub &amp; Ud &gt; Uc
   ,choice := &quot;D&quot;
 ]</code></pre>
-<table style="width:69%;">
+<table style="width:54%;">
 <colgroup>
 <col width="12%" />
 <col width="12%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="6%" />
+<col width="6%" />
+<col width="6%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1281,50 +1719,50 @@ U[
 <tr class="odd">
 <td align="center">1</td>
 <td align="center">C</td>
-<td align="center">-0.82</td>
-<td align="center">0.14</td>
-<td align="center">1.76</td>
-<td align="center">-0.05</td>
+<td align="center">-0.7</td>
+<td align="center">1.23</td>
+<td align="center">3.29</td>
+<td align="center">0.82</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">B</td>
-<td align="center">-0.41</td>
-<td align="center">7.32</td>
-<td align="center">2.54</td>
-<td align="center">0.47</td>
+<td align="center">1.29</td>
+<td align="center">1.7</td>
+<td align="center">0.84</td>
+<td align="center">-0.92</td>
 </tr>
 <tr class="odd">
 <td align="center">3</td>
 <td align="center">B</td>
-<td align="center">-0.2</td>
-<td align="center">1.58</td>
-<td align="center">1</td>
-<td align="center">0.35</td>
+<td align="center">-0.99</td>
+<td align="center">1.94</td>
+<td align="center">1.05</td>
+<td align="center">-1.06</td>
 </tr>
 <tr class="even">
 <td align="center">4</td>
-<td align="center">D</td>
-<td align="center">0.48</td>
-<td align="center">-0.87</td>
-<td align="center">1.4</td>
-<td align="center">2.35</td>
+<td align="center">C</td>
+<td align="center">-0.19</td>
+<td align="center">0</td>
+<td align="center">1.73</td>
+<td align="center">-1.24</td>
 </tr>
 <tr class="odd">
 <td align="center">5</td>
-<td align="center">C</td>
-<td align="center">2.51</td>
-<td align="center">1.49</td>
-<td align="center">5.23</td>
-<td align="center">4.7</td>
+<td align="center">B</td>
+<td align="center">0.65</td>
+<td align="center">2.58</td>
+<td align="center">2.26</td>
+<td align="center">-1.42</td>
 </tr>
 <tr class="even">
 <td align="center">6</td>
-<td align="center">B</td>
-<td align="center">-0.06</td>
-<td align="center">2.77</td>
-<td align="center">-0.06</td>
-<td align="center">1.02</td>
+<td align="center">C</td>
+<td align="center">-1.02</td>
+<td align="center">1.09</td>
+<td align="center">1.93</td>
+<td align="center">1.03</td>
 </tr>
 </tbody>
 </table>
@@ -1381,12 +1819,12 @@ est &lt;-
 <tr class="odd">
 <td align="center"><strong>Z1</strong></td>
 <td align="center">1</td>
-<td align="center">1.16</td>
+<td align="center">1.08</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>Z2</strong></td>
-<td align="center">-0.77</td>
-<td align="center">-0.9</td>
+<td align="center">-0.95</td>
+<td align="center">-1.01</td>
 </tr>
 </tbody>
 </table>
@@ -1406,23 +1844,23 @@ est &lt;-
 <tbody>
 <tr class="odd">
 <td align="center">A</td>
-<td align="center">0.14</td>
-<td align="center">0.14</td>
+<td align="center">0.17</td>
+<td align="center">0.17</td>
 </tr>
 <tr class="even">
 <td align="center">B</td>
-<td align="center">0.22</td>
-<td align="center">0.19</td>
+<td align="center">0.26</td>
+<td align="center">0.24</td>
 </tr>
 <tr class="odd">
 <td align="center">C</td>
-<td align="center">0.37</td>
-<td align="center">0.4</td>
+<td align="center">0.46</td>
+<td align="center">0.48</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">0.28</td>
-<td align="center">0.28</td>
+<td align="center">0.11</td>
+<td align="center">0.12</td>
 </tr>
 </tbody>
 </table>
@@ -1455,13 +1893,13 @@ d_mnl[
   )
   ,on = c(alt = &quot;alt&quot;)
 ]</code></pre>
-<table style="width:56%;">
+<table style="width:50%;">
 <colgroup>
 <col width="12%" />
 <col width="8%" />
 <col width="12%" />
-<col width="11%" />
-<col width="11%" />
+<col width="8%" />
+<col width="8%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1477,57 +1915,57 @@ d_mnl[
 <td align="center">1</td>
 <td align="center">A</td>
 <td align="center">0</td>
-<td align="center">-1.84</td>
-<td align="center">-2.37</td>
+<td align="center">-0.75</td>
+<td align="center">-0.79</td>
 </tr>
 <tr class="even">
 <td align="center">1</td>
 <td align="center">B</td>
 <td align="center">0</td>
-<td align="center">0.82</td>
-<td align="center">0.71</td>
+<td align="center">0.4</td>
+<td align="center">0.08</td>
 </tr>
 <tr class="odd">
 <td align="center">1</td>
 <td align="center">C</td>
 <td align="center">1</td>
-<td align="center">2.48</td>
-<td align="center">2.01</td>
+<td align="center">0.91</td>
+<td align="center">-0.06</td>
 </tr>
 <tr class="even">
 <td align="center">1</td>
 <td align="center">D</td>
 <td align="center">0</td>
-<td align="center">0.93</td>
-<td align="center">0.42</td>
+<td align="center">-0.1</td>
+<td align="center">0.27</td>
 </tr>
 <tr class="odd">
 <td align="center">2</td>
 <td align="center">A</td>
 <td align="center">0</td>
-<td align="center">-1.84</td>
-<td align="center">-2.37</td>
+<td align="center">-0.75</td>
+<td align="center">-0.79</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">B</td>
 <td align="center">1</td>
-<td align="center">0.82</td>
-<td align="center">0.71</td>
+<td align="center">0.4</td>
+<td align="center">0.08</td>
 </tr>
 <tr class="odd">
 <td align="center">2</td>
 <td align="center">C</td>
 <td align="center">0</td>
-<td align="center">2.48</td>
-<td align="center">2.01</td>
+<td align="center">0.91</td>
+<td align="center">-0.06</td>
 </tr>
 <tr class="even">
 <td align="center">2</td>
 <td align="center">D</td>
 <td align="center">0</td>
-<td align="center">0.93</td>
-<td align="center">0.42</td>
+<td align="center">-0.1</td>
+<td align="center">0.27</td>
 </tr>
 </tbody>
 </table>
@@ -1559,12 +1997,12 @@ mn_u &lt;-
 <tr class="odd">
 <td align="center"><strong>z1</strong></td>
 <td align="center">1</td>
-<td align="center">0.73</td>
+<td align="center">1.02</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>z2</strong></td>
-<td align="center">-0.77</td>
-<td align="center">-0.49</td>
+<td align="center">-0.95</td>
+<td align="center">-0.92</td>
 </tr>
 </tbody>
 </table>
@@ -1606,32 +2044,32 @@ y[n] ~ categorical(softmax( z * gamma ));
       # ,refresh = -2
       # ,verbose = FALSE
     )</code></pre>
-<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config.hpp:39:0,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/math/tools/config.hpp:13,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file15f877a51fbe.cpp:8:
-## C:/Users/tmangin/Documents/R/win-library/3.5/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+<pre><code>## In file included from C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/config.hpp:39:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file4770e1a5e9.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.4/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
 ##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
 ##  ^
 ## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
-## In file included from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core.hpp:44:0,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file15f877a51fbe.cpp:8:
-## C:/Users/tmangin/Documents/R/win-library/3.5/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+## In file included from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file4770e1a5e9.cpp:8:
+## C:/Users/tmangin/Documents/R/win-library/3.4/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
 ##      static void set_zero_all_adjoints() {
 ##                  ^
 ## 
 ## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 1).
 ## 
-## Gradient evaluation took 0.001 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
@@ -1648,9 +2086,9 @@ y[n] ~ categorical(softmax( z * gamma ));
 ## Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Iteration: 2000 / 2000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 24.815 seconds (Warm-up)
-##                30.329 seconds (Sampling)
-##                55.144 seconds (Total)
+##  Elapsed Time: 15.241 seconds (Warm-up)
+##                14.732 seconds (Sampling)
+##                29.973 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 2).
@@ -1673,15 +2111,15 @@ y[n] ~ categorical(softmax( z * gamma ));
 ## Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Iteration: 2000 / 2000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 24.941 seconds (Warm-up)
-##                23.059 seconds (Sampling)
-##                48 seconds (Total)
+##  Elapsed Time: 15.121 seconds (Warm-up)
+##                14.942 seconds (Sampling)
+##                30.063 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 3).
 ## 
-## Gradient evaluation took 0.001 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
@@ -1698,15 +2136,15 @@ y[n] ~ categorical(softmax( z * gamma ));
 ## Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Iteration: 2000 / 2000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 22.615 seconds (Warm-up)
-##                21.683 seconds (Sampling)
-##                44.298 seconds (Total)
+##  Elapsed Time: 15.16 seconds (Warm-up)
+##                13.357 seconds (Sampling)
+##                28.517 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL &#39;1d492203ee8ceac819ae1ecfa34129e2&#39; NOW (CHAIN 4).
 ## 
-## Gradient evaluation took 0.001 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 10 seconds.
+## Gradient evaluation took 0.002 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 20 seconds.
 ## Adjust your expectations accordingly!
 ## 
 ## 
@@ -1723,9 +2161,9 @@ y[n] ~ categorical(softmax( z * gamma ));
 ## Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Iteration: 2000 / 2000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 22.732 seconds (Warm-up)
-##                23.373 seconds (Sampling)
-##                46.105 seconds (Total)</code></pre>
+##  Elapsed Time: 14.552 seconds (Warm-up)
+##                13.293 seconds (Sampling)
+##                27.845 seconds (Total)</code></pre>
 <pre class="r"><code>  pars &lt;- 
     extract(mn_bayes)
 
@@ -1751,19 +2189,19 @@ y[n] ~ categorical(softmax( z * gamma ));
 <tr class="odd">
 <td align="center"><strong>Z1</strong></td>
 <td align="center">1</td>
-<td align="center">0.72</td>
+<td align="center">1.02</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>Z2</strong></td>
-<td align="center">-0.77</td>
-<td align="center">-0.48</td>
+<td align="center">-0.95</td>
+<td align="center">-0.92</td>
 </tr>
 </tbody>
 </table>
-<table style="width:65%;">
+<table style="width:62%;">
 <colgroup>
 <col width="12%" />
-<col width="8%" />
+<col width="5%" />
 <col width="20%" />
 <col width="23%" />
 </colgroup>
@@ -1778,27 +2216,27 @@ y[n] ~ categorical(softmax( z * gamma ));
 <tbody>
 <tr class="odd">
 <td align="center">A</td>
-<td align="center">135</td>
-<td align="center">0.14</td>
-<td align="center">0.14</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.17</td>
 </tr>
 <tr class="even">
 <td align="center">B</td>
-<td align="center">215</td>
-<td align="center">0.22</td>
-<td align="center">0.21</td>
+<td align="center">262</td>
+<td align="center">0.26</td>
+<td align="center">0.24</td>
 </tr>
 <tr class="odd">
 <td align="center">C</td>
-<td align="center">373</td>
-<td align="center">0.37</td>
-<td align="center">0.38</td>
+<td align="center">457</td>
+<td align="center">0.46</td>
+<td align="center">0.47</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">277</td>
-<td align="center">0.28</td>
-<td align="center">0.27</td>
+<td align="center">114</td>
+<td align="center">0.11</td>
+<td align="center">0.12</td>
 </tr>
 </tbody>
 </table>
@@ -1836,25 +2274,25 @@ mu &lt;- as.matrix(Z[2:4,c(1,2)])%*%as.matrix(c(gamma1,gamma2))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="center"><strong>(Intercept):B</strong></td>
-<td align="center">0.27</td>
-<td align="center">0.47</td>
+<td align="center">0.32</td>
+<td align="center">0.45</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>(Intercept):C</strong></td>
-<td align="center">0.92</td>
-<td align="center">1.02</td>
+<td align="center">0.97</td>
+<td align="center">1.01</td>
 </tr>
 <tr class="odd">
 <td align="center"><strong>(Intercept):D</strong></td>
-<td align="center">0.61</td>
-<td align="center">0.72</td>
+<td align="center">-0.35</td>
+<td align="center">-0.38</td>
 </tr>
 </tbody>
 </table>
-<table style="width:65%;">
+<table style="width:62%;">
 <colgroup>
 <col width="12%" />
-<col width="8%" />
+<col width="5%" />
 <col width="20%" />
 <col width="23%" />
 </colgroup>
@@ -1869,61 +2307,261 @@ mu &lt;- as.matrix(Z[2:4,c(1,2)])%*%as.matrix(c(gamma1,gamma2))</code></pre>
 <tbody>
 <tr class="odd">
 <td align="center">A</td>
-<td align="center">135</td>
-<td align="center">0.14</td>
-<td align="center">0.14</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.17</td>
 </tr>
 <tr class="even">
 <td align="center">B</td>
-<td align="center">215</td>
-<td align="center">0.22</td>
-<td align="center">0.21</td>
+<td align="center">262</td>
+<td align="center">0.26</td>
+<td align="center">0.24</td>
 </tr>
 <tr class="odd">
 <td align="center">C</td>
-<td align="center">373</td>
-<td align="center">0.37</td>
-<td align="center">0.38</td>
+<td align="center">457</td>
+<td align="center">0.46</td>
+<td align="center">0.47</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">277</td>
-<td align="center">0.28</td>
-<td align="center">0.27</td>
+<td align="center">114</td>
+<td align="center">0.11</td>
+<td align="center">0.12</td>
 </tr>
 </tbody>
 </table>
-<table style="width:54%;">
+</div>
+<div id="decision-tree-with-caret-1" class="section level3">
+<h3>Decision Tree with caret</h3>
+<p>“Machine Learning” (Scare quotes intended)</p>
+<pre class="r"><code>d_ml &lt;- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = &quot;person&quot;
+]
+
+trctrl &lt;- 
+  trainControl(
+    method = &quot;repeatedcv&quot;
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit &lt;- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-&quot;person&quot;]
+    ,method = &quot;rpart&quot;
+    ,parms = list(split = &quot;information&quot;)
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]</code></pre>
+<pre class="r"><code>shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;choice&quot;
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;pred&quot;
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = &quot;pred&quot;)
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;Actual Share&quot;,&quot;Estimated Share&quot;)
+
+pander(shares[order(choice)],round = 2)</code></pre>
+<table style="width:62%;">
 <colgroup>
-<col width="27%" />
 <col width="12%" />
-<col width="13%" />
+<col width="5%" />
+<col width="20%" />
+<col width="23%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="center"> </th>
-<th align="center"> </th>
-<th align="center">Estimate</th>
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><strong>(Intercept):B</strong></td>
-<td align="center">0.27</td>
-<td align="center">0.47</td>
+<td align="center">A</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0</td>
 </tr>
 <tr class="even">
-<td align="center"><strong>(Intercept):C</strong></td>
-<td align="center">0.92</td>
-<td align="center">1.02</td>
+<td align="center">B</td>
+<td align="center">262</td>
+<td align="center">0.26</td>
+<td align="center">0</td>
 </tr>
 <tr class="odd">
-<td align="center"><strong>(Intercept):D</strong></td>
-<td align="center">0.61</td>
-<td align="center">0.72</td>
+<td align="center">C</td>
+<td align="center">457</td>
+<td align="center">0.46</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">114</td>
+<td align="center">0.11</td>
+<td align="center">0</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="knn-with-caret-1" class="section level3">
+<h3>kNN with caret</h3>
+<pre class="r"><code>d_ml &lt;- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = &quot;person&quot;
+]
+
+trctrl &lt;- 
+  trainControl(
+    method = &quot;repeatedcv&quot;
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit &lt;- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-&quot;person&quot;]
+    ,method = &quot;knn&quot;
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]</code></pre>
+<pre class="r"><code>shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;choice&quot;
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares &lt;- 
+  d_ml[
+    ,.(N = .N)
+    ,by = &quot;pred&quot;
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = &quot;pred&quot;)
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;Actual Share&quot;,&quot;Estimated Share&quot;)
+
+pander(shares[order(choice)],round = 2)</code></pre>
+<table style="width:62%;">
+<colgroup>
+<col width="12%" />
+<col width="5%" />
+<col width="20%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">choice</th>
+<th align="center">N</th>
+<th align="center">Actual Share</th>
+<th align="center">Estimated Share</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">167</td>
+<td align="center">0.17</td>
+<td align="center">0.02</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">262</td>
+<td align="center">0.26</td>
+<td align="center">0.1</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">457</td>
+<td align="center">0.46</td>
+<td align="center">0.88</td>
+</tr>
+<tr class="even">
+<td align="center">D</td>
+<td align="center">114</td>
+<td align="center">0.11</td>
+<td align="center">0.01</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>colnames(shares) &lt;- c(&quot;choice&quot;,&quot;N&quot;,&quot;share&quot;,&quot;est_share&quot;)</code></pre>
 </div>
 </div>
 

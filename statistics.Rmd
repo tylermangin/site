@@ -10,7 +10,7 @@ output:
 
 ### [Categorical Outcomes](individual_categorial_choices.html)
 
-Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it a bit dry, but I use it mostly as a reference and a laboratory.
+Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it is a bit dry, but I use it mostly as a reference and a laboratory.
 
  [Continue Reading](individual_categorial_choices.html)
  
@@ -30,6 +30,21 @@ I ran this routine on a canonical data set from Aviv Nevo. I found the data here
 
  [Continue Reading](BLP_estimation_cereal.html)
 
+ 
+<br>
+<br>
+<br>
 
+
+### [Minimum Detectable Effects for Proportions](mde_prop.html)
+
+I think standard power calculations are difficult to explain in a clear way. And, I don't think it's because people don't understand the basic idea - they know that a smaller $n$ means that you won't be able to find relatively large effects if they exist. Or in a formal way, it increases the probability of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true. 
+
+But power calculations don't really frame the question that way, because they calculate an observation size for a given effect size. Try asking someone who has been away from statistics for a while what a "meaningful effect size" is.I rarely find that people have a good anser for the question "How large of an effect are you trying to find?". When I've asked people who maybe only vaugely remember statistics from college that question, they usually are a bit confused. First, how should they know? Second, don't they want to find 'any' effect?
+
+So, another way to look at a power calculation is to take $n$ as a given and return an effect size.
+
+
+ [Continue Reading](mde_prop.html)
 
 

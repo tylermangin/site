@@ -11,7 +11,7 @@
 
 
 
-<title>Projects</title>
+<title>Minimum Detectable Effects for Proportions</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -245,27 +245,119 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Projects</h1>
+<h1 class="title toc-ignore">Minimum Detectable Effects for Proportions</h1>
 
 </div>
 
 
-<div id="statistics" class="section level1">
-<h1><a href="statistics.html">Statistics</a></h1>
-<p>Math and code</p>
-</div>
-<div id="blog" class="section level1">
-<h1><a href="http://abitenummi.blogspot.com/">Blog</a></h1>
-<p>Frivolity and links</p>
-</div>
-<div id="research" class="section level1">
-<h1><a href="research.html">Research</a></h1>
-<p>Math and text</p>
-</div>
-<div id="teaching" class="section level1">
-<h1><a href="Teaching.html">Teaching</a></h1>
-<p>Slides and graphs</p>
-</div>
+<p>I think standard power calculations are difficult to explain in a clear way. And, I don’t think it’s because people don’t understand the basic idea - they know that a smaller <span class="math inline">\(n\)</span> means that you won’t be able to find relatively large effects if they exist. Or in a formal way, it increases the probability of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true.</p>
+<p>But power calculations don’t really frame the question that way, because they calculate an observation size for a given effect size. Try asking someone who has been away from statistics for a while what a “meaningful effect size” is. I rarely find that people have a good anser for the question “How large of an effect are you trying to find?”. When I’ve asked people who maybe only vaugely remember statistics from college that question, they usually are a bit confused. First, how should they know? Second, don’t they want to find ‘any’ effect?</p>
+<p>So, another way to look at a power calculation is to take <span class="math inline">\(n\)</span> as a given and return an effect size. This is referred to as ‘minimum detectable effect,’ and I’m a little disappointed how much of the discussion about it seems confined to medical work and statistical education theory. <a href="http://thomasleeper.com/Rcourse/Tutorials/power.html">Thomas Leeper</a> has a good description about this approach.</p>
+<p>For instance, let’s say we have a known proportion <span class="math inline">\(p\)</span>. But, also have some subgroup of size <span class="math inline">\(n\)</span> with a proportion of <span class="math inline">\(p_1\)</span>, and we would like to know if <span class="math inline">\(n\)</span> is “large enough” to say that <span class="math inline">\(p_0\)</span> and <span class="math inline">\(p_1\)</span> are different.</p>
+<p>A standard power calculation in this case would find <span class="math inline">\(n\)</span> required under the alternative hypothesis with a given probability of type 1 error <span class="math inline">\(\alpha\)</span> and probability of Type II error <span class="math inline">\(\beta\)</span>:</p>
+<p><span class="math display">\[ n = p_1(1-p_1) \Bigg(\frac{Z_{\frac{1-\alpha}{2}} - Z_{\frac{1-\beta}{2}}}{p_1-p_0}\Bigg)^2  \]</span></p>
+<p>Instead, if we solve for <span class="math inline">\(p_1-p_0\)</span>,</p>
+<p><span class="math display">\[ p_0- p_1  = \Bigg(\frac{Z_{\frac{1-\alpha}{2}} - Z_{\frac{1-\beta}{2}}}{\sqrt{\frac{n}{p_0(1-p_0)}}}\Bigg)  \]</span></p>
+<p>which is nice, simple calculation that makes a lot of sense. Let’s say we know that overall 25% of people buy persimmons every week. We want to know if Coloradans who move to the East Coast are more likely to. But, our sample only has 10 people. Is that “enough”? Well, the smallest difference we could detect, if we are being conservative about making errors, is</p>
+<pre class="r"><code>p=0.25
+n = 10
+alpha=0.01
+beta=0.05
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+
+print(diff)</code></pre>
+<pre><code>## [1] 0.5779408</code></pre>
+<p>. That would make the East Coast Coloradans likelihood need to actually be 0.83 or greater for us to detect the difference with confidence.</p>
+<p>It decreases as n increases, the tolerance loosens, or the known proportion is farther from 50%.</p>
+<pre class="r"><code>p=0.5
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.1243237</code></pre>
+<pre class="r"><code>##increase in n
+
+p=0.5
+n = 500
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.05559927</code></pre>
+<pre class="r"><code>## Tighter Tolerance
+#decrease in alpha
+
+p=0.5
+n = 100
+alpha=0.05
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.1400793</code></pre>
+<pre class="r"><code>#decrease in beta
+
+p=0.5
+n = 100
+alpha=0.10
+beta=0.10
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.1463203</code></pre>
+<pre class="r"><code>##small p
+
+p=0.05
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.05419146</code></pre>
+<pre class="r"><code>##large p
+
+p=0.90
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.07459425</code></pre>
+<pre class="r"><code>##super large p
+
+p=0.9999999
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 7.862924e-05</code></pre>
+<pre class="r"><code>##super small p
+
+p=0.001
+n = 100
+alpha=0.10
+beta=0.20
+
+
+diff &lt;- (qnorm(1-alpha/2)+qnorm(1-beta))/sqrt(n/(p*(1-p)))
+print(diff)</code></pre>
+<pre><code>## [1] 0.007858991</code></pre>
+<p>Now, I cheated a little bit by assuming the population proportion was known - we are rarely so lucky.</p>
 
 
 

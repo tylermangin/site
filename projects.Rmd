@@ -2,14 +2,18 @@
 title: "Projects"
 ---
 
-# Header 1
+# [Statistics](statistics.html)
 
-This is some text
+Math and code
 
-## Header 2
+# [Blog](http://abitenummi.blogspot.com/)
 
-This is some text
+Frivolity and links
 
-### Header 3
+# [Research](research.html)
 
-This is some text
+Math and text
+
+# [Teaching](Teaching.html)
+
+Slides and graphs

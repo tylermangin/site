@@ -10,14 +10,20 @@ output: html_document
 
 #### [Resume](Resume.html)
 
+#### [Projects](Projects.html)
+
 ```{r, echo = FALSE, fig.align='center'}
+
 knitr::include_graphics("tyler-resized-final.png",dpi =300)
+
 ```
 
 
 ```{r,  echo =FALSE, warning=FALSE, fig.align='center'}
 
 library(leaflet)
+
+knitr::opts_chunk$set(out.extra = 'style="display:block; margin:auto;"') 
 
 load("map.Rdata")
 

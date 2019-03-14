@@ -7,7 +7,7 @@ output:
     toc_float: true
 ---
 
-```{r setup}
+```{r setup, warning = FALSE}
 
 library(data.table) # the best R package
 library(pander) # for tables
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 ```
 
-Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it a bit dry, but I use it mostly as a reference and a laboratory.
+Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I'm sorry if it is a bit dry, but I use it mostly as a reference and a laboratory.
 
 
 ## Multinomial Choice
@@ -33,13 +33,14 @@ I'll use the example of a individual-level choice between four outcomes ($j \in 
 ### Themes
 
 * Linear Dependence: If you estimate the probability of choosing all but one alternative, you can find the last probability by using the fact they all must sum to one. In practice this means for $J$ alternatives we generally estimate the likelihood for $J-1$, and take the last alternative as a reference.
-* Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R for OLS, the mnlogit package for Maximum Likelihood Estimation, and Rstan for Bayesian estimation
+* Computational Expense : These are beasts to solve. Fast estimation procedures are a must. I use base R for OLS, the mnlogit package for Maximum Likelihood Estimation, Rstan for Bayesian estimation, and caret for machine learning.
 
 
 ```{r}
 
 library(mnlogit) # estimation package
 library(rstan) # estimation package
+library(caret)  # estimation package
 
 ```
 
@@ -69,7 +70,7 @@ library(evd) # for gumbel distributions
 
 ### Types of Factors
 
-Predictors can be broken up broadly into indvidual-specific  factors like income or age, and alternative-specific factors lke price. There is also the possibility of a 'context-specific' factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won't consider them here. 
+Predictors can be broken up broadly into indvidual-specific  factors like income or age, and alternative-specific factors like price. There is also the possibility of a 'context-specific' factor that can vary across both individuals and alternatives. Those are more rare, and not estimated any differently than individual-specific factors anyway, so I won't consider them here. 
 
 ### Types of Effects
 
@@ -276,8 +277,11 @@ mn_u <-
     ,choiceVar = "alt"
   )
 
+
+
 ```
 
+#### Estimation
 
 ```{r, echo = FALSE}
 
@@ -286,6 +290,48 @@ coef_names <-  names(coefficients(mn_u)) #for later
 pander(cbind("True Model" = c(betaB,betaC,betaD),"Estimate" = coefficients(mn_u)), round = 2)
 
 ```
+
+#### Prediction
+
+One way to predict is to pick the outcome with the highest probability for each individual.
+
+```{r}
+
+U <-
+  cbind(
+    U
+    ,round(predict(mn_u),2)
+  )
+
+U[
+  ,pred := predict(mn_u,probability = FALSE)
+]
+
+pander(U[1:10,.(person,choice,pred,A,B,C,D)])
+
+```
+You could measure the accuracy of the prediction by how many choices were correctly predicted. 
+
+```{r, echo = FALSE}
+
+U[,`Correctly Predicted` := 0]
+
+U[
+  choice == pred
+  ,`Correctly Predicted` := 1
+]
+
+hit_rate <- U[,.N,by=`Correctly Predicted`]
+
+hit_rate[
+  ,N := N / sum(N)
+]
+
+pander(hit_rate, round = 2)
+
+```
+
+Or, you could measure the accuracy of the prediction by how close to the actual outcomes shares the estimates were. 
 
 
 ```{r, echo = FALSE}
@@ -300,35 +346,33 @@ shares[
   ,share := N/sum(N)
 ]
 
-est <-
-  data.frame(
-    "est_share" =
-      colSums(predict(mn_u))/1000
-    )
+est_shares <- 
+  U[
+    ,.(N = .N)
+    ,by = "pred"
+  ]
 
-```
-
-
-```{r, echo = FALSE}
-
-est$alt <- rownames(est)
-
-est <- data.table(est)
+est_shares[
+  ,pred_share := N/sum(N)
+]
 
 shares[
-  est
-  ,est_share := i.est_share
-  ,on = c(choice = "alt")
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = "pred")
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
 ]
 
 colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
 
 pander(shares[order(choice)],round = 2)
 
-colnames(shares) <- c("choice","N","share","est_share")
-
-
 ```
+
 
 ### Estimation with rStan
 
@@ -391,17 +435,58 @@ standata <-
       ,verbose = FALSE
     )
   
-    
   pars <- 
     extract(mn_bayes)
 
-
   beta <- 
     apply(pars$beta,colSums,MARGIN = 3)/4000
-  
-  pred <- exp(as.matrix(X[,1:5])%*%t(as.matrix(beta)))/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+```
 
-  shares_est <- colSums(pred)/1000
+```{r}
+  pred <- 
+    data.table(
+    exp(
+      as.matrix(X[,1:5])%*%t(as.matrix(beta))
+    )/rowSums(exp(as.matrix(X[,1:5])%*%t(as.matrix(beta))))
+    )
+  
+  for(i in 1:1000){
+
+  if (pred[i,1] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := "A"
+    ]
+  }
+  
+  if (pred[i,2] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := "B"
+    ]
+  }
+    
+  if (pred[i,3] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := "C"
+    ]
+  }
+    
+  if (pred[i,4] == max(pred[i,1:4])){
+    pred[
+     i
+     ,pred := "D"
+    ]
+  }
+    
+}
+
+shares_est <-
+  pred[
+    ,.N
+    ,by = "pred"
+  ]
   
 
 ```
@@ -414,14 +499,14 @@ rownames(frame) <- coef_names
 
 pander(frame, round = 2)
 
-
-
 ```
 
 ```{r, echo = FALSE}
 
 
-  shares_est <- data.table(cbind(c("A","B","C","D"),round(as.numeric(shares_est),2)))
+shares_est[
+  ,share := N/sum(N)
+]
 
 shares <- 
   U[
@@ -435,8 +520,8 @@ shares[
 
 shares[
   shares_est
-  ,est_share := i.V2
-  ,on = c(choice = "V1")
+  ,est_share := i.share
+  ,on = c(choice = "pred")
 ]
 
 colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
@@ -445,6 +530,179 @@ pander(shares[order(choice)],round = 2)
 
 colnames(shares) <- c("choice","N","share","est_share")
 
+
+```
+
+### Decision Tree with caret
+
+"Machine Learning" (Scare quotes intended)
+
+```{r}
+
+d_ml <- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = "person"
+]
+
+trctrl <- 
+  trainControl(
+    method = "repeatedcv"
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit <- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-"person"]
+    ,method = "rpart"
+    ,parms = list(split = "information")
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]
+
+
+```
+
+
+```{r}
+
+shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "pred"
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = "pred")
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+
+
+```
+
+### kNN with caret
+
+```{r}
+
+d_ml <- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = "person"
+]
+
+trctrl <- 
+  trainControl(
+    method = "repeatedcv"
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit <- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-"person"]
+    ,method = "knn"
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]
+
+
+```
+
+
+```{r}
+
+shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "pred"
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = "pred")
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
 
 ```
 
@@ -945,7 +1203,178 @@ d_mnl[
 
 ```
 
+### Decision Tree with caret
 
+"Machine Learning" (Scare quotes intended)
+
+```{r}
+
+d_ml <- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = "person"
+]
+
+trctrl <- 
+  trainControl(
+    method = "repeatedcv"
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit <- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-"person"]
+    ,method = "rpart"
+    ,parms = list(split = "information")
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]
+
+
+```
+
+
+```{r}
+
+shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "pred"
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = "pred")
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+
+
+```
+
+### kNN with caret
+
+```{r}
+
+d_ml <- U[,.(person,choice)]
+
+d_ml[
+  X
+  ,`:=`(
+    x1 = i.V1
+    ,x2 = i.V2
+    ,x3 = i.V3
+    ,x4 = i.V4
+    ,x5 = i.V5
+  )
+  ,on = "person"
+]
+
+trctrl <- 
+  trainControl(
+    method = "repeatedcv"
+    ,number = 10
+    ,repeats = 3
+  )
+
+set.seed(3333)
+
+dtree_fit <- 
+  train(
+    choice ~ .
+    ,data = d_ml[,-"person"]
+    ,method = "knn"
+    ,trControl = trctrl
+    ,tuneLength = 10
+    )
+
+d_ml[
+  ,pred := predict(dtree_fit)
+]
+
+
+```
+
+
+```{r}
+
+shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "choice"
+  ]
+
+shares[
+  ,share := N/sum(N)
+]
+
+est_shares <- 
+  d_ml[
+    ,.(N = .N)
+    ,by = "pred"
+  ]
+
+est_shares[
+  ,pred_share := N/sum(N)
+]
+
+shares[
+  est_shares
+  ,pred_share := i.pred_share
+  ,on = c(choice = "pred")
+]
+
+shares[
+  is.na(pred_share)
+  ,pred_share := 0
+]
+
+colnames(shares) <- c("choice","N","Actual Share","Estimated Share")
+
+pander(shares[order(choice)],round = 2)
+
+colnames(shares) <- c("choice","N","share","est_share")
+
+```
 
 
 
