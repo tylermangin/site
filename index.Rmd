@@ -10,7 +10,7 @@ output: html_document
 
 #### [Resume](Resume.html)
 
-#### [Projects](Projects.html)
+#### [Projects](projects.html)
 
 ```{r, echo = FALSE, fig.align='center'}
 
