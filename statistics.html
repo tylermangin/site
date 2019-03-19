@@ -348,9 +348,17 @@ div.tocify {
 </div>
 
 
+<div id="making-individual-level-predictions-when-all-you-have-is-aggregate-shares" class="section level3">
+<h3><a href="indv_agg_accuracy.html">Making Individual-Level Predictions When All You Have is Aggregate Shares</a></h3>
+<p>That title about sums it up. Let’s jump in. The population has 1000 individuals, each with some categorical class in <span class="math inline">\((A,B,C,D)\)</span>. This is unobserved. But, we do observe the aggregate shares of each class.</p>
+<p>I’ve found myself of being in roughly this position many times: the task is to make an individual-level prediction, but this is the only real information available. It’s a tough spot, and when I run this issue by other smart people, a common reaction is that the whole project it misguided. To that, I can only say: Defeatism is no plan. And, in fact, the highly-sophisticated, have-to-learn-it-in-grad-school econometric procedure known as <a href="BLP_estimation_cereal.html">BLP Estimation</a> is actually a form of this problem, but the baseline assumption there is that someone has already done the hard data work of scrounging up some <a href="individual_categorial_choices.html">alternative-specific factors</a> to do the estimation with the benefit of some actual information. But sometimes that isn’t the case.</p>
+<p>It seems to me there are two basic options, that are both accurate, but in very different ways.</p>
+<p><a href="indv_agg_accuracy.html">Continue Reading</a></p>
+<p><br> <br> <br></p>
+</div>
 <div id="categorical-outcomes" class="section level3">
 <h3><a href="individual_categorial_choices.html">Categorical Outcomes</a></h3>
-<p>Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I’m sorry if it a bit dry, but I use it mostly as a reference and a laboratory.</p>
+<p>Hopefully this is a less technical description, with more simulation. This is a work in progress that I update as I find and test new methods. I’m sorry if it is a bit dry, but I use it mostly as a reference and a laboratory.</p>
 <p><a href="individual_categorial_choices.html">Continue Reading</a></p>
 <p><br> <br> <br></p>
 </div>
@@ -363,8 +371,8 @@ div.tocify {
 </div>
 <div id="minimum-detectable-effects-for-proportions" class="section level3">
 <h3><a href="mde_prop.html">Minimum Detectable Effects for Proportions</a></h3>
-<p>I think standard power calculations are difficult to explain in a clear way. And, I don’t think its because people don’t understand the basic idea - they know that a smaller <span class="math inline">\(n\)</span> means that you won’t be able to find relatively large effects if they exist. Or in a formal way, it increases the probability of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true.</p>
-<p>But power calculations don’t really frame the question that way, because they calculate a observation size for a given effect size. Try asking someone who has been away from statistics for a while what a “meaningful effect size” is.I rarely find that people have a good anser for the question “How large of an effect are you trying to find?”. When I’ve asked people who maybe only vaugely remember statistics from college that question, they usually are a bit confused. First, how should they know? Second, don’t they want to find ‘any’ effect?</p>
+<p>I think standard power calculations are difficult to explain in a clear way. And, I don’t think it’s because people don’t understand the basic idea - they know that a smaller <span class="math inline">\(n\)</span> means that you won’t be able to find relatively large effects if they exist. Or in a formal way, it increases the probability of incorrectly failing to reject a null hypothesis when an alternative hypothesis is true.</p>
+<p>But power calculations don’t really frame the question that way, because they calculate an observation size for a given effect size. Try asking someone who has been away from statistics for a while what a “meaningful effect size” is.I rarely find that people have a good anser for the question “How large of an effect are you trying to find?”. When I’ve asked people who maybe only vaugely remember statistics from college that question, they usually are a bit confused. First, how should they know? Second, don’t they want to find ‘any’ effect?</p>
 <p>So, another way to look at a power calculation is to take <span class="math inline">\(n\)</span> as a given and return an effect size.</p>
 <p><a href="mde_prop.html">Continue Reading</a></p>
 </div>

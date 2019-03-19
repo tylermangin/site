@@ -6,6 +6,19 @@ output:
     toc_float: true
 ---
 
+### [Making Individual-Level Predictions When All You Have is Aggregate Shares](indv_agg_accuracy.html)
+
+That title about sums it up. Let's jump in. The population has 1000 individuals, each with some categorical class in $(A,B,C,D)$. This is unobserved. But, we do observe the aggregate shares of each class.
+
+I've found myself of being in roughly this position many times: the task is to make an individual-level prediction, but this is the only real information available. It's a tough spot, and when I run this issue by other smart people, a common reaction is that the whole project it misguided. To that, I can only say: Defeatism is no plan. And, in fact, the highly-sophisticated, have-to-learn-it-in-grad-school econometric procedure known as [BLP Estimation](BLP_estimation_cereal.html) is actually a form of this problem, but the baseline assumption there is that someone has already done the hard data work of scrounging up some [alternative-specific factors](individual_categorial_choices.html) to do the estimation with the benefit of some actual information. But sometimes that isn't the case. 
+
+It seems to me there are two basic options, that are both accurate, but in very different ways.
+
+ [Continue Reading](indv_agg_accuracy.html)
+ 
+<br>
+<br>
+<br>
 
 
 ### [Categorical Outcomes](individual_categorial_choices.html)
