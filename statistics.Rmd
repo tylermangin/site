@@ -6,6 +6,19 @@ output:
     toc_float: true
 ---
 
+### [Time Series](time_series.html)
+
+I don't know if two post makes a series, but like the post on [Categorial Outcomes](individual_categorical_choices.html), this is my reference and laboratory for time series. 
+
+I'm going to use the Airline Pasengers Data[^1], because its famous and everyone uses it ect. ect. ect. The observations are at the monthly level, running from January 1949 to December 1960. 
+
+ [Continue Reading](time_series.html)
+ 
+<br>
+<br>
+<br>
+
+
 ### [Making Individual-Level Predictions When All You Have is Aggregate Shares](indv_agg_accuracy.html)
 
 That title about sums it up. Let's jump in. The population has 1000 individuals, each with some categorical class in $(A,B,C,D)$. This is unobserved. But, we do observe the aggregate shares of each class.

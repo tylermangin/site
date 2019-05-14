@@ -1,24 +1,25 @@
 ---
 title: "Time Series"
-author: "Tyler Mangin"
-output:
-  html_document:
-    toc: true
-    toc_float: true
+output: html_document
 ---
 
-```{r setup,warning = FALSE}
+I don't know if two post makes a series, but like the post on [Categorial Outcomes](individual_categorical_choices.html), this is my reference and laboratory for time series. 
+
+```{r setup, warning = FALSE, message = FALSE}
 
 library(data.table) # the best R package
-library(pander) # for tables
-library(highcharter)
 
-# ARIMA
-library(forecast)
-# Bayes
-library(rstan)
+library(forecast) # estimation
+  data("AirPassengers") # Airline Pasengers Data
+library(rstan) # estimation
+library(bsts) # estimation  
+library(prophet) # estimation
+library(tsfknn) #estimation
 
-```
+library(highcharter) # graphs
+library(pander) # tables  
+  
+``` 
 
 ```{r, echo = FALSE}
 
@@ -27,159 +28,1191 @@ knitr::opts_chunk$set(
   ,message = FALSE
   )
 
-wd <- "C:/Users/tmangin/Downloads/"
-
 ```
 
-I will use a canonical dataset of shampoo sales originally from Makridakis, Wheelwright and Hyndman (1998). I found it [here](https://datamarket.com/data/set/22r0/sales-of-shampoo-over-a-three-year-period#!ds=22r0&display=line). 
+I'm going to use the Airline Pasengers Data[^1], because its famous and everyone uses it ect. ect. ect. The observations are at the monthly level, running from January 1949 to December 1960. 
 
 
-```{r}
+```{r, echo =FALSE}
 
-d <- fread(paste0(wd,'sales-of-shampoo-over-a-three-ye.csv'), data.table = TRUE)
+d <- data.table(AirPassengers)
 
-#time frame
-time_frame <- 24:36
+d[
+  , month := month.abb[cycle(AirPassengers)]
+]
+
+d[
+  ,year := floor(time(AirPassengers))
+]
+
+pander(head(d))
+
+d[
+  ,month_year := paste0(month," ",year)
+]
+
+d[
+  ,AirPassengers := as.numeric(AirPassengers)
+]
+
+d[
+  ,log_AirPassengers := log(AirPassengers)
+]
+
+d[
+  ,t := .I
+]
 
 
-```
-
-```{r}
-
-hchart(
-  d
-  ,"line"
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "Air Passengers"
+  ,marker = FALSE
   ,hcaes(
-    x = Month
-    ,y = `Sales of shampoo over a three year period`
+    x = "month_year"
+    ,y = "AirPassengers"
   )
-)  %>% 
+) %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+At first glance, it has an increasing trend and some clear seasonality.  Interestingly, the seasonal pattern becomes more pronounced over time. Since the variance increases along with time, this series is often log-transformed before estimation.
+
+```{r, echo = FALSE}
+
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "Log of Air Passengers"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "log_AirPassengers"
+  )
+) %>%
 hc_exporting(enabled = TRUE)
 
 
 ```
 
-arima$(0,1,q)(0,1,Q)_4$ Seasonal Random Trend with smoothing
+That makes the seasonal pattern more stable and easier to model. I think one of the reasons this time series is popular is that its pretty well-behaved.
 
-$$ y_{t} = y_{t-1} + y_{t-4} - y_{t-5} + \sum_q\theta_q\epsilon_{t-q} + \sum_Q\theta_Q\epsilon_{t-Q} $$
+# One-Month- and One-Year-Ahead Forecasting
+
+I personally do not know what anyone ever learns from looking at a 'backcast' model, where the estimated values are made with the benefit of data that would not have been available at the time the estimate needed to be made. And yet, it is such a common graph to see. Sometimes people at least have 'holdout' period, but when it comes time to make actual forecasts, every period is a 'holdout' period. All of the estimates I will make below will be true forecasts, where a time period is being estimated only with data prior to that time period. However, to do that, I have to choose a forecast window. With any time series, one-step-head (in this case one-month-ahead) is always my default, but since the data is organized into 12 months, a one-year ahead forecast also seems reasonable here. To split the difference, I'll estimate a one-month-ahead forecast window in the first ten-year period of the series (from 1949 to 1959), and then do a one-year-ahead forecast window in the last year of the series (1960).
+
+# ARIMA$(0,1,1)(0,1,1)_{12}$ 
+
+ARIMA is the baseline for most time-series forecasting, but its such a general class of models, each with rules of thumb and diagnostics to get to the "right" specification. I like the summary by Duke University's [Robert Nau](https://people.duke.edu/~rnau/411arim.htm) when I want to dig into the perfect specification for any particular time series. 
+
+Luckily almost all of the time series I've ever had to forecast have two features in common with the Airline Data: a non-linear trend and seasonality. A [standard ARIMA specification](https://people.duke.edu/~rnau/seasarim.htm) for a time in that case is $ARIMA(0,1,1)(0,1,1)_S$:
+
+$$\hat{y}_t  =  y_{t-S} + y_{t-1} - y_{t-1-S} - \theta_1 \epsilon_{t-1} - \theta_2 \epsilon_{t-S} + \theta_1\theta_2\epsilon_{t-1-S} $$
+
+That is a first-order difference, a first-order seasonal difference, a first-order moving average, and a first-order seasonal moving average. It also happens to be well-suited to the Airplane Passengers data, even to the point where its called the "Airline Model".
+
+## Estimation with the forecast package
+
+First, here is how to estimate $ARIMA(0,1,1)(0,1,1)_{12}$ using [Rob Hyndman's](https://robjhyndman.com/) fantastic [forecast](https://cran.r-project.org/web/packages/forecast/forecast.pdf) package.
+
+[^1]: Box, G. E. P., Jenkins, G. M. and Reinsel, G. C. (1976) Time Series Analysis, Forecasting and Control. Third Edition. Holden-Day. Series G.
+
 
 ```{r}
 
-d[,"arima"] <- as.numeric(NA)
+d[
+  ,classic_arima := NA
+]
 
-order <- c(0,1,1)
-season <- c(0,1,1)
+#one-month ahead
+for (i in 24:131){
 
-coef <- NA
-
-coef[[1]] <- list(NA)
-
-for(i in time_frame)
-{  
-  arima_m <- 
-    Arima(
-      y = d[1:i-1,"Sales of shampoo over a three year period"]
-      ,order = order
-      ,seasonal = 
-        list(
-          order = season
-          ,period = 12
-        )
+m <-
+  Arima(
+    y = d[t < i,"log_AirPassengers"]
+    ,order = c(0,1,1)
+    ,seasonal = 
+      list(
+        order = c(0,1,1)
+        ,period = 12
       )
-  d[i,"arima"] <- forecast(arima_m, h=1)$mean
-  coef[[i]] <- arima_m$coef
+  )
+
+d$classic_arima[i] <- round(exp(forecast(m)$mean[1]),0)
+
 }
 
-coef[[1]] <- NULL
+#one-year ahead
+m <-
+  Arima(
+    y = d[t < 132,"log_AirPassengers"]
+    ,order = c(0,1,1)
+    ,seasonal = 
+      list(
+        order = c(0,1,1)
+        ,period = 12
+      )
+  )
+
+d$classic_arima[132:144] <- round(exp(forecast(m)$mean[1:13]),0)
+
+```
+
+
+```{r, echo = FALSE}
+
+arima_onestep_forecast_mse <- sum((d$AirPassengers[25:131]-d$classic_arima[25:131])^2)
+
+arima_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$classic_arima[132:144])^2)
 
 
 ```
 
+## Estimation with rstan  
+
+Next, the same specification, using the formula from above, but with a Bayesian estimation using the the rstan package 
+
 ```{r}
 
-g <- melt(d[,c("Month","Sales of shampoo over a three year period","arima")],id.vars = "Month")
+stan <-
+  "
+data {
+  int<lower = 1> T;
+  int<lower = 1> S;
+  vector[T] y;
+}
+parameters {
+  real<lower = -1, upper = 1> theta1;
+  real<lower = -1, upper = 1> theta2;
+  real<lower = 0> sigma;
+  vector[S+1] epsilon_0;
+}
+transformed parameters {
+  vector[T] y_hat;
+  vector[T] epsilon;
 
-hchart(
-  g
-  ,"line"
-  ,hcaes(
-    x = Month
-    ,y = value
-    ,group = variable
+  epsilon[1:S+1] = epsilon_0;
+
+  for (t in 1:S+1){
+    y_hat[t] = y[t] - epsilon[t];
+  }
+
+  for (t in S+2:T){
+
+    y_hat[t] = y[t-1] + y[t-S] - y[t-1-S] + theta1*(epsilon[t-1]) + theta2*(epsilon[t-S]) + theta1*theta2*(epsilon[t-1-S]);
+
+    epsilon[t] = y[t] - y_hat[t];
+
+  }
+
+}
+model {
+
+for (t in 1:S+1){
+  epsilon_0 ~ normal(0,sigma);
+}
+
+for (t in S+2:T){
+  y[t] ~ normal(y_hat[t],sigma);
+}
+
+
+}
+"
+
+```
+
+
+```{r, echo = FALSE, eval = FALSE}
+
+d[,bayes_arima := NA]
+
+#one-month ahead
+
+for (i in 24:131){
+  
+b <-
+  stan(
+    model_code = stan
+    ,iter = 2000
+    ,cores = 4
+    ,chains = 4
+    ,data = 
+      list(
+        T = i-1
+        ,S = 12
+        ,y = unlist(d[t<i,"log_AirPassengers"])
+      )
   )
-)  %>% 
+
+out <- extract(b)
+
+epsilon <- apply(out$epsilon,MARGIN = 2,FUN = mean)
+
+theta1 <- mean(out$theta1)
+
+theta2 <- mean(out$theta2)
+
+d$bayes_arima[i] <- exp(unlist(d[i-1,"log_AirPassengers"])+ unlist(d[i-12,"log_AirPassengers"]) - unlist(d[i-1-12,"log_AirPassengers"]) + theta1*epsilon[i-1] + theta2*epsilon[i-12] + theta1*theta2*(epsilon[i-1-12]))
+
+}
+
+#one-year ahead
+
+b <-
+  stan(
+    model_code = stan
+    ,iter = 2000
+    ,cores = 4
+    ,chains = 4
+    ,data = 
+      list(
+        T = 131
+        ,S = 12
+        ,y = unlist(d[t<132,"log_AirPassengers"])
+      )
+  )
+
+out <- extract(b)
+
+epsilon <- apply(out$epsilon,MARGIN = 2,FUN = mean)
+
+theta1 <- mean(out$theta1)
+
+theta2 <- mean(out$theta2)
+
+d$actual_and_forecast <- c(unlist(d[1:131,"log_AirPassengers"]),rep(NA,14))
+
+for(i in 132:144){
+  
+d$actual_and_forecast[i] <- 
+unlist(d[i-1,actual_and_forecast])+ unlist(d[i-12,actual_and_forecast]) - unlist(d[i-1-12,actual_and_forecast]) + theta1*epsilon[i-1] + theta2*epsilon[i-12] + theta1*theta2*(epsilon[i-1-12])
+
+epsilon <- c(epsilon,mean(epsilon))
+
+}
+
+d$bayes_arima[132:144] <- d$actual_and_forecast[132:144]
+
+```
+
+```{r, echo = FALSE, eval = FALSE}
+
+d$bayes_arima[132:144] <- d$actual_and_forecast[132:144]
+
+d$bayes_arima[132:144] <- round(exp(d$bayes_arima[132:144]),0)
+
+bayes_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$bayes_arima[25:130])^2)
+
+bayes_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$bayes_arima[132:144])^2)
+
+
+```
+
+```{r secret_save, echo = FALSE, eval = FALSE}
+
+save(d,bayes_onestep_forecast_mse,bayes_twelvestep_forecast_mse,arima_onestep_forecast_mse,arima_twelvestep_forecast_mse,out,file = "C:/Users/tmangin/Documents/out.RData")
+
+```
+
+
+```{r secret_load, echo = FALSE}
+
+load("C:/Users/tmangin/Documents/out.RData")
+
+```
+
+## Comparison
+
+Here are the two ARIMA(0,1,1)(0,1,1)12 models side by side. The point forecasts are pretty much indistinguishable. 
+
+```{r, echo = FALSE}
+
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,dashStyle = "ShortDot"
+  ,name = "forecast package"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "classic_arima"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "actual"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "AirPassengers"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "rstan package"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "bayes_arima"
+  )
+) %>%
 hc_exporting(enabled = TRUE)
 
 ```
 
+```{r, echo = FALSE}
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = arima_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = arima_twelvestep_forecast_mse), caption = "ARIMA(1,1,1)(0,1,1)12 Estimated with forecast")
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = bayes_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = bayes_twelvestep_forecast_mse), caption = "ARIMA(1,1,1)(0,1,1)12 Estimated with rstan")
+
+```
 
 
+And, here is a comparison of the coefficent estimates for the first-order moving average. Notably, the Bayesian posterior distribution has a smaller standard deviation than the estimated standard error of the coefficent from the "classic"" ARIMA estimation.
+
+```{r, echo = FALSE}
+
+max <- round(max(out$theta1),4) + 0.0001
+min <- round(min(out$theta1),4) - 0.0001
+bins <- round(seq(min, max, length.out = 100),4)
+bins_max <- max(bins)
+bins_min <- min(bins)
+
+h0 <- 
+  hist(
+    out$theta1
+    ,breaks = bins
+    ,plot = FALSE
+  )
+
+h1 <- 
+  hchart(h0) %>% 
+  hc_yAxis(max = 175)  %>% 
+  hc_xAxis(max = max, min = min) %>% 
+  hc_title(text = "Bayes MA1 Coefficent Estimate") %>% 
+  hc_plotOptions(series = list(showInLegend = FALSE))
+
+draws <- 
+  rnorm(
+    n= length(out$theta1)
+    ,mean = m$coef[1]
+    , sd = sqrt(m$var.coef[1,1])
+  )
+
+h2 <- 
+  hist(
+    draws[draws < bins_max&draws >= bins_min]
+    ,breaks = bins
+    ,plot = FALSE
+  )
+
+h2 <- 
+  hchart(h2) %>% 
+  hc_yAxis(max = 175) %>% 
+  hc_xAxis(max = max, min = min) %>% 
+  hc_title(text = "Simulated ARIMA MA1 Coefficent Estimates") %>% 
+  hc_plotOptions(series = list(showInLegend = FALSE))
+
+hw_grid(h1, h2)
+
+```
 
 
+# Local Linear Trend with Fixed Seasonality
 
+Besides ARIMA, state space models are the other general class of time series models. These models typically have two parts: an observation equation, and then some number of unobserved state equations.
 
+The observation equation describes the relationship between the data $y_t$, and the unobserved states. I'll consider a baseline specification here with two unobserved states $\mu$ and $\tau$, and noise term $\epsilon_{1t}$.
 
-```{r}
+$$ y_t = \mu_t + \tau_t + \epsilon_{1t}  $$
+The next three state equations describe the unobserved states and how they evolve over time. The first unobserved state $\mu$ is the non-linear trend or "linear local level". From period to period, it changes based on the time-varying slope $\beta$ with its own noise component, $\epsilon_{2t}$.
 
-d[
-  ,month := as.numeric(substr(Month,3,4))
-]
+$$ \mu_t = \mu_{t-1} + \beta_{t-1} + \epsilon_{2t} $$
+The slope $\beta$ follows a random walk.
+$$ \beta_t = \beta_{t-1} + \epsilon_{3t} $$
+The last unobserved state is a seasonal effect $\tau$ which is set up to be mean-zero across the seasons $S$ (months in this case), of the the full period (year in this case).
+$$ \tau_t = -\sum_{k \in S , k \neq t}^{S-1} \tau_{k} + \epsilon_{4t} $$
 
-d[
-  ,time := seq(1,36)
-]
+Once you move into the world of state space models, there is a lot of flexibility to set up the unobserved components of time series. I think this approach has a lot of intuitive appeal. The time series *looks* like it has a non-linear trend and a seasonal pattern, so why not model it like that?
 
-d[
-  ,time_sq := time^2
-]
+## Estimation with the bsts package
 
-for(i in time_frame)
-{  
-seasonal_a <-
-  lm(
-    `Sales of shampoo over a three year period` ~ 0 + factor(month) + time + time_sq
-    ,data = d[1:i-1,]
-    )
+The bsts package by [Steven Scott](https://github.com/steve-the-bayesian) is a great, [widely used](https://multithreaded.stitchfix.com/blog/2016/04/21/forget-arima/) package for Bayesian State-Space Models. 
+
+First, a quick digression about the priors this package uses. I could not replicate the same model using the [rstan](https://mc-stan.org/users/interfaces/rstan) package (below). My suspicion is that the difference has to do with default prior assumptions. With some digging, I found the [default priors](https://github.com/cran/bsts/blob/master/R/add.local.linear.trend.R) (line 65 of the code) for the bsts package:
+
+```{r, eval= FALSE}
+
+if (!missing(y)) {
+    stopifnot(is.numeric(y))
+    observed.y <- as.numeric(y[!is.na(y)])
+    sdy <- sd(observed.y, na.rm = TRUE)
+    initial.y <- observed.y[1]
+  }
+
+  if (is.null(level.sigma.prior)) {
+    ## The prior distribution says that level.sigma is small, and can be no
+    ## larger than the sample standard deviation of the time series
+    ## being modeled.
+    level.sigma.prior <- SdPrior(.01 * sdy, upper.limit = sdy)
+  }
+
+  if (is.null(slope.sigma.prior)) {
+    ## The prior distribution says that slope.sigma is small, and can be no
+    ## larger than the sample standard deviation of the time series
+    ## being modeled.
+    slope.sigma.prior <- SdPrior(.01 * sdy, upper.limit = sdy)
+  }
+
+  if (is.null(initial.level.prior)) {
+    ## The mean of the initial level is the first observation.
+    initial.level.prior <- NormalPrior(initial.y, sdy);
+  }
+
+  if (is.null(initial.slope.prior)) {
+    if (!missing(y)) {
+      ## If y is actually provided, then set the mean of the initial slope to
+      ## the slope of a line connecting the first and last points of y.
+      final.y <- tail(as.numeric(observed.y), 1)
+      initial.slope.mean <- (final.y - initial.y) / length(y)
+    } else {
+      ## If y is missing set the mean of the initial slope to zero.
+      initial.slope.mean <- 0
+    }
+    initial.slope.prior <- NormalPrior(initial.slope.mean, sdy);
+  }
+
+```
+
+The SdPrior function comes from another package, Boom, by the same author, and specifices an inverse gamma prior for the variance parameter of the state components.
+
+Since bsts was built explicity for state space models, it has default informative priors well-suited for the pariticular model. In particular, we really want most of the short-term variation to be described by the seasonal effects, so bsts applies prior information that the variation of the trend and slope components is small, so that those components evolve slowly. 
+
+So, now on to the estimation with bsts.
+
+```{r, eval = FALSE}
+
+d[,bsts_ll := 0]
+
+#one-month ahead
+
+for (i in 24:131){
+
+spec <- 
+  AddLocalLinearTrend(
+    list()
+    ,y = d$log_AirPassengers[d$t < i]
+  )
+
+spec <- 
+  AddSeasonal(
+    spec
+    ,y = d$log_AirPassengers[d$t < i]
+    ,nseasons = 12
+  )
+
+ss <- 
+  bsts(
+    d$log_AirPassengers[d$t < i]
+    ,state.specification = spec
+    ,niter = 1000
+  )
 
 d[
   i
-  ,ols:= 
-    tail(
-      predict(
-        seasonal_a
-        ,newdata = d[1:i]
+  ,bsts_ll :=
+    round(
+      exp(
+        predict.bsts(
+          ss
+          ,horizon = 1
+          ,burn = 500
+          ,quantiles = c(.025, .975)
+        )$mean
       )
-      ,1
+      ,0
     )
-] 
+]
+
 }
 
+# one-year-ahead
 
+spec <- 
+  AddLocalLinearTrend(
+    list()
+    ,y = d$log_AirPassengers[d$t < 132]
+  )
+
+spec <- 
+  AddSeasonal(
+    spec
+    ,y = d$log_AirPassengers[d$t < 132]
+    ,nseasons = 12
+  )
+
+ss <- 
+  bsts(
+    d$log_AirPassengers[d$t < 132]
+    ,state.specification = spec
+    ,niter = 1000
+  )
+
+d[
+  132:144
+  ,bsts_ll :=
+    round(
+      exp(
+        predict.bsts(
+          ss
+          ,horizon = 13
+          ,burn = 500
+          ,quantiles = c(.025, .975)
+        )$mean
+      )
+      ,0
+    )
+]
+```
+
+```{r, echo = FALSE}
+bsts_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$bsts_ll[25:130])^2)
+
+bsts_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$bsts_ll[132:144])^2)
 
 ```
 
-```{r}
+```{r secret_save2, echo = FALSE, eval = FALSE}
 
-g <- melt(d[,c("Month","Sales of shampoo over a three year period","ols")],id.vars = "Month")
+save(d,spec,ss,bsts_onestep_forecast_mse,bsts_twelvestep_forecast_mse,file = "C:/Users/tmangin/Documents/out2.RData")
 
-hchart(
-  g
-  ,"line"
-  ,hcaes(
-    x = Month
-    ,y = value
-    ,group = variable
-  )
-)  %>% 
+```
+
+
+```{r secret_load2, echo = FALSE}
+
+load("C:/Users/tmangin/Documents/out2.RData")
+
+```
+
+Relative to the ARIMA model above, there is a tradeoff here. On the one hand this model has lower forecast accuracy.
+
+```{r, echo = FALSE}
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = bsts_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = bsts_twelvestep_forecast_mse), caption = "Local Linear Trend, Fixed Seasonality Estimated with bsts")
+
+```
+
+On the other hand, we have more explanatory power, since we can describe the trend and seasonal components seperately.
+
+```{r, echo = FALSE}
+
+trend <- round(exp(apply(ss$state.contributions,MARGIN = c(2,3),FUN = mean)[1,]),0)
+seasonal <- round(exp(apply(ss$state.contributions,MARGIN = c(2,3),FUN = mean)[2,]),4)
+
+highchart() %>%
+hc_add_series(
+  data =  trend
+  ,type = "line"
+  ,name = "Trend"
+  ,marker = FALSE
+)%>%
+hc_exporting(enabled = TRUE)
+
+highchart() %>%
+hc_add_series(
+  data =  seasonal
+  ,type = "line"
+  ,name = "Seasonal"
+  ,marker = FALSE
+) %>%
 hc_exporting(enabled = TRUE)
 
 ```
 
+To my eye, the trend is overfit here, and picking up some of the seasonality at the end of the series. That indicates to me that the log transform isn't enough to completely stabilize the seasonality in this model. 
 
-```{r}
+## Estimation with rstan
 
-autoplot(decompose(ts(d[,"Sales of shampoo over a three year period"],frequency = 12)))
+```{r secret_load3,  echo = FALSE}
+
+load(file = "C:/Users/tmangin/Documents/thebadness.RData")
 
 ```
 
+So, as mentioned above, when I went to replicate the [bsts](http://www.unofficialgoogledatascience.com/2017/07/fitting-bayesian-structural-time-series.html) estimation of the local linear level state space model using [rstan](https://mc-stan.org/users/interfaces/rstan), my first attempt failed miserably, because the two packages have different default priors. Unlike bsts, rstan is meant for general Bayesian estimation, and so the priors aren't as directly suited to the model. If you only specify a strictly positive parameter for a variance, stan uses an improper $U(0,\infty)$ prior(see section 1.3 of the [manual](https://mc-stan.org/docs/2_18/stan-users-guide/regression-priors-section.html)). What you get in that case is the model isn't sure what variance should be attributed to the trend, and what variance should be attributed to the seasonal pattern.
+
+```{r, echo = FALSE}
+
+trend <- round(exp(apply(out2$trend,MARGIN = 2,FUN = mean)),0)
+seasonal <- round(exp(apply(out2$seasonal,MARGIN = 2,FUN = mean)),4)
+
+highchart() %>%
+hc_add_series(
+  data =  trend
+  ,type = "line"
+  ,name = "Trend"
+  ,marker = FALSE
+)%>%
+hc_exporting(enabled = TRUE)
+
+highchart() %>%
+hc_add_series(
+  data =  seasonal
+  ,type = "line"
+  ,name = "Seasonal"
+  ,marker = FALSE
+) %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+In a Bayesian sense, we are missing information here - namely that the trend changes slowly and the seasonality changes quickly. In what follows, I specify informative priors in the vein of the bsts defaults.
+
+```{r}
+
+periodicity_index <- rep(1:12,each = 12)
+
+seasonal_index <- rep(seq(1,12,1),12)
+
+season_index <- replicate(rep(NA,each = 12),n = 11)
+
+for (i in 1:12){
+  season_index[i,] <- seq(1,12,1)[-i] 
+}
+
+stan <-
+  "
+data {
+  int<lower = 1> T;
+  int<lower = 1> S;
+  vector[T] y;
+  int seasonality_index[T];
+  int season_index[S,S-1];
+}
+parameters {
+  vector[T] slope;
+  vector[T] trend;
+  vector[S] season;
+  real slope1;
+  real trend1;
+  real<lower = 0> sigma_trend;
+  real<lower = 0> sigma_slope;
+  real<lower = 0> sigma_seasonal;
+}
+transformed parameters {
+  vector[T] seasonal;
+
+  for (t in 1:T){
+    seasonal[t] = season[seasonality_index[t]];
+  }
+
+}
+model {
+
+sigma_trend ~ inv_gamma(100,sd(y));
+sigma_slope ~ inv_gamma(100,sd(y));
+sigma_seasonal ~ inv_gamma(100,sd(y));
+
+trend[1] ~ normal(y[1],sd(y));
+slope[1] ~ normal((y[2]-y[1]),sd(y));
+
+for(t in 2:T){
+  slope[t] ~ normal(slope[t-1],sigma_trend);
+  trend[t] ~ normal(trend[t-1] + slope[t-1],sigma_slope);
+}
+
+for (s in 1:S){
+  season[s] ~ normal(-sum(season[to_array_1d(season_index[s,])]),sigma_seasonal);
+}
+
+for (t in 1:T){
+  y[t] ~ normal(trend[t] + seasonal[t],sd(y));
+}
+
+
+}
+"
+
+```
+
+
+```{r, eval = FALSE}
+d[
+  ,rstan_ll := NA
+]
+
+#one-month ahead
+for (i in 24:131){
+  
+b <-
+  stan(
+    model_code = stan
+    ,iter = 1000
+    ,chains = 3
+    ,data = 
+      list(
+        T = i-1
+        ,S = 12
+        ,y = d$log_AirPassengers[d$t<i]
+        ,seasonality_index = seasonal_index[1:i-1]
+        ,season_index = season_index
+      )
+  )
+
+out <- extract(b)
+
+slope <- mean(out$slope[,i-1])
+
+trend <- mean(out$trend[,i-1]) + slope
+
+seasonal <- mean(out$season[,seasonal_index[i]])
+
+d$rstan_ll[i] <- trend + seasonal
+
+gc()
+
+} 
+
+b <-
+  stan(
+    model_code = stan
+    ,iter = 1000
+    ,chains = 2
+    ,data = 
+      list(
+        T = 131
+        ,S = 12
+        ,y = d$log_AirPassengers[d$t<132]
+        ,seasonality_index = seasonal_index[1:131]
+        ,season_index = season_index
+      )
+  )
+
+out <- extract(b)
+
+slope <- mean(out$slope[,131])
+
+trend <- mean(out$trend[,131]) + slope
+
+seasonal <- mean(out$season[,seasonal_index[132]])
+
+d$actual_and_forecast <- c(unlist(d[1:131,"log_AirPassengers"]),rep(NA,13))
+
+for(i in 132:144){
+
+seasonal <- mean(out$season[,seasonal_index[i]])
+    
+d$actual_and_forecast[i] <- trend + seasonal
+
+trend <- trend + slope
+
+}
+
+d$rstan_ll[132:144] <- d$actual_and_forecast[132:144]
+
+d$rstan_ll <- round(exp(d$rstan_ll),0)
+
+```
+
+```{r, echo = FALSE}
+
+rstan_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$rstan_ll[25:130])^2)
+
+rstan_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$rstan_ll[132:144])^2)
+
+```
+
+```{r secret_save4, echo = FALSE, eval = FALSE}
+
+save(d,b,rstan_onestep_forecast_mse,rstan_twelvestep_forecast_mse,file = "C:/Users/tmangin/Documents/out3.RData")
+
+```
+
+```{r secret_load4, echo = FALSE}
+
+load(file = "C:/Users/tmangin/Documents/out3.RData")
+
+out <- extract(b)
+
+```
+
+```{r, echo = FALSE}
+
+trend <- round(exp(apply(out$trend,MARGIN = 2,FUN = mean)),0)
+seasonal <- round(exp(apply(out$seasonal,MARGIN = 2,FUN = mean)),4)
+
+highchart() %>%
+hc_add_series(
+  data =  trend
+  ,type = "line"
+  ,name = "Trend"
+  ,marker = FALSE
+)%>%
+hc_exporting(enabled = TRUE)
+
+highchart() %>%
+hc_add_series(
+  data =  seasonal
+  ,type = "line"
+  ,name = "Seasonal"
+  ,marker = FALSE
+) %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+## Comparison
+
+Unfortunetly, I was still not able to get the rstan estimation to match the bsts estimation. My local linear trend model in rstan has a much worse fit than the same model estimated with bsts.
+
+```{r, echo = FALSE}
+
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,dashStyle = "ShortDot"
+  ,name = "bsts Local Linear"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "bsts_ll"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "actual"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "AirPassengers"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "rStan Local Linear"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "rstan_ll"
+  )
+) %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+```{r, echo = FALSE}
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = bsts_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = bsts_twelvestep_forecast_mse), caption = "Local Linear Trend, Fixed Seasonality Estimated with bsts")
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = rstan_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = rstan_twelvestep_forecast_mse), caption = "Local Linear Trend, Fixed Seasonality Estimated with rstan")
+
+```
+
+I still belive it might have something to do with the priors, but one more possibility I have considered is the upper limit that the SdPrior function in the Boom package allows. If I am reading it right, MCMC draws where the variance is above the specified limit are just thrown out. The [documentation](https://github.com/cran/Boom/blob/master/man/sd.prior.Rd) for Boom notes that not all MCMC algorithms support this, and I am not aware of that feature in rstan. 
+
+Overall, I actually like the estimated trend in rstan a little better - its flatter at the end of the series than the bsts estimate. But, it comes with a price in terms of accuracy.
+
+# Machine Learning Algorithms
+
+My understanding is that time series is more of a weak spot for many machine learning algorithms, at least realative to the classification tasks that many are best suited for. Certainly, cross validation doesn't make a ton of sense in a time series context.
+
+But, I have run across some [work](https://cran.r-project.org/web/packages/tsfknn/vignettes/tsfknn.html) trying to apply K-Nearest Neighbor Regression to time series, using the tsfknn package. And, the forecast package includes a function for a neural network model.
+
+## Estimation with nnetar
+
+The function nnetar in the forecast package fits a [neural network](https://www.rdocumentation.org/packages/forecast/versions/8.7/topics/nnetar) to a time series. Based on the documentation, it seems like it only tests lagged values of the series, which is probably a poor choice for this particular time series.
+
+```{r}
+
+d[,nnet := 0]
+
+#one-month ahead
+for (i in 24:131){
+  
+nn <- nnetar(d$log_AirPassengers[d$t<i], lambda=0.5)
+
+d[i,nnet := forecast(nn, h=1)$mean]
+
+}
+
+#one-year ahead
+
+nn <- nnetar(d$log_AirPassengers[d$t<132], lambda=0.5)
+
+d[132:144,nnet := forecast(nn, h=13)$mean]
+
+d[nnet == 0,nnet := NA]
+
+d[,nnet := round(exp(nnet),0)]
+
+```
+
+
+```{r, echo = FALSE}
+
+nnet_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$nnet[25:130])^2)
+
+nnet_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$nnet[132:144])^2)
+
+```
+
+
+## Estimation with tsfknn
+
+The tsfknn package fits a [k-means](https://www.rdocumentation.org/packages/tsfknn/versions/0.1.0/topics/knn_forecasting) clustering alogrithm to the data.
+
+```{r}
+
+d[,knn := 0]
+
+#one-month ahead
+for (i in 24:131){
+  
+k <- knn_forecasting(d$log_AirPassengers[d$t<i], h = 1, lags = c(1,12), k = 2)
+
+d[i,knn := k$prediction]
+
+}
+
+#one-year ahead
+
+k <- knn_forecasting(d$log_AirPassengers[d$t<132], h = 13, lags = c(1,12), k = 2)
+
+d[132:144,knn := k$prediction]
+
+d[knn == 0,knn := NA]
+
+d[,knn := round(exp(knn),0)]
+
+
+```
+
+```{r, echo = FALSE}
+
+knn_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$knn[25:130])^2)
+
+knn_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$knn[132:144])^2)
+
+```
+
+## Comparison
+
+Both methods are less accurate than the ARIMA forecast and the state-space models, although the neural net is not too far off. Notably, the k-means regression really does poorly in the 12-month-ahead forecast. This might be a bit unexpected, since the typial tradeoff offered by algorithmic estimation is higher accuracy with lower interpretability. But, in this case these particular algorithms seem limited by the choice of using lagged values as the relevant features. 
+
+```{r, echo = FALSE}
+
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,dashStyle = "ShortDot"
+  ,name = "Neural Network"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "nnet"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "actual"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "AirPassengers"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "K-Nearest Neighbors"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "knn"
+  )
+) %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+```{r, echo = FALSE}
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = nnet_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = nnet_twelvestep_forecast_mse), caption = "Neural Network with nnetar")
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = knn_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = knn_twelvestep_forecast_mse), caption = "K-Nearest Neighbors Regression with tsfknn")
+
+```
+
+
+# "Automatic" Forecasts 
+
+A few R packages have algorithms mean to 'automate' forecasts. The functions take a time series, and return a model without requiring a specification. The motivation offered for these types of routines is a setting where there are many, many time series to forecast, and the limiting factor is the time and effort to analyze and specify all of them. So, we probably shouldn't expect too much from these models, but also we shouldn't expect much from ourselves in terms of working with them. They are designed to be used without much thought, so I won't give them much.
+
+https://blog.exploratory.io/is-prophet-better-than-arima-for-forecasting-time-series-fa9ae08a5851
+
+## Estimation with Prophet
+
+Here's one:
+
+```{r, message = FALSE, eval = FALSE}
+
+# prophet requires columns named "ds" and "y"
+d$ds <- 
+  paste0(
+    as.numeric(d$year)
+    ,"-"
+    ,sprintf(
+      "%02d"
+      ,rep(seq(1,12,1),12)
+    )
+    ,"-01"
+  )
+
+d$y <- d$log_AirPassengers
+
+d[,prophet := 0]
+
+#one-month ahead
+for (i in 24:131){
+
+p <- prophet(d[t < i,.(ds,y)])
+  
+future <- make_future_dataframe(p, 1, freq = 'm')
+forecast <- predict(p, future)
+
+d[i,prophet := unlist(forecast[i,"yhat"])]
+
+}
+
+#one-year ahead
+p <- prophet(d[t < 132,.(ds,y)])
+  
+future <- make_future_dataframe(p, 13, freq = 'm')
+forecast <- predict(p, future)
+
+d[132:144,prophet := unlist(forecast[132:144,"yhat"])]
+
+d[prophet == 0,prophet := NA]
+
+d[,prophet := round(exp(prophet),0)]
+
+
+
+```
+
+```{r secretsave5, eval = FALSE, echo = FALSE}
+
+save(d,file = "C:/Users/tmangin/Documents/out5.RData")
+
+```
+
+```{r, echo = FALSE}
+
+load("C:/Users/tmangin/Documents/out5.RData")
+
+prophet_onestep_forecast_mse <- sum((d$AirPassengers[25:131]-d$prophet[25:131])^2)
+
+prophet_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$prophet[132:144])^2)
+
+```
+
+## Estimation with auto.arima
+
+Here's another one:
+
+```{r}
+
+d[
+  ,auto_arima := NA
+]
+
+#one-month ahead
+for (i in 24:131){
+
+m <- auto.arima(y = d[t < i,"log_AirPassengers"])
+
+d$auto_arima[i] <- round(exp(forecast(m)$mean[1]),0)
+
+}
+
+m <- auto.arima(y = d[t < 132,"log_AirPassengers"])
+
+d$auto_arima[132:144] <- round(exp(forecast(m)$mean[1:13]),0)
+
+
+```
+
+```{r, echo = FALSE}
+
+auto_onestep_forecast_mse <- sum((d$AirPassengers[25:131]-d$auto_arima[25:131])^2)
+
+auto_twelvestep_forecast_mse <- sum((d$AirPassengers[132:141]-d$auto_arima[132:141])^2)
+
+```
+
+## Comparison
+
+The auto.arima routine picks autoregressive lags, which seems like a poor choice for this time series. Prophet does better in terms of fit.
+
+```{r, echo = FALSE}
+
+highchart() %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,dashStyle = "ShortDot"
+  ,name = "auto.arima"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "auto_arima"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "actual"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "AirPassengers"
+  )
+) %>%
+hc_add_series(
+  data =  d
+  ,type = "line"
+  ,name = "prophet"
+  ,marker = FALSE
+  ,hcaes(
+    x = "month_year"
+    ,y = "prophet"
+  )
+)  %>%
+hc_exporting(enabled = TRUE)
+
+```
+
+Prophet also looks better in terms of prediction error, although worse than the manual specifications.
+
+```{r, echo = FALSE}
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = prophet_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = prophet_twelvestep_forecast_mse), caption = "Estimated with Prophet")
+
+pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = auto_onestep_forecast_mse,"One Year-Ahead Forecast MSE (1960)" = auto_twelvestep_forecast_mse), caption = "Estimated with auto.arima (forecast package)")
+
+```
 
