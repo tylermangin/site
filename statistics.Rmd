@@ -6,7 +6,7 @@ output:
     toc_float: true
 ---
 
-### [Time Series](time_series.html)
+### [Time Series](time_series.html) 
 
 I don't know if two post makes a series, but like the post on [Categorial Outcomes](individual_categorical_choices.html), this is my reference and laboratory for time series. 
 
