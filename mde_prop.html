@@ -369,11 +369,11 @@ print(diffs)</code></pre>
 <pre><code>##   MDE Below   MDE Above 
 ## -0.10918711  0.03557964</code></pre>
 <p>For fun, I went ahead and plotted the minimum detectable effect for all the sample sizes between 1 and 100.</p>
-<pre class="r"><code>diffs &lt;- replicate(replicate(rep(0,2),n = 99),n=100)
+<pre class="r"><code>diffs &lt;- replicate(replicate(rep(0,2),n = 99),n=50)
 
 k &lt;- 1
 
-for (k in 1:100){
+for (k in 1:50){
 
 j &lt;- 1
 
@@ -409,15 +409,33 @@ j &lt;- j + 1
 k &lt;- k + 1
 
 }</code></pre>
-<p>Each pair of lines is a sample size from n = 1 (grey) to n = 100 (black). The distance from y = 0 is the minimum difference above and below the reference proportion on the x-axis. Not bad sample size art.</p>
-<pre class="r"><code>grad &lt;- colorRampPalette(c(&quot;grey&quot;,&quot;black&quot;))
+<p>Each pair of lines is a sample size from n = 1 (orange) to n = 100 (blue). The distance from y = 0 is the minimum difference above and below the reference proportion on the x-axis. Not bad sample size art.</p>
+<pre class="r"><code>grad &lt;- colorRampPalette(c(&quot;#edda55&quot;,&quot;#003366&quot;))
 
-grey &lt;- grad(100)
+fill &lt;- grad(50)
 
-matplot(diffs[1,,], type = &quot;l&quot;, col = grey, ylim = c(-0.8,0.8),ylab = &quot;Minimum Difference&quot;,xlab = &quot;Reference Proportion (%)&quot;) 
-matplot(diffs[2,,], type = &quot;l&quot;, add = TRUE, col = grey) 
-abline(h = 0, lty = 2)</code></pre>
-<p><img src="mde_prop_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+
+matplot(
+  diffs[1,,]
+  ,type = &quot;l&quot;
+  ,col = fill
+  ,ylim = c(-1,1)
+  ,ylab = &quot;Minimum Difference&quot;
+  ,xlab = &quot;Reference Proportion (%)&quot;
+  ,lty = 1
+) 
+matplot(
+  diffs[2,,]
+  ,type = &quot;l&quot;
+  ,add = TRUE
+  ,col = fill
+  ,lty = 1
+) 
+legend(&quot;topright&quot;, inset=.02, title=&quot;Sample Size&quot;,
+   legend = c(1,10,20,30,40,50), fill=fill[c(1,10,20,30,40,50)])
+abline(h = 0, lty = 2)
+axis(side=2,at=seq(-1,1,0.1),labels=seq(-1,1,0.1))</code></pre>
+<p><img src="mde_prop_files/figure-html/unnamed-chunk-8-1.png" width="1152" /></p>
 
 
 
