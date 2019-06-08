@@ -268,10 +268,10 @@ shares &lt;- d[ ,.N ,by = class]
 shares[ ,share := N/sum(N)]
 
 pander(shares,round = 2)</code></pre>
-<table style="width:26%;">
+<table style="width:29%;">
 <colgroup>
 <col width="11%" />
-<col width="5%" />
+<col width="8%" />
 <col width="9%" />
 </colgroup>
 <thead>
@@ -283,28 +283,28 @@ pander(shares,round = 2)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">C</td>
-<td align="center">97</td>
-<td align="center">0.1</td>
-</tr>
-<tr class="even">
 <td align="center">A</td>
-<td align="center">662</td>
-<td align="center">0.66</td>
-</tr>
-<tr class="odd">
-<td align="center">B</td>
-<td align="center">185</td>
-<td align="center">0.18</td>
+<td align="center">671</td>
+<td align="center">0.67</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">56</td>
-<td align="center">0.06</td>
+<td align="center">36</td>
+<td align="center">0.04</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">198</td>
+<td align="center">0.2</td>
+</tr>
+<tr class="even">
+<td align="center">C</td>
+<td align="center">95</td>
+<td align="center">0.1</td>
 </tr>
 </tbody>
 </table>
-<p>I’ve found myself of being in roughly this position many times: the task is to make an individual-level prediction, but this is the only real information available. It’s a tough spot, and when I run this issue by other smart people, a common reaction is that the whole project it misguided. To that, I can only say: Defeatism is no plan. And, in fact, the highly-sophisticated, have-to-learn-it-in-grad-school econometric procedure known as <a href="BLP_estimation_cereal.html">BLP Estimation</a> is actually a form of this problem, but the baseline assumption there is that someone has already done the hard data work of scrounging up some <a href="individual_categorial_choices.html#alternative-specific_factors">alternative-specific factors</a> to do the estimation with the benefit of some actual information. But sometimes that isn’t the case.</p>
+<p>I’ve found myself of being in roughly this position many times: the task is to make an individual-level prediction, but this is the only real information available. It’s a tough spot, and when I run this issue by other smart people, a common reaction is that the whole project is doomed. That may be true, I can only say to them that defeatism is no plan. And, in fact, the highly-sophisticated, have-to-learn-it-in-grad-school econometric procedure known as <a href="BLP_estimation_cereal.html">BLP Estimation</a> is actually a form of this problem, but the baseline assumption there is that someone has already done the hard data work of scrounging up some <a href="individual_categorial_choices.html#alternative-specific_factors">alternative-specific factors</a> to do the estimation with the benefit of some actual information. But sometimes that isn’t the case.</p>
 <p>It seems to me there are two basic options, that are both accurate, but in very different ways. The first is to predict everyone is a member of the most common class.</p>
 <pre class="r"><code>m1 &lt;- rep(shares[share == max(share),class],1000)</code></pre>
 <p>The second is to randomly select everyone into a predicted class based on the observed aggregate shares.</p>
@@ -326,10 +326,10 @@ d[
 ]
 
 pander(summary(d[,.(hit1,hit2)])[4,1:2]) # m1 &gt; m2)</code></pre>
-<table style="width:33%;">
+<table style="width:39%;">
 <colgroup>
-<col width="16%" />
-<col width="16%" />
+<col width="19%" />
+<col width="19%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -339,8 +339,8 @@ pander(summary(d[,.(hit1,hit2)])[4,1:2]) # m1 &gt; m2)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">Mean :0.662</td>
-<td align="center">Mean :0.199</td>
+<td align="center">Mean :0.671</td>
+<td align="center">Mean :0.47</td>
 </tr>
 </tbody>
 </table>
@@ -370,10 +370,10 @@ shares[
 shares[is.na(shares2),shares2:=0]
 
 pander(shares)</code></pre>
-<table style="width:56%;">
+<table style="width:58%;">
 <colgroup>
 <col width="11%" />
-<col width="5%" />
+<col width="8%" />
 <col width="11%" />
 <col width="13%" />
 <col width="13%" />
@@ -389,32 +389,32 @@ pander(shares)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center">C</td>
-<td align="center">97</td>
-<td align="center">0.097</td>
-<td align="center">0</td>
-<td align="center">0.198</td>
-</tr>
-<tr class="even">
 <td align="center">A</td>
-<td align="center">662</td>
-<td align="center">0.662</td>
+<td align="center">671</td>
+<td align="center">0.671</td>
 <td align="center">1</td>
-<td align="center">0.095</td>
-</tr>
-<tr class="odd">
-<td align="center">B</td>
-<td align="center">185</td>
-<td align="center">0.185</td>
-<td align="center">0</td>
-<td align="center">0.653</td>
+<td align="center">0.671</td>
 </tr>
 <tr class="even">
 <td align="center">D</td>
-<td align="center">56</td>
-<td align="center">0.056</td>
+<td align="center">36</td>
+<td align="center">0.036</td>
 <td align="center">0</td>
-<td align="center">0.054</td>
+<td align="center">0.087</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">198</td>
+<td align="center">0.198</td>
+<td align="center">0</td>
+<td align="center">0.033</td>
+</tr>
+<tr class="even">
+<td align="center">C</td>
+<td align="center">95</td>
+<td align="center">0.095</td>
+<td align="center">0</td>
+<td align="center">0.209</td>
 </tr>
 </tbody>
 </table>
@@ -455,27 +455,27 @@ return(p)
 test &lt;- m(0.99)
 
 pander(test)</code></pre>
-<table style="width:43%;">
+<table style="width:56%;">
 <colgroup>
-<col width="6%" />
-<col width="11%" />
-<col width="12%" />
-<col width="12%" />
+<col width="9%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="center">A</th>
-<th align="center">C</th>
-<th align="center">B</th>
 <th align="center">D</th>
+<th align="center">B</th>
+<th align="center">C</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="center">0.99</td>
-<td align="center">0.00287</td>
-<td align="center">0.005473</td>
-<td align="center">0.001657</td>
+<td align="center">0.001094</td>
+<td align="center">0.006018</td>
+<td align="center">0.002888</td>
 </tr>
 </tbody>
 </table>
@@ -484,27 +484,27 @@ pander(test)</code></pre>
 test &lt;- m(0.75)
 
 pander(test)</code></pre>
-<table style="width:38%;">
+<table style="width:49%;">
 <colgroup>
-<col width="6%" />
-<col width="11%" />
 <col width="9%" />
-<col width="9%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="center">A</th>
-<th align="center">C</th>
-<th align="center">B</th>
 <th align="center">D</th>
+<th align="center">B</th>
+<th align="center">C</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="center">0.75</td>
-<td align="center">0.07175</td>
-<td align="center">0.1368</td>
-<td align="center">0.04142</td>
+<td align="center">0.02736</td>
+<td align="center">0.1505</td>
+<td align="center">0.07219</td>
 </tr>
 </tbody>
 </table>
@@ -513,27 +513,27 @@ pander(test)</code></pre>
 test &lt;- m(0.5)
 
 pander(test)</code></pre>
-<table style="width:35%;">
+<table style="width:47%;">
 <colgroup>
-<col width="5%" />
-<col width="9%" />
-<col width="9%" />
-<col width="9%" />
+<col width="8%" />
+<col width="13%" />
+<col width="12%" />
+<col width="12%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="center">A</th>
-<th align="center">C</th>
-<th align="center">B</th>
 <th align="center">D</th>
+<th align="center">B</th>
+<th align="center">C</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="center">0.5</td>
-<td align="center">0.1435</td>
-<td align="center">0.2737</td>
-<td align="center">0.08284</td>
+<td align="center">0.05471</td>
+<td align="center">0.3009</td>
+<td align="center">0.1444</td>
 </tr>
 </tbody>
 </table>
@@ -580,7 +580,7 @@ loss[j] &lt;-
 axis(1, at = 1:length(100:round((shares[,max(share)]*100),0))-1, labels = 100:round((shares[,max(share)]*100),0))</code></pre>
 <p><img src="indv_agg_accuracy_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <pre class="r"><code>(100 - which(loss == min(loss)))/100</code></pre>
-<pre><code>## [1] 0.81</code></pre>
+<pre><code>## [1] 0.82</code></pre>
 <p>Of course, this is just one loss function of many, so within this framework, you could set up any trade-off you want between individual-level accuracy and aggregate share accuracy.</p>
 <p>Or, you know, get some real data.</p>
 
