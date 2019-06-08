@@ -1,6 +1,9 @@
 ---
 title: "Time Series"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 I don't know if two post makes a series, but like the post on [Categorial Outcomes](individual_categorical_choices.html), this is my reference and laboratory for time series. 
@@ -584,6 +587,7 @@ d[
 ```
 
 ```{r, echo = FALSE}
+
 bsts_onestep_forecast_mse <- sum((d$AirPassengers[25:130]-d$bsts_ll[25:130])^2)
 
 bsts_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$bsts_ll[132:144])^2)
@@ -600,6 +604,7 @@ save(d,spec,ss,bsts_onestep_forecast_mse,bsts_twelvestep_forecast_mse,file = "C:
 ```{r secret_load2, echo = FALSE}
 
 load("C:/Users/tmangin/Documents/out2.RData")
+
 
 ```
 
@@ -843,6 +848,11 @@ load(file = "C:/Users/tmangin/Documents/out3.RData")
 
 out <- extract(b)
 
+
+d[1:24,rstan_ll := NA]
+
+d[1:24,bsts_ll := NA]
+
 ```
 
 ```{r, echo = FALSE}
@@ -1062,7 +1072,6 @@ pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = knn_onestep_forecast_m
 
 A few R packages have algorithms mean to 'automate' forecasts. The functions take a time series, and return a model without requiring a specification. The motivation offered for these types of routines is a setting where there are many, many time series to forecast, and the limiting factor is the time and effort to analyze and specify all of them. So, we probably shouldn't expect too much from these models, but also we shouldn't expect much from ourselves in terms of working with them. They are designed to be used without much thought, so I won't give them much.
 
-https://blog.exploratory.io/is-prophet-better-than-arima-for-forecasting-time-series-fa9ae08a5851
 
 ## Estimation with Prophet
 
