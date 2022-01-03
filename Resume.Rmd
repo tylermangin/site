@@ -3,25 +3,35 @@ title: "Resume"
 output: html_document
 ---
 
-[.pdf version](Resume.pdf)
+[.pdf version](Mangin Resume.pdf)
 
 ## Work Experience
 
+### Director of Research
+Comlinkdata
+July 2021 to Present
+
+* Developed modeling and oversaw implementation for a full upgrade of Comlinkdata’s flagship data product, ensuring key contract extensions and upselling for largest
+clients
+
 ### Economist
 Comlinkdata
-July 2016 to Present
+July 2016 to July 2021
 
-* Developed new revenue from digital audience engagement forecasting and estimation product 
+* Developed and deployed a full-industry-view model for Wireless and Device markets, integrating multiple points
+of internal and external information within a framework of constantly-updating Bayesian inference
 
-* Improved and extended market forecasting for financial services clients
+* Expanded forecasting offerings and improved data and modelling quality, driving growth in a underdeveloped industry vertical
+
 
 ### Senior Analyst
 Comlinkdata
 July 2016 to July 2017 
 
-* Created and productized individual-level model of consumer demand 
+* Developed and drove revenue growth from a novel digital audiences product based on individual-level model of
+consumer demand
 
-* Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem 
+* Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem
 
 ### Instructor
 University of Colorado
@@ -42,16 +52,14 @@ February 2012 to July 2013
 Whole Foods
 March 2009 to February 2012
 
-* Purchased \$1 million of produce each month
-* Created automated ordering system with underlying sales modeling and forecasting, leading to a 10% reduction in spoilage and waste
+• Purchased and maintained inventory for roughly /$10 million per year of fresh produce
+• Created novel sales-modeling and automated inventory tracking, leading to a 10% reduction in spoilage and waste
 
 
 ## Education
 
 ### PhD  
-Economics 
-Dissertation Completed: December 2018
-Official Graduation Date: May 2019
+Economics (May 2019)
 The University of Colorado
 
 
@@ -93,5 +101,6 @@ Advanced
 * STATA 
 * SQL (Microsoft, PostgresSQL)
 * R (data.table, markdown)
+* STAN (rstan)
 
 

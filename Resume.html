@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -22,9 +22,17 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
-<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -72,9 +80,8 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
+
 
 <style type = "text/css">
 .main-container {
@@ -88,7 +95,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -98,6 +104,9 @@ img {
 }
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -113,7 +122,6 @@ body {
   padding-top: 65px;
   margin-top: -65px;
 }
-
 .section h2 {
   padding-top: 65px;
   margin-top: -65px;
@@ -133,6 +141,43 @@ body {
 .section h6 {
   padding-top: 65px;
   margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -154,19 +199,74 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -214,25 +314,25 @@ $(document).ready(function () {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="mailto:tyler.mangin@gmail.com">
-    <span class="fa fa-envelope-o fa-2x"></span>
+    <span class="fas fa-envelope-o fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/tylermangin">
-    <span class="fa fa-github fa-2x"></span>
+    <span class="fas fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/RealTylerMangin">
-    <span class="fa fa-twitter fa-2x"></span>
+    <span class="fas fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
-    <span class="fa fa-linkedin fa-2x"></span>
+    <span class="fas fa-linkedin fa-2x"></span>
      
   </a>
 </li>
@@ -250,23 +350,30 @@ $(document).ready(function () {
 </div>
 
 
-<p><a href="Resume.pdf">.pdf version</a></p>
+<p><a href="Mangin%20Resume.pdf">.pdf version</a></p>
 <div id="work-experience" class="section level2">
 <h2>Work Experience</h2>
+<div id="director-of-research" class="section level3">
+<h3>Director of Research</h3>
+<p>Comlinkdata July 2021 to Present</p>
+<ul>
+<li>Developed modeling and oversaw implementation for a full upgrade of Comlinkdata’s flagship data product, ensuring key contract extensions and upselling for largest clients</li>
+</ul>
+</div>
 <div id="economist" class="section level3">
 <h3>Economist</h3>
-<p>Comlinkdata July 2016 to Present</p>
+<p>Comlinkdata July 2016 to July 2021</p>
 <ul>
-<li><p>Developed new revenue from digital audience engagement forecasting and estimation product</p></li>
-<li><p>Improved and extended market forecasting for financial services clients</p></li>
+<li><p>Developed and deployed a full-industry-view model for Wireless and Device markets, integrating multiple points of internal and external information within a framework of constantly-updating Bayesian inference</p></li>
+<li><p>Expanded forecasting offerings and improved data and modelling quality, driving growth in a underdeveloped industry vertical</p></li>
 </ul>
 </div>
 <div id="senior-analyst" class="section level3">
 <h3>Senior Analyst</h3>
 <p>Comlinkdata July 2016 to July 2017</p>
 <ul>
-<li><p>Created and productized individual-level model of consumer demand</p></li>
-<li><p>Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem</p></li>
+<li><p>Developed and drove revenue growth from a novel digital audiences product based on individual-level model of consumer demand</p></li>
+<li><p>Utilized and developed big data architecture for forecasting and estimation tasks utilizing R, Hive, Spark, and AWS ecosystem</p></li>
 </ul>
 </div>
 <div id="instructor" class="section level3">
@@ -288,10 +395,7 @@ $(document).ready(function () {
 <div id="produce-buyer" class="section level3">
 <h3>Produce Buyer</h3>
 <p>Whole Foods March 2009 to February 2012</p>
-<ul>
-<li>Purchased $1 million of produce each month</li>
-<li>Created automated ordering system with underlying sales modeling and forecasting, leading to a 10% reduction in spoilage and waste</li>
-</ul>
+<p>• Purchased and maintained inventory for roughly /$10 million per year of fresh produce • Created novel sales-modeling and automated inventory tracking, leading to a 10% reduction in spoilage and waste</p>
 </div>
 </div>
 <div id="education" class="section level2">
@@ -333,6 +437,7 @@ $(document).ready(function () {
 <li>STATA</li>
 <li>SQL (Microsoft, PostgresSQL)</li>
 <li>R (data.table, markdown)</li>
+<li>STAN (rstan)</li>
 </ul>
 </div>
 
@@ -345,7 +450,7 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
@@ -353,6 +458,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

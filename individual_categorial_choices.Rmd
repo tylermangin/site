@@ -7,6 +7,10 @@ output:
     toc_float: true
 ---
 
+
+http://rpubs.com/jimsavage/using_decisionmaker_variables_in_mixed_logit
+
+
 ```{r setup, warning = FALSE}
 
 library(data.table) # the best R package
@@ -440,6 +444,7 @@ standata <-
 
   beta <- 
     apply(pars$beta,colSums,MARGIN = 3)/4000
+  
 ```
 
 ```{r}
@@ -530,6 +535,31 @@ pander(shares[order(choice)],round = 2)
 
 colnames(shares) <- c("choice","N","share","est_share")
 
+
+```
+
+### Estimation with brms
+
+```{r}
+
+d_brms <-
+  cbind(
+    "choice" = U[,choice]
+    ,X
+  )
+
+mn_brms <- 
+  brm(
+    data = d_brms
+    ,choice ~ 0 + V1 + V2 + V3 + V4 + V5
+    ,family = "categorical"
+  )
+
+```
+
+```{r}
+
+pred(mn_brms)
 
 ```
 
@@ -845,7 +875,7 @@ pander(head(U[,c("person","choice","Ua","Ub","Uc","Ud")]),round =2)
 
 ### OLS Log-linear Estimation
 
-The first way to estimate in this situation is to use an algebra trick I won't show directly here - there are lot of places to find the derivation. But, my making the particular choices we did, in particular the specification of utility and the choice of the Type I extreme value errors, we can estimate $\gamma_1$ and $\gamma_2$ with a log-level OLS on the the shares $s_j$ relative to the share of the reference alternative $s_0$.
+The first way to estimate in this situation is to use an algebra trick I won't show directly here - there are lot of places to find the derivation. But, by making the particular choices we did, in particular the specification of utility and the choice of the Type I extreme value errors, we can estimate $\gamma_1$ and $\gamma_2$ with a log-level OLS on the the shares $s_j$ relative to the share of the reference alternative $s_0$.
 
 $$ ln(s_j) - ln(s_0) =   Z_j\gamma_j +  \epsilon_j$$
 Everyone loves OLS, right?
@@ -1377,6 +1407,42 @@ colnames(shares) <- c("choice","N","share","est_share")
 ```
 
 
+## Time Variation 
+
+```{r }
+
+gamma_a_t0 <- rnorm(1)
+gamma_b_t0 <- rnorm(1)
+gamma_b_t0 <- rnorm(1)
+gamma_b_t0 <- rnorm(1)
+
+gamma_a_t <- gamma_a_t0 + rnorm(n = 12)
+
+```
+
+
+```{r, echo = FALSE}
+
+Z <- rbind(Za,Zb,Zc,Zd)
+
+colnames(Z) <- c("Z1","Z2")
+
+rownames(Z) <- c("A","B","C","D")
+
+pander(Z,round = 2)
+
+```
+
+
+
+
+```{r}
+
+gamma1 <- 1
+gamma2 <- -Za[1]/Za[2]
+
+```
+.
 
 
 

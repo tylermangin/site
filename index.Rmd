@@ -6,7 +6,7 @@ output: html_document
 <br>
 
 
-#### From [Gold Hill, Colorado](https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183). Currently living in [Boston, Mass](https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178). 
+#### From [Gold Hill, Colorado](https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183), formerly of [Boston, Mass](https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178), now returned to [Denver, Colorado](https://www.google.com/maps/place/Union+Station/@39.7531332,-105.0087434,15z/data=!4m13!1m7!3m6!1s0x876c78c309781fbb:0xfa51804416e57e70!2sLoDo,+Denver,+CO+80202!3b1!8m2!3d39.7526509!4d-105.001685!3m4!1s0x876c78c3ae9274a1:0x7ab09dfe2be27660!8m2!3d39.7537055!4d-105.0008349).
 
 #### [Resume](Resume.html)
 

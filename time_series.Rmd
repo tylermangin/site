@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 
 ```
 
-I'm going to use the Airline Pasengers Data[^1], because its famous and everyone uses it ect. ect. ect. The observations are at the monthly level, running from January 1949 to December 1960. 
+I'm going to use the Airline Passengers Data[^1], because its famous and everyone uses it etc. etc. etc. The observations are at the monthly level, running from January 1949 to December 1960. 
 
 
 ```{r, echo =FALSE}
@@ -379,7 +379,7 @@ pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = bayes_onestep_forecast
 ```
 
 
-And, here is a comparison of the coefficent estimates for the first-order moving average. Notably, the Bayesian posterior distribution has a smaller standard deviation than the estimated standard error of the coefficent from the "classic"" ARIMA estimation.
+And, here is a comparison of the coefficient estimates for the first-order moving average. Notably, the Bayesian posterior distribution has a smaller standard deviation than the estimated standard error of the coefficient from the "classic"" ARIMA estimation.
 
 ```{r, echo = FALSE}
 
@@ -400,7 +400,7 @@ h1 <-
   hchart(h0) %>% 
   hc_yAxis(max = 175)  %>% 
   hc_xAxis(max = max, min = min) %>% 
-  hc_title(text = "Bayes MA1 Coefficent Estimate") %>% 
+  hc_title(text = "Bayes MA1 Coefficient Estimate") %>% 
   hc_plotOptions(series = list(showInLegend = FALSE))
 
 draws <- 
@@ -421,7 +421,7 @@ h2 <-
   hchart(h2) %>% 
   hc_yAxis(max = 175) %>% 
   hc_xAxis(max = max, min = min) %>% 
-  hc_title(text = "Simulated ARIMA MA1 Coefficent Estimates") %>% 
+  hc_title(text = "Simulated ARIMA MA1 Coefficient Estimates") %>% 
   hc_plotOptions(series = list(showInLegend = FALSE))
 
 hw_grid(h1, h2)
@@ -495,9 +495,9 @@ if (!missing(y)) {
 
 ```
 
-The SdPrior function comes from another package, Boom, by the same author, and specifices an inverse gamma prior for the variance parameter of the state components.
+The SdPrior function comes from another package, Boom, by the same author, and specifies an inverse gamma prior for the variance parameter of the state components.
 
-Since bsts was built explicity for state space models, it has default informative priors well-suited for the pariticular model. In particular, we really want most of the short-term variation to be described by the seasonal effects, so bsts applies prior information that the variation of the trend and slope components is small, so that those components evolve slowly. 
+Since bsts was built explicitly for state space models, it has default informative priors well-suited for the particular model. In particular, we really want most of the short-term variation to be described by the seasonal effects, so bsts applies prior information that the variation of the trend and slope components is small, so that those components evolve slowly. 
 
 So, now on to the estimation with bsts.
 
@@ -608,7 +608,7 @@ load("C:/Users/tmangin/Documents/out2.RData")
 
 ```
 
-Relative to the ARIMA model above, there is a tradeoff here. On the one hand this model has lower forecast accuracy.
+Relative to the ARIMA model above, there is a trade-off here. On the one hand this model has lower forecast accuracy.
 
 ```{r, echo = FALSE}
 
@@ -616,7 +616,7 @@ pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = bsts_onestep_forecast_
 
 ```
 
-On the other hand, we have more explanatory power, since we can describe the trend and seasonal components seperately.
+On the other hand, we have more explanatory power, since we can describe the trend and seasonal components separately.
 
 ```{r, echo = FALSE}
 
@@ -643,7 +643,7 @@ hc_exporting(enabled = TRUE)
 
 ```
 
-To my eye, the trend is overfit here, and picking up some of the seasonality at the end of the series. That indicates to me that the log transform isn't enough to completely stabilize the seasonality in this model. 
+To my eye, the trend is over-fit here, and picking up some of the seasonality at the end of the series. That indicates to me that the log transform isn't enough to completely stabilize the seasonality in this model. 
 
 ## Estimation with rstan
 
@@ -882,7 +882,7 @@ hc_exporting(enabled = TRUE)
 
 ## Comparison
 
-Unfortunetly, I was still not able to get the rstan estimation to match the bsts estimation. My local linear trend model in rstan has a much worse fit than the same model estimated with bsts.
+Unfortunately, I was still not able to get the rstan estimation to match the bsts estimation. My local linear trend model in rstan has a much worse fit than the same model estimated with bsts.
 
 ```{r, echo = FALSE}
 
@@ -930,13 +930,13 @@ pander(cbind("One-Month-Ahead Forecast MSE (1949-1959)" = rstan_onestep_forecast
 
 ```
 
-I still belive it might have something to do with the priors, but one more possibility I have considered is the upper limit that the SdPrior function in the Boom package allows. If I am reading it right, MCMC draws where the variance is above the specified limit are just thrown out. The [documentation](https://github.com/cran/Boom/blob/master/man/sd.prior.Rd) for Boom notes that not all MCMC algorithms support this, and I am not aware of that feature in rstan. 
+I still believe it might have something to do with the priors, but one more possibility I have considered is the upper limit that the SdPrior function in the Boom package allows. If I am reading it right, MCMC draws where the variance is above the specified limit are just thrown out. The [documentation](https://github.com/cran/Boom/blob/master/man/sd.prior.Rd) for Boom notes that not all MCMC algorithms support this, and I am not aware of that feature in rstan. 
 
 Overall, I actually like the estimated trend in rstan a little better - its flatter at the end of the series than the bsts estimate. But, it comes with a price in terms of accuracy.
 
 # Machine Learning Algorithms
 
-My understanding is that time series is more of a weak spot for many machine learning algorithms, at least realative to the classification tasks that many are best suited for. Certainly, cross validation doesn't make a ton of sense in a time series context.
+My understanding is that time series is more of a weak spot for many machine learning algorithms, at least relative to the classification tasks that many are best suited for. Certainly, cross validation doesn't make a ton of sense in a time series context.
 
 But, I have run across some [work](https://cran.r-project.org/web/packages/tsfknn/vignettes/tsfknn.html) trying to apply K-Nearest Neighbor Regression to time series, using the tsfknn package. And, the forecast package includes a function for a neural network model.
 
@@ -1017,9 +1017,11 @@ knn_twelvestep_forecast_mse <- sum((d$AirPassengers[132:144]-d$knn[132:144])^2)
 
 ```
 
+## Estimation with rnn
+
 ## Comparison
 
-Both methods are less accurate than the ARIMA forecast and the state-space models, although the neural net is not too far off. Notably, the k-means regression really does poorly in the 12-month-ahead forecast. This might be a bit unexpected, since the typial tradeoff offered by algorithmic estimation is higher accuracy with lower interpretability. But, in this case these particular algorithms seem limited by the choice of using lagged values as the relevant features. 
+Both methods are less accurate than the ARIMA forecast and the state-space models, although the neural net is not too far off. Notably, the k-means regression really does poorly in the 12-month-ahead forecast. This might be a bit unexpected, since the typical trade-off offered by algorithmic estimation is higher accuracy with lower interpretability. But, in this case these particular algorithms seem limited by the choice of using lagged values as the relevant features. 
 
 ```{r, echo = FALSE}
 
@@ -1175,7 +1177,7 @@ auto_twelvestep_forecast_mse <- sum((d$AirPassengers[132:141]-d$auto_arima[132:1
 
 ## Comparison
 
-The auto.arima routine picks autoregressive lags, which seems like a poor choice for this time series. Prophet does better in terms of fit.
+The auto.arima routine picks auto-regressive lags, which seems like a poor choice for this time series. Prophet does better in terms of fit.
 
 ```{r, echo = FALSE}
 

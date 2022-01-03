@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
 
-<title></title>
+<title>index.utf8</title>
 
 <script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,20 +22,27 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/htmlwidgets-0.8/htmlwidgets.js"></script>
-<link href="site_libs/leaflet-0.7.7/leaflet.css" rel="stylesheet" />
-<script src="site_libs/leaflet-0.7.7/leaflet.js"></script>
+<script src="site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
 <link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
-<link href="site_libs/leaflet-label-0.2.2/leaflet.label.css" rel="stylesheet" />
-<script src="site_libs/leaflet-label-0.2.2/leaflet.label.js"></script>
-<script src="site_libs/Proj4Leaflet-0.7.2/proj4-compressed.js"></script>
-<script src="site_libs/Proj4Leaflet-0.7.2/proj4leaflet.js"></script>
-<script src="site_libs/leaflet-binding-1.1.0/leaflet.js"></script>
-<script src="site_libs/leaflet-providers-1.0.27/leaflet-providers.js"></script>
-<script src="site_libs/leaflet-providers-plugin-1.1.0/leaflet-providers-plugin.js"></script>
-<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
-<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+<script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
+<script src="site_libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+<script src="site_libs/leaflet-providers-plugin-2.0.4.1/leaflet-providers-plugin.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -83,9 +90,8 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
+
 
 <style type = "text/css">
 .main-container {
@@ -99,7 +105,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -109,6 +114,9 @@ img {
 }
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -124,7 +132,6 @@ body {
   padding-top: 65px;
   margin-top: -65px;
 }
-
 .section h2 {
   padding-top: 65px;
   margin-top: -65px;
@@ -144,6 +151,43 @@ body {
 .section h6 {
   padding-top: 65px;
   margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -165,19 +209,74 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -225,25 +324,25 @@ $(document).ready(function () {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="mailto:tyler.mangin@gmail.com">
-    <span class="fa fa-envelope-o fa-2x"></span>
+    <span class="fas fa-envelope-o fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/tylermangin">
-    <span class="fa fa-github fa-2x"></span>
+    <span class="fas fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/RealTylerMangin">
-    <span class="fa fa-twitter fa-2x"></span>
+    <span class="fas fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
-    <span class="fa fa-linkedin fa-2x"></span>
+    <span class="fas fa-linkedin fa-2x"></span>
      
   </a>
 </li>
@@ -261,8 +360,8 @@ $(document).ready(function () {
 
 
 <p><br></p>
-<div id="from-gold-hill-colorado.-currently-living-in-boston-mass." class="section level4">
-<h4>From <a href="https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183">Gold Hill, Colorado</a>. Currently living in <a href="https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178">Boston, Mass</a>.</h4>
+<div id="from-gold-hill-colorado-formerly-of-boston-mass-now-returned-to-denver-colorado." class="section level4">
+<h4>From <a href="https://www.google.com/maps/place/Gold+Hill,+CO+80302/@40.0612355,-105.435797,14z/data=!3m1!4b1!4m5!3m4!1s0x876bc29818cda7a1:0xe7f1598da1300296!8m2!3d40.0633019!4d-105.4096183">Gold Hill, Colorado</a>, formerly of <a href="https://www.google.com/maps/place/Fenway+Park/@42.3466764,-71.0972178,15z/data=!4m5!3m4!1s0x0:0xa2800dcb647a5504!8m2!3d42.3466764!4d-71.0972178">Boston, Mass</a>, now returned to <a href="https://www.google.com/maps/place/Union+Station/@39.7531332,-105.0087434,15z/data=!4m13!1m7!3m6!1s0x876c78c309781fbb:0xfa51804416e57e70!2sLoDo,+Denver,+CO+80202!3b1!8m2!3d39.7526509!4d-105.001685!3m4!1s0x876c78c3ae9274a1:0x7ab09dfe2be27660!8m2!3d39.7537055!4d-105.0008349">Denver, Colorado</a>.</h4>
 </div>
 <div id="resume" class="section level4">
 <h4><a href="Resume.html">Resume</a></h4>
@@ -270,8 +369,8 @@ $(document).ready(function () {
 <div id="projects" class="section level4">
 <h4><a href="projects.html">Projects</a></h4>
 <p><img src="tyler-resized-final.png" width="328" style="display: block; margin: auto;" /></p>
-<div id="htmlwidget-3957f8092acf4a7d203f" style="width:672px;height:480px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3957f8092acf4a7d203f">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron",null,null,{"errorTileUrl":"","noWrap":false,"zIndex":null,"unloadInvisibleTiles":null,"updateWhenIdle":null,"detectRetina":false,"reuseTiles":false}]},{"method":"addCircles","args":[[42.9157315,41.1499734,41.1546866,42.3530286,42.3529822,42.3544342,42.3552022,42.3484607,42.3520611,42.355094,41.9152474,39.9891316,42.3528562,41.6038246,42.3532803,40.007168,42.355884,36.1443367,42.3515444,42.3683388,38.7119135,42.3582287,42.3541601,41.237925,42.3535082,42.3517415,42.3539013,41.134907,42.3546371,42.3524245,38.4578386,42.3543824,39.8603326,42.418264,42.3552495,42.3526247,42.3558541,42.3536056,42.3506727,42.3336692,41.7513256,39.9858184,42.3515266,42.3387666,42.3538442,42.3537436,42.3549957,42.913995,38.5348685,43.1620499,41.5813763,42.3156303,39.8586947,42.3493054,42.3550848,42.3532184,39.6686516,42.3830613,41.1431578,40.006732,42.3554679,42.352865,42.3486668,41.6170377,42.3515257,37.7428558,38.7422501,42.3511447,42.3532287,42.3523403,41.1500886,42.3549635,42.3207554,39.9972269,42.3529183,41.1055685,42.3529742,42.3528994,42.3583504,41.164022,38.470673,38.5349504,42.3530475,42.3524047,40.0101478,42.3553385,42.3763041,42.3542347,42.3554772,42.3957079,40.0079275,42.3529543,42.3539206,42.3548702,42.3536741,42.9963352,42.3530175,42.3537352,40.0070633,42.3536762,40.8137292,42.3530065,39.7400661,42.452337,42.3530573,40.0000888,39.6687879,42.3490015,40.940588,41.1482659,42.3537227,42.3503894,39.9956167,42.3528792,42.3529405,42.348736,42.3534641,42.3515267,39.9999736,40.7849391,42.3555245,42.3473892,42.3506416,41.1582463,42.3563733,38.5346544,40.9684832,42.3521406,42.3550441,42.3532543,41.1614836,42.3553806,42.9280232,42.3521621,42.3551977,42.3550744,36.1468972,42.3549411,42.3475854,39.9206746,38.7017437,42.3549886,42.3503073,42.3500525,42.3532889,40.7681003,42.3545124,40.0170735,41.1666425,39.9861802,41.1600703,40.0078414,42.3529251,41.1796749,42.3502553,40.7649385,42.3528038,41.1468692,42.3630644,42.3543245,36.1463153,41.1396656,42.3530349,39.9690234,42.3512181,39.597373,38.7090168,36.13153,42.3550004,39.9952192,36.1607016,42.3579572,42.3497637,40.0163448,42.3549508,42.3512665,42.3548611,36.1312771,42.3528997,42.3556189,42.3539816,40.0078272,38.712554,42.3496547,37.1013728,42.353298,42.3534164,39.9952308,37.1190416,39.7412076,42.3529534,42.3585412,40.0078313,42.3514691,41.1803081,42.3531064,42.3546669,42.3549361,42.3647006,40.7849151],[-70.8153414,-8.6172695,-112.0247224,-71.0848481,-71.0656504,-71.07247,-71.0608122,-71.0803106,-71.0907734,-71.0711115,-111.8144578,-105.1384375,-71.0765009,-70.6368457,-71.0570236,-105.273737,-71.0698645,-86.6650542,-71.0756446,-71.1226417,-9.1383232,-71.062804,-71.0836205,-8.6724933,-71.0729674,-71.1071274,-71.0555879,-8.615118,-71.054872,-71.0613512,-28.1735289,-71.0688438,-105.2355879,-71.1511208,-71.0553673,-71.0701538,-71.0613751,-71.0758918,-71.0947509,-71.0734699,-111.8344435,-105.2459855,-71.0757138,-71.0935012,-71.0717494,-71.0581127,-71.0550375,-70.8650529,-28.5289891,-111.0206054,-111.9743443,-71.104087,-104.6744194,-71.0836764,-71.0551591,-71.0768374,-105.0905515,-71.0765726,-8.614605,-105.2751956,-71.0604226,-71.0765351,-71.0742509,-111.9327127,-71.1074636,-25.6692818,-9.1223485,-71.0856979,-71.0788715,-71.0763858,-8.6196694,-71.0550014,-70.9297505,-105.1403722,-71.0766274,-7.9879243,-71.0766794,-71.0765718,-71.0706316,-7.7922309,-28.1879315,-28.5290977,-71.0780754,-71.0880008,-105.2693236,-71.0744062,-71.1398308,-71.0550768,-71.0602259,-71.0794687,-105.2739712,-71.0766968,-71.0746424,-71.0550827,-71.075834,-111.0488124,-71.0766928,-71.0557299,-105.2747435,-71.0573802,-111.9226366,-71.0766877,-105.0814315,-71.1589334,-71.0767027,-105.1885575,-105.0905328,-71.0801981,-111.8912913,-8.6204529,-71.0652723,-71.0756157,-105.1400624,-71.0765521,-71.0691032,-71.0885175,-71.0847849,-71.1049902,-105.1906981,-111.9811702,-71.0601302,-71.0757471,-71.0752912,-7.7835167,-71.0563329,-28.5283341,-111.8914708,-71.0759574,-71.1176417,-71.0767916,-7.7906512,-71.0751481,-70.8328192,-71.1135979,-71.0636698,-71.0551097,-86.6658267,-71.0597692,-71.074999,-105.1645121,-9.1760846,-71.071447,-71.0797963,-71.0795452,-71.0606237,-111.9856665,-71.0728828,-105.2705737,-7.5659833,-105.207145,-7.7884039,-105.2743959,-71.0765977,-7.8151765,-71.0758716,-111.8925629,-71.1150551,-8.6137946,-71.0163289,-71.0552942,-86.6653922,-8.6087318,-71.0767041,-105.1263827,-71.0756376,-104.8807264,-9.1332542,-86.668524,-71.0550549,-105.1399814,-86.7779142,-71.0624624,-71.0790598,-105.269435,-71.055039,-71.0755103,-71.0550618,-86.668817,-71.0765503,-71.0584173,-71.0586537,-105.2743461,-9.1339466,-71.082039,-8.0638812,-71.0608342,-71.0764883,-105.1402098,-8.5398947,-104.9816323,-71.0766334,-71.0522648,-105.2743454,-71.0803454,-7.8131003,-71.0572022,-71.0548384,-71.0549718,-71.0212797,-111.9811543],8,null,null,{"lineCap":null,"lineJoin":null,"clickable":true,"pointerEvents":null,"className":"","stroke":true,"color":"#000000","weight":5,"opacity":0.5,"fill":true,"fillColor":"#000000","fillOpacity":0.2,"dashArray":null},null,null,null,null,null,null]}],"limits":{"lat":[36.1312771,43.1620499],"lng":[-112.0247224,-7.5659833]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-628c54eacf32100f07c4" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-628c54eacf32100f07c4">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["CartoDB.Positron",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircles","args":[[42.3533702,42.3550804,42.3476211,42.3533006,42.3581111,39.7988161,42.3609631,42.3631307,38.7731911,42.3518386,42.3542147,42.350541,42.3520401,42.3529237,42.35335,41.6031471,42.355409,38.5345454,42.3549088,42.3529364,42.3222053,42.3529417,41.1504378,38.7117657,42.3645043,39.9646916,42.3530627,42.3446185,42.3555612,42.3534783,40.0078116,41.048001,42.3524285,42.3530007,42.3645659,42.3535285,42.352857,38.7118563,42.3553819,42.3487524,42.3507163,42.3494235,42.3531925,38.7481053,42.3527355,42.3631127,41.1584185,42.3566575,41.9521269,42.9359668,42.3554479,42.3475844,42.3662206,36.1580817,42.3522034,42.3553935,42.3542895,42.3507536,42.3528651,42.3518386,42.3533312,42.3533896,36.1609788,40.0135356,42.049586,40.0088306,38.6303619,42.3505119,38.5173032,42.3543296,42.3532275,43.4767348,43.5860069,38.7137429,40.7649385,42.3519246,42.36601,41.1468692,39.9954761,42.3537447,39.9871011,42.3529749,42.3534634,42.3545525,42.3555245,42.3521163,42.3531064,42.3551338,41.1802397,42.3530441,42.3588118,42.3535363,42.3592271,42.355122,42.9021091,40.8785289,42.3623605,42.3541814,42.3533389,42.3536164,41.180129,38.5273703,42.0450216,39.6588513,41.1498928,42.3529883,40.0093954,42.3517313,42.344428,42.3534183,42.3536974,42.3537492,36.1466672,42.3550073,40.0078328,41.1730142,38.7696606,41.1500319,42.3538727,41.180387,42.348616,42.3502558,42.3480165,42.3529466,42.3529324,42.3512239,38.7688618,42.3488927,42.3495833,42.35021,39.7301424,42.3612408,42.3554216,36.1369665,42.3530328,42.354974,42.353541,42.3544796,41.1802662,39.9673256,42.3525506,41.1805308,39.9603966,42.3534944,42.3544146,42.352895,40.0068098,42.350888,39.9869296,42.3489342,42.3529765,38.5047833,42.3528493,42.3554152,42.3525875,42.3507835,42.3552192,43.1632525,42.3544719,41.150011,42.9101116,42.3510682,42.3510204,42.3578129,41.1892328,42.356162,41.1497664,42.3529353,37.1189953,42.3529647,38.7264884,42.4423201,39.9877782,41.1431211,42.3524056,42.3512862,38.5281809,42.3545082,42.361075,40.000237,42.3530977,40.004619,42.3545403,36.2154936,42.354308,42.3530556,42.3554163,42.353579,42.3447295,42.361047,42.3692486,36.1406609,42.3534819,37.0788559,42.3529028,42.350878,40.0002271,42.3514053,42.339696,37.1178946],[-71.0740884,-71.0551081,-71.0800206,-71.0768304,-71.0704713,-104.9865574,-71.1161411,-71.0246794,-9.1310388,-71.0759562,-71.0809405,-71.0753904,-71.0892333,-71.0765808,-71.0765908,-70.6386606,-71.0601432,-28.5290924,-71.0605603,-71.0766557,-71.100759,-71.0765836,-8.6203916,-9.1363977,-71.1017501,-105.1644296,-71.0766859,-71.0994061,-71.0554652,-71.072382,-105.27434,-111.9582083,-71.1140845,-71.0765772,-71.1179527,-71.075991,-71.0765275,-9.139059,-71.0621054,-71.0739919,-71.0961248,-71.083312,-71.0767567,-105.1824777,-71.0761612,-71.0246615,-7.7839562,-71.0697152,-111.8134002,-70.7962741,-71.0601647,-71.0755181,-71.1178706,-86.7717309,-71.0811342,-71.060173,-71.0680844,-71.0862081,-71.0765587,-71.0759562,-71.0771362,-71.0626831,-86.7778283,-105.2724463,-70.1880002,-105.2676,-8.9017612,-71.0753378,-28.4915267,-71.0549035,-71.0641378,-110.8817121,-110.8289305,-9.1331503,-111.8925629,-71.1094021,-71.1177756,-8.6137946,-105.1405086,-71.075454,-105.1332931,-71.0766928,-71.0591143,-71.0620746,-71.0601302,-71.0765872,-71.0572022,-71.0551515,-7.8135405,-71.0766562,-71.0707361,-71.0576996,-71.0707659,-71.0551929,-70.8146734,-111.8966719,-71.0542449,-71.0695627,-71.0593368,-71.0759063,-7.8135705,-28.5361535,-70.1807353,-105.0816295,-7.7574266,-71.0782439,-105.271046,-71.0616795,-71.0747605,-71.0639849,-71.0558175,-71.0756465,-86.6654637,-71.0550259,-105.2743442,-7.8143742,-9.1168743,-8.6197298,-71.0645179,-8.1362768,-71.0884127,-71.0804069,-71.0823502,-71.0766425,-71.0783626,-71.0758886,-9.1298268,-71.0818703,-71.0637089,-71.089162,-105.2098251,-71.0699745,-71.0601325,-86.6673509,-71.0781744,-71.0550097,-71.0762521,-71.0792058,-7.8136122,-105.2129193,-71.0763954,-7.8145972,-105.1718198,-71.0617744,-71.0593693,-71.0765826,-105.2752442,-71.0820537,-105.1451144,-71.0847448,-71.0767821,-28.5067875,-71.0765311,-71.0601636,-71.0671088,-71.0974055,-71.073311,-111.0178384,-71.068737,-8.6131162,-70.8108878,-71.076958,-71.0649101,-71.0704185,-7.540346,-71.0531074,-8.6200493,-71.0766497,-8.5380047,-71.0766147,-9.1494223,-111.7568003,-105.1356114,-8.614775,-71.0807477,-71.1043898,-28.5353955,-71.0712016,-71.0707211,-105.252473,-71.0768072,-105.2700996,-71.0724802,-86.5946204,-71.0706016,-71.0633479,-71.0602723,-71.0642637,-71.097186,-71.057045,-71.1310696,-86.7216055,-71.0644,-8.6677561,-71.0766112,-71.0991955,-105.1478417,-71.1035454,-71.1003578,-8.5378598],8,null,null,{"interactive":true,"className":"","stroke":true,"color":"#000000","weight":5,"opacity":0.5,"fill":true,"fillColor":"#000000","fillOpacity":0.2},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]}],"limits":{"lat":[36.1369665,43.5860069],"lng":[-111.9582083,-7.540346]}},"evals":[],"jsHooks":[]}</script>
 </div>
 
 
@@ -283,7 +382,7 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
@@ -291,6 +390,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

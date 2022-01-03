@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Tyler Mangin" />
@@ -26,9 +26,17 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
-<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
-<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -76,9 +84,8 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
+
 
 <style type = "text/css">
 .main-container {
@@ -92,7 +99,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -102,6 +108,9 @@ img {
 }
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -117,7 +126,6 @@ body {
   padding-top: 65px;
   margin-top: -65px;
 }
-
 .section h2 {
   padding-top: 65px;
   margin-top: -65px;
@@ -137,6 +145,43 @@ body {
 .section h6 {
   padding-top: 65px;
   margin-top: -65px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -158,47 +203,66 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
-
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -212,6 +276,12 @@ $(document).ready(function ()  {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -247,8 +317,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -257,6 +325,16 @@ div.tocify {
 
 
 </style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
@@ -313,25 +391,25 @@ div.tocify {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="mailto:tyler.mangin@gmail.com">
-    <span class="fa fa-envelope-o fa-2x"></span>
+    <span class="fas fa-envelope-o fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://github.com/tylermangin">
-    <span class="fa fa-github fa-2x"></span>
+    <span class="fas fa-github fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/RealTylerMangin">
-    <span class="fa fa-twitter fa-2x"></span>
+    <span class="fas fa-twitter fa-2x"></span>
      
   </a>
 </li>
 <li>
   <a href="https://www.linkedin.com/in/tyler-mangin-72779197/">
-    <span class="fa fa-linkedin fa-2x"></span>
+    <span class="fas fa-linkedin fa-2x"></span>
      
   </a>
 </li>
@@ -345,7 +423,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">BLP Estimation on Cereal Data</h1>
-<h4 class="author"><em>Tyler Mangin</em></h4>
+<h4 class="author">Tyler Mangin</h4>
 
 </div>
 
@@ -362,10 +440,28 @@ div.tocify {
 </ol>
 <p>In these data, the share has been constructed, the products are indicated by the “brand” field, the markets are cities, and the product characteristics are price, the “mushiness” of the cereal, and the amount of sugar in the cereal.</p>
 <pre class="r"><code>  while(!require(AER)){install.packages(&quot;AER&quot;)}</code></pre>
-<pre><code>## Warning: package &#39;AER&#39; was built under R version 3.5.0</code></pre>
-<pre class="r"><code>  while(!require(SQUAREM)){install.packages(&quot;SQUAREM&quot;)}
-  while(!require(BB)){install.packages(&quot;BB&quot;)}</code></pre>
-<pre><code>## Warning: package &#39;BB&#39; was built under R version 3.5.0</code></pre>
+<pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, : there is no package
+## called &#39;AER&#39;</code></pre>
+<pre><code>## package &#39;sandwich&#39; successfully unpacked and MD5 sums checked
+## package &#39;Formula&#39; successfully unpacked and MD5 sums checked
+## package &#39;AER&#39; successfully unpacked and MD5 sums checked
+## 
+## The downloaded binary packages are in
+##  C:\Users\tmangin\AppData\Local\Temp\Rtmpecbgpw\downloaded_packages</code></pre>
+<pre class="r"><code>  while(!require(SQUAREM)){install.packages(&quot;SQUAREM&quot;)}</code></pre>
+<pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, : there is no package
+## called &#39;SQUAREM&#39;</code></pre>
+<pre><code>## package &#39;SQUAREM&#39; successfully unpacked and MD5 sums checked
+## 
+## The downloaded binary packages are in
+##  C:\Users\tmangin\AppData\Local\Temp\Rtmpecbgpw\downloaded_packages</code></pre>
+<pre class="r"><code>  while(!require(BB)){install.packages(&quot;BB&quot;)}</code></pre>
+<pre><code>## Warning in library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, : there is no package
+## called &#39;BB&#39;</code></pre>
+<pre><code>## package &#39;BB&#39; successfully unpacked and MD5 sums checked
+## 
+## The downloaded binary packages are in
+##  C:\Users\tmangin\AppData\Local\Temp\Rtmpecbgpw\downloaded_packages</code></pre>
 <pre class="r"><code>  while(!require(plyr)){install.packages(&quot;plyr&quot;)}
 
 
@@ -391,9 +487,7 @@ div.tocify {
 <p>Additionally, although income <span class="math inline">\(y_i\)</span> is important for theory, it drops out of the estimation (exactly at which step is indicated below), so I will exclude that from here on out as well.</p>
 <p>That makes my simplified, less pedagogic version of the above :</p>
 <p><span class="math display">\[u_{ijm} = x_{jm}\theta_{i} + \xi_{jm} + \epsilon_{ijm} \]</span> (Equation 1)</p>
-</div>
-<div id="defining-markets-and-market-shares" class="section level3">
-<h3>Defining Markets and Market Shares</h3>
+<p>###Defining Markets and Market Shares</p>
 <p>These data are not at an individual level, so we will express demand in terms of market share. In this data set, most of the process has been done, so that we are given the set of shares.</p>
 <p>Observed market shares are defined in theory as <span class="math inline">\(s_{jm} = q_{jm}/M\)</span>. Technically, <span class="math inline">\(\sum_J q_{jm} = M\)</span> but, the practice usually used is to define a market <span class="math inline">\(M\)</span> based on some population measure. Almost surely, the sum of observed <span class="math inline">\(q\)</span> across all the choices is smaller than <span class="math inline">\(M\)</span>, which creates take a set of <span class="math inline">\(s_{jm}\)</span> that do not sum to 1 across <span class="math inline">\(j\)</span>.</p>
 <pre class="r"><code>  #market object
@@ -419,12 +513,9 @@ div.tocify {
   sum1 &lt;- temp$x[match(mkt.id, temp$mkt.id)];
   s.j0 &lt;- as.vector(1 - sum1);
   rm(temp, sum1);</code></pre>
-</div>
-<div id="models" class="section level2">
-<h2>Models</h2>
+<p>##Models</p>
 <p>How the model is estimated depends crucially on what assumptions are made on how <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> vary across individuals.</p>
-<div id="the-logit-model" class="section level3">
-<h3>The Logit Model</h3>
+<p>###The Logit Model</p>
 <p>If it is assumed that all consumer heterogeneity is captured in <span class="math inline">\(\epsilon_{ijm}\)</span>, then equation 1 becomes:</p>
 <p><span class="math display">\[u_{ijm} = x_{jm}\theta + \xi_{jm} + \epsilon_{ijm} \]</span></p>
 <p>Importantly, that means that <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are the same across all consumers, so <span class="math inline">\(\theta_{i}\)</span> is now just <span class="math inline">\(\theta = [\alpha, \beta]\)</span>, which does not vary across <span class="math inline">\(i\)</span>.</p>
@@ -528,11 +619,10 @@ div.tocify {
     tsls.se &lt;- sqrt(diag(PX.inv %*% t(X.hat) %*% X.hat %*% PX.inv))
     # print(&quot;GMM step 2 updated theta1 estimate:&quot;)
     # print(beta.est &lt;- data.frame(beta.est = theta1, se.est = tsls.se))
-  }
-  dat[, &quot;xi.hat&quot;] &lt;- xi.hat</code></pre>
-</div>
-<div id="random-coefficents" class="section level3">
-<h3>Random Coefficents</h3>
+  }</code></pre>
+<pre><code>## Warning in if (&quot;matrix&quot; == class(W.inv)) {: the condition has length &gt; 1 and only the first element will be used</code></pre>
+<pre class="r"><code>  dat[, &quot;xi.hat&quot;] &lt;- xi.hat</code></pre>
+<p>###Random Coefficents</p>
 <p>If <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> are individual-specific parameters, we need to model their distribution. A common way of doing this is to assume <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_i\)</span> follow a multivariate normal. If <span class="math inline">\(v_i\)</span> is an individual’s deviation from the average, then this assumption amounts to</p>
 <p><span class="math display">\[ \begin{bmatrix} \alpha_i \\ \beta_i \end{bmatrix}  \sim N(\begin{bmatrix} \alpha \\ \beta \end{bmatrix},\Sigma v_i)\]</span></p>
 <p>In aggregate market data, consumers are not observed, and so the <span class="math inline">\(v_i\)</span> are simulated.</p>
@@ -557,7 +647,6 @@ div.tocify {
 <p><span class="math display">\[ s_{jm}(x_m,p_m,\delta_m; \theta_2) = \int_{m_{j}} dP^*(v,\epsilon) \]</span></p>
 <p>Let <span class="math inline">\(S\)</span> be the actual observed shares in the data, as opposed to the model’s shares <span class="math inline">\(s\)</span>. The estimation algorithm becomes</p>
 <p><span class="math display">\[ Min_{\delta_m,\theta_2} || s_{jm}(x_m,p_m;\delta_m, \theta_2) - S  || \]</span></p>
-</div>
 </div>
 <div id="optimization-routine" class="section level2">
 <h2>Optimization routine</h2>
@@ -762,13 +851,56 @@ div.tocify {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
